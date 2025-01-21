@@ -6,8 +6,10 @@
 package eus.tartanga.crud.model;
 
 import java.io.Serializable;
+import java.sql.Time;
 import java.util.Date;
 import java.util.List;
+import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -26,6 +28,7 @@ public class Concert implements Serializable {
 
     private byte[] billboard;
 
+    @NotNull(message = "concertName.required")
     private String concertName;
 
    
