@@ -1,0 +1,219 @@
+/* ------------------ Estilos Generales ------------------ */
+* {
+    -fx-light-blue: #d9edf4;
+    -fx-blue: #c0c9e6;
+    -fx-darker-blue: #7573d6;
+    -fx-secondary-color: #8f9bbf;
+    -fx-pink: #fdd3e1;
+    -fx-pink-darker:#ffb6c1;
+    -fx-yellow: #f9eccf;
+    -fx-yellow-darker: #f7dc9e;
+}
+
+/* ------------------ Estilos de Fondo ------------------ */
+.background-pane {
+    -fx-background-image: url("/eus/tartanga/crud/resources/fondo.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: cover;
+    -fx-background-position: center; 
+}
+
+/* ------------------ Estilos de la TableView ------------------ */
+.table-view {
+    -fx-border-color: -fx-blue;    
+    -fx-border-width: 1px;        
+}
+
+/* Customize the scrollbar inside TableView */
+.table-view .scroll-bar {
+    -fx-background-color: -fx-yellow; /* Background of the scrollbar */
+}
+
+/* Customize the track of the scrollbar */
+.table-view .scroll-bar .track {
+    -fx-background-color: -fx-yellow; /* Track color */
+}
+
+/* Customize the thumb (the draggable part) */
+.table-view .scroll-bar .thumb {
+    -fx-background-color: -fx-light-blue; /* Thumb color */
+    -fx-border-color: -fx-blue;
+}
+
+.table-view .column-header {
+    -fx-background-color: -fx-light-blue;
+    -fx-border-color: -fx-blue;
+    -fx-alignment: CENTER;
+}
+
+.table-row-cell {
+    -fx-background-color: #fdd3e1; 
+}
+
+/* ------------------ Estilos para Botones ------------------ */
+.yellow-button {
+    -fx-background-color: -fx-yellow;
+    -fx-padding: 5px;
+    -fx-border-radius: 3px;
+}
+
+.yellow-button:hover {
+    -fx-background-color: -fx-yellow-darker;
+}
+
+/* ------------------ Estilos de DatePicker ------------------ */
+.date-picker {
+    -fx-pref-height: 36px;
+    -fx-pref-width: 180px;
+}
+
+.date-picker .arrow-button {
+    -fx-background-color: -fx-blue;
+    -fx-background-radius: 0;
+    -fx-border-color: #7573d6;     
+    -fx-border-width: 1px; 
+}
+.date-picker .arrow-button:hover {
+    -fx-background-color: -fx-secondary-color;
+}
+.date-picker .arrow-button .arrow {
+    -fx-background-color: black;
+    -fx-padding: 0.8em 0.8em 0.5em 0.5em;   
+}
+
+.date-picker .selected {
+    -fx-background-color: -fx-pink-darker;
+    -fx-text-fill: black;
+}
+
+.date-picker-popup  {
+    -fx-border-color: black;
+}
+
+.date-picker-popup > * > .day-cell:hover {
+    -fx-background-color: -fx-pink;
+    -fx-text-fill: black;
+}
+
+.date-picker-popup > * > .day-name-cell,
+.date-picker-popup > * > .week-number-cell {
+    -fx-background-color: -fx-light-blue;
+    -fx-font-size: 1em; 
+}
+.date-picker-popup .month-year-pane {
+    -fx-background-color: -fx-blue;
+    -fx-padding: 0.5em 5em 0.8em 0.7em;
+}
+
+.date-picker-popup .month-year-pane .label {
+    -fx-text-fill: black;
+    -fx-font-size: 1.2em;
+}
+.date-picker-popup .week-number-cell {
+    -fx-text-fill: -fx-secondary-color;
+}
+.date-picker-popup .spinner .button .left-arrow,
+.date-picker-popup .spinner .button .right-arrow {
+    -fx-background-color: -fx-yellow;
+    -fx-padding: 0.5em 0.3em 0.5em 0.3em;
+}
+
+.date-picker-popup > * > .spinner > .button:hover {
+    -fx-background-color: transparent;
+}
+
+.date-picker-popup > * > .spinner > .button:hover > .left-arrow,
+.date-picker-popup > * > .spinner > .button:hover > .right-arrow {
+    -fx-background-color: -fx-pink-darker;
+    -fx-padding: 0.5em 0.3em 0.5em 0.3em;
+}
+
+.date-picker-popup > * > .previous-month,
+.date-picker-popup > * > .next-month {
+    -fx-background: -fx-yellow;
+}
+.date-picker .text-field {
+    -fx-background-color: -fx-blue;
+    -fx-text-fill: black;          
+    -fx-border-color: #7573d6;     
+    -fx-border-width: 1px;         
+}
+
+/* ------------------ Estilos de CheckBox ------------------ */
+.check-box {
+    -fx-background-color: -fx-blue; 
+    -fx-padding: 4; 
+    -fx-border-color: -fx-darker-blue;
+}
+.check-box .box {
+    -fx-background-color: #f9eccf;
+    -fx-border-color: -fx-darker-blue;          
+    -fx-padding: 2px;             
+
+}
+
+.check-box .box .mark {
+    -fx-background-color: transparent;     
+}
+
+.check-box:selected .box .mark {
+    -fx-background-color: -fx-darker-blue; 
+}
+
+.text-field{
+    -fx-background-color: -fx-blue; 
+    -fx-border-color: -fx-darker-blue;
+}
+
+/* ------------------ Estilos para el Menú ------------------ */
+/*MENU BAR*/
+.menu-bar{
+    -fx-padding: 0; /* Elimina cualquier relleno interno */
+    -fx-spacing: 0; /* Elimina cualquier espaciado entre menús */
+    -fx-background-color: -fx-yellow; /* Color de fondo si es necesario */
+    -fx-border-color: #bfbadd; /* Margen visual para el MenuBar */
+    -fx-border-width: 1px; /* Grosor del borde (margen visual) */
+    -fx-border-style: solid; /* Define que sea un borde sólido */
+}
+
+/* Estilo para los Menús dentro del MenuBar */
+.menu-bar .menu {
+    -fx-border-color: #bfbadd; /* Margen para cada menú */
+    -fx-border-width: 1px; /* Grosor del margen */
+    -fx-padding: 5px; /* Espaciado interno */
+    -fx-text-fill: black; /* Texto negro */
+}
+
+/* Estilo para el fondo cuando se pasa el ratón */
+.menu-bar .menu:hover {
+    -fx-background-color: -fx-pink;
+    -fx-border-color: #bfbadd; /* Mantiene el color del margen */
+
+}
+/* Estilo para el texto del menú cuando se pasa el ratón */
+.menu-bar .menu:hover .label {
+    -fx-text-fill: black; /* Cambia el color del texto a negro */
+}
+
+/* Estado seleccionado del menú */
+.menu-bar .menu:showing {
+    -fx-background-color: -fx-pink; /* Cambia el azul por amarillo */
+    -fx-border-color: #bfbadd; /* Mantiene el borde */
+}
+/*MENU ITEMS*/
+/* Fondo amarillo para los MenuItems */
+.menu-item {
+    -fx-background-color: -fx-yellow;
+    -fx-text-fill: black; /* Asegura que el texto sea visible */
+    -fx-border-color: #bfbadd; /* Color del margen */
+    -fx-border-width: 1px; /* Tamaño del margen */
+    -fx-border-style: solid; /* Define que sea un borde sólido */
+}
+
+/* Fondo rosita al pasar el ratón sobre los MenuItems */
+.menu-item:hover {
+    -fx-background-color: -fx-pink;
+    -fx-text-fill: black; /* Asegura que el texto siga siendo visible */
+    -fx-border-color: #bfbadd;
+
+}
