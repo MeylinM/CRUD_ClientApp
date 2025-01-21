@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+
+<MenuBar fx:id="menu" prefHeight="32.0" prefWidth="161.0" stylesheets="@../css/styles.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eus.tartanga.crud.userInterface.controllers.MenuBarViewController">
+    <menus>
+        <Menu fx:id="profile">
+            <graphic>
+                <ImageView fx:id="profileIcon" fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <Image url="@../../app/resources/profile.png" />
+                    </image>
+                </ImageView>
+            </graphic>
+            <items>
+                <MenuItem fx:id="itemProfile" text="Profile" onAction ="#openProfile" />
+                <MenuItem fx:id="itemMyOrders" text="MyOrders" onAction = "#openMyOrders"/>
+                <MenuItem fx:id="itemLogOut" text="LogOut" onAction = "#logOut" />
+            </items>
+        </Menu>
+        <Menu fx:id="itemArtist" text="Artist" onAction ="#openArtist" />
+        <Menu fx:id="itemMyCart" text="MyCart" onAction ="#openMyCart" />
+        <Menu fx:id="itemHelp" text="Help">
+            <items>
+                <MenuItem fx:id="itemHelpArtist" text="Help Artist" onAction ="#showHelpArtist"/>
+                <MenuItem fx:id="itemHelpConcert" text="Help Concert" onAction ="#showHelpConcert" />
+                <MenuItem fx:id="itemHelpProduct" text="Help Product" onAction ="#showHelpProduct" />
+                <MenuItem fx:id="itemHelpCart" text="Help Cart" onAction ="#showHelpCart"/>
+                <MenuItem fx:id="itemHelpOrder" text="Help Order" onAction ="#showHelpOrder"/>
+            </items>
+        </Menu>
+    </menus>
+</MenuBar>
