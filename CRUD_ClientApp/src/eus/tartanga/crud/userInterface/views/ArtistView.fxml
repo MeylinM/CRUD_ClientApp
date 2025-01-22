@@ -1,14 +1,98 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.net.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eus.tartanga.crud.userInterface.controllers.ArtistViewController">
-    <stylesheets>
-        <URL value="@/eus/tartanga/crud/userInterface/css/styles.css"/>
-    </stylesheets>
-</AnchorPane>
+<VBox prefHeight="768.0" prefWidth="1366.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eus.tartanga.crud.userInterface.controllers.ArtistViewController">
+    <fx:include fx:id="menuBar" source="MenuBarView.fxml" />
+    <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="742.0" prefWidth="1369.0" styleClass="background-pane" stylesheets="@../css/styles.css" VBox.vgrow="ALWAYS">
+         <children>
+            <VBox alignment="CENTER" fillWidth="false" layoutX="45.0" layoutY="148.0" prefHeight="557.0" prefWidth="1278.0" spacing="10.0" stylesheets="@styles.css">
+               <children>
+                  <HBox alignment="CENTER_LEFT" prefHeight="66.0" prefWidth="1278.0">
+                     <children>
+                        <TextField fx:id="searchField" prefHeight="42.0" prefWidth="429.0" promptText="Search products...">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </TextField>
+                        <ImageView fitHeight="62.0" fitWidth="53.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../app/resources/lupa.png" />
+                           </image>
+                        </ImageView>
+                        <HBox alignment="CENTER_RIGHT" prefHeight="66.0" prefWidth="816.0">
+                           <children>
+                              <DatePicker prefHeight="37.0" prefWidth="137.0" promptText="From...">
+                                 <HBox.margin>
+                                    <Insets right="25.0" />
+                                 </HBox.margin>
+                              </DatePicker>
+                              <DatePicker promptText="To..." />
+                           </children>
+                        </HBox>
+                     </children>
+                  </HBox>
+                  <TableView fx:id="artistTable" prefHeight="400.0" prefWidth="1279.0">
+                        <columns>
+                            <TableColumn fx:id="artistColumn" prefWidth="210.0" style="-fx-alignment: center;" text="Artist" />
+                            <TableColumn fx:id="nameColumn" prefWidth="210.0" style="-fx-alignment: center-left;" text="Name" />
+                            <TableColumn fx:id="companyColumn" prefWidth="230.0" style="-fx-alignment: center-left;" text="Company" />
+                            <TableColumn fx:id="lastAlbumColumn" prefWidth="370.0" style="-fx-alignment: center-left;" text="Last Album" />
+                            <TableColumn fx:id="debutColumn" prefWidth="210.0" style="-fx-alignment: center-left;" text="Debut" />
+                        </columns>
+                    </TableView>
+                  <HBox prefHeight="30.0" prefWidth="1255.0" spacing="373.0">
+                     <children>
+                        <HBox prefHeight="30.0" prefWidth="1258.0" spacing="30.0">
+                           <children>
+                              <Button fx:id="addButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="125.0" styleClass="yellow-button" text="Add Artist">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Button>
+                              <Button fx:id="deleteButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="125.0" styleClass="yellow-button" text="Delete Artist">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets right="680.0" />
+                                 </HBox.margin>
+                              </Button>
+                              <Button fx:id="concertsButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="125.0" styleClass="yellow-button" text="Concerts">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Button>
+                              <Button fx:id="shopButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="125.0" styleClass="yellow-button" text="Shop">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Button>
+                           </children>
+                        </HBox>
+                     </children>
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                  </HBox>
+               </children>
+            </VBox>
+            <ImageView fx:id="artistImg" fitHeight="155.0" fitWidth="507.0" layoutX="431.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../app/resources/ArtistTittle.png" />
+               </image>
+            </ImageView>
+         </children>
+    </AnchorPane>
+</VBox>

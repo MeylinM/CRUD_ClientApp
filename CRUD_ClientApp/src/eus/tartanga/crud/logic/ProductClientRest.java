@@ -22,8 +22,10 @@ import javax.ws.rs.core.GenericType;
  *        client.close();
  * </pre>
  *
- * @author 2dam
+ * @author ELBIRE
  */
+
+//CAMBIA LOS TRHOWS LOCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 public class ProductClientRest implements ProductManager{
 
     private WebTarget webTarget;
