@@ -16,7 +16,11 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import eus.tartanga.crud.logic.CartManager;
 import eus.tartanga.crud.model.Cart;
+import eus.tartanga.crud.userInterface.controllers.ProductViewController;
+import java.io.IOException;
 import java.util.List;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javax.ws.rs.core.GenericType;
 
 /**
@@ -26,41 +30,29 @@ import javax.ws.rs.core.GenericType;
 public class CRUD_ClientApp extends Application {
     
     @Override
-    public void start(Stage primaryStage) {
-        Button btn = new Button();
-        btn.setText("Say 'Hello World'");
-        btn.setOnAction(new EventHandler<ActionEvent>() {
-            
-            @Override
-            public void handle(ActionEvent event) {
-                System.out.println("Hello World!");
-            }
-        });
-        
-        StackPane root = new StackPane();
-        root.getChildren().add(btn);
-        
-        Scene scene = new Scene(root, 300, 250);
-        
-        primaryStage.setTitle("Hello World!");
-        primaryStage.setScene(scene);
-        primaryStage.show();
+    public void start(Stage stage) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ProductView.fxml"));
+        Parent root = (Parent) loader.load();
+        //Scene scene = new Scene(root);
+        ProductViewController controller = ((ProductViewController) loader.getController());
+        controller.setStage(stage);
+        controller.initStage(root);
     }
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) throws ReadException {
-        //launch(args); ayudajjjs
+        launch(args);
         
         
-        List<Cart> carts = CartFactory.getCartManager().findAllBoughtProducts_XML(new GenericType<List<Cart>>() {});
+        /*List<Cart> carts = CartFactory.getCartManager().findAllBoughtProducts_XML(new GenericType<List<Cart>>() {});
         for(Cart c : carts){
             System.out.println("------------------------------");
             System.out.println(c.getClient().getFullName());
             System.out.println(c.getOrderDate());
             System.out.println(c.getProduct().getTitle());
-        }
+        }*/
         
     }
     

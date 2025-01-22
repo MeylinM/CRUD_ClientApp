@@ -12,7 +12,7 @@
 
 /* ------------------ Estilos de Fondo ------------------ */
 .background-pane {
-    -fx-background-image: url("file:src/eus/tartanga/crud/app/resources/fondo.png");
+    -fx-background-image: url("../../app/resources/fondo.png");
     -fx-background-repeat: no-repeat;
     -fx-background-size: cover;
     -fx-background-position: center; 

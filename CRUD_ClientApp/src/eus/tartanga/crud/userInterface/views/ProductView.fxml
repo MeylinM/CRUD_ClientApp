@@ -1,14 +1,112 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.net.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eus.tartanga.crud.userInterface.controllers.ProductViewController">
-    <stylesheets>
-        <URL value="@/eus/tartanga/crud/userInterface/css/styles.css"/>
-    </stylesheets>
-</AnchorPane>
+<VBox prefHeight="768.0" prefWidth="1366.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eus.tartanga.crud.userInterface.controllers.ProductViewController">
+  <children>
+    <MenuBar stylesheets="@../css/styles.css" VBox.vgrow="NEVER">
+      <menus>
+        <Menu mnemonicParsing="false" text="Profile">
+        </Menu>
+        <Menu mnemonicParsing="false" text="Artist">
+        </Menu>
+        <Menu mnemonicParsing="false" text="Help">
+        </Menu>
+        <Menu mnemonicParsing="false" text="---">
+               <items>
+                  <MenuItem mnemonicParsing="false" text="LogOut" />
+                  <MenuItem mnemonicParsing="false" text="Exit" />
+               </items></Menu>
+      </menus>
+    </MenuBar>
+    <AnchorPane fx:id="productAnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="742.0" prefWidth="1369.0" styleClass="background-pane" stylesheets="@../css/styles.css" VBox.vgrow="ALWAYS">
+         <children>
+            <VBox alignment="CENTER" fillWidth="false" layoutX="45.0" layoutY="148.0" prefHeight="557.0" prefWidth="1278.0" spacing="10.0" stylesheets="@styles.css">
+               <children>
+                  <HBox alignment="CENTER_LEFT" prefHeight="66.0" prefWidth="1278.0">
+                     <children>
+                        <TextField fx:id="searchField" prefHeight="42.0" prefWidth="429.0" promptText="Search products...">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </TextField>
+                        <ImageView fitHeight="62.0" fitWidth="53.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../resources/lupa.png" />
+                           </image>
+                        </ImageView>
+                        <HBox alignment="CENTER_RIGHT" prefHeight="66.0" prefWidth="816.0">
+                           <children>
+                              <DatePicker prefHeight="37.0" prefWidth="137.0" promptText="From...">
+                                 <HBox.margin>
+                                    <Insets right="25.0" />
+                                 </HBox.margin>
+                              </DatePicker>
+                              <DatePicker promptText="To..." />
+                           </children>
+                        </HBox>
+                     </children>
+                  </HBox>
+                  <TableView fx:id="productTable" prefHeight="400.0" prefWidth="1279.0">
+                        <columns>
+                            <TableColumn fx:id="imageColumn" prefWidth="138" style="-fx-alignment: center;" text="Image" />
+                            <TableColumn fx:id="titleColumn" prefWidth="200.0" style="-fx-alignment: center-left;" text="Title" />
+                            <TableColumn fx:id="artistColumn" prefWidth="200.0" style="-fx-alignment: center-left;" text="Artist" />
+                            <TableColumn fx:id="descriptionColumn" prefWidth="390.0" style="-fx-alignment: center-left;" text="Description" />
+                            <TableColumn fx:id="releaseDateColumn" prefWidth="153" style="-fx-alignment: center;" text="Release Date" />
+                            <TableColumn fx:id="stockColumn" prefWidth="83" style="-fx-alignment: center;" text="Stock" />
+                            <TableColumn fx:id="priceColumn" prefWidth="108.7999267578125" style="-fx-alignment: center-right;" text="Price (€)" />
+                        </columns>
+                    </TableView>
+                  <HBox prefHeight="30.0" prefWidth="1255.0" spacing="373.0">
+                     <children>
+                        <HBox prefHeight="30.0" prefWidth="697.0" spacing="30.0">
+                           <children>
+                              <Button fx:id="btnAddProduct" mnemonicParsing="false" prefHeight="26.0" prefWidth="125.0" styleClass="yellow-button" text="Add Product">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Button>
+                              <Button fx:id="btnDeleteProduct" mnemonicParsing="false" prefHeight="26.0" prefWidth="125.0" styleClass="yellow-button" text="Delete Product">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Button>
+                           </children>
+                        </HBox>
+                        <CheckBox fx:id="cbxStock" alignment="CENTER" mnemonicParsing="false" prefHeight="30.0" prefWidth="185.0" text="Available products">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </CheckBox>
+                     </children>
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                  </HBox>
+               </children>
+            </VBox>
+            <ImageView fitHeight="167.0" fitWidth="429.0" layoutX="518.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../resources/ShopTittle.png" />
+               </image>
+            </ImageView>
+         </children>
+    </AnchorPane>
+  </children>
+</VBox>
