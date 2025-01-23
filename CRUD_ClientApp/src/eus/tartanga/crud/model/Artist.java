@@ -25,7 +25,7 @@ public class Artist implements Serializable {
     private Integer artistId;
 
     private byte[] image;
-
+   
    
     private Date debut;
 
