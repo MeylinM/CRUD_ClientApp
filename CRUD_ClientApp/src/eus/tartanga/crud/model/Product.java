@@ -33,7 +33,15 @@ public class Product implements Serializable {
     private float price;
     private int stock;
     private byte[] image;
-
+    
+    public Product() {
+        this.title = "Tittle of the product";
+        this.description = "Description of the product";
+        this.releaseDate = new Date();
+        this.price = 0;
+        this.stock = 1;
+    }
+    
     public Integer getProductId() {
         return productId;
     }
