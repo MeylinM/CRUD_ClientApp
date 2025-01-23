@@ -13,6 +13,7 @@ import eus.tartanga.crud.logic.ProductFactory;
 import eus.tartanga.crud.logic.ProductManager;
 import eus.tartanga.crud.model.Artist;
 import eus.tartanga.crud.model.Product;
+import eus.tartanga.crud.userInterface.factories.ProductDateEditingCell;
 import java.io.ByteArrayInputStream;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -50,6 +51,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import javafx.util.converter.FloatStringConverter;
 import javafx.util.converter.IntegerStringConverter;
 import javax.ws.rs.core.GenericType;
@@ -147,6 +149,9 @@ public class ProductViewController {
             //Para obtener la lista de artistas se usará el método de lógica findAllArtist
             artistList = FXCollections.observableArrayList(artistInterface.findAllArtist(new GenericType<List<Artist>>() {
             }));
+            
+            final Callback<TableColumn<Product, Date>, TableCell<Product, Date>> dateCell
+                = (TableColumn<Product, Date> param) -> new ProductDateEditingCell();
 
             // Hacer las columnas editables
             titleColumn.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -203,7 +208,8 @@ public class ProductViewController {
                     }
                 }
             });
-            releaseDateColumn.setCellFactory(column -> new TableCell<Product, Date>() {
+            releaseDateColumn.setCellFactory(dateCell);
+            /*releaseDateColumn.setCellFactory(column -> new TableCell<Product, Date>() {
                 @Override
                 protected void updateItem(Date date, boolean empty) {
                     super.updateItem(date, empty);
@@ -217,7 +223,7 @@ public class ProductViewController {
                         setText(formattedDate);
                     }
                 }
-            });
+            });*/
 
             priceColumn.setCellFactory(column -> new TableCell<Product, Float>() {
                 @Override
