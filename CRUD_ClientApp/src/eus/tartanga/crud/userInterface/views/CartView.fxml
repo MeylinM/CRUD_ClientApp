@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="eus.tartanga.crud.userInterface.controllers.CartViewController"
+      prefHeight="768.0" prefWidth="1366.0" stylesheets="@../css/styles.css"> 
+    <!-- Menú superior -->
+    <fx:include fx:id="menuBar" source="MenuBarView.fxml" />
+    <!-- Contenido principal -->
+    <AnchorPane prefHeight="728.0" prefWidth="1366.0" styleClass="background-pane" stylesheets="@../css/styles.css">
+        <children>
+            <!-- Título -->
+            <Label text="MY CART" styleClass="cartTitle" layoutX="600.0" layoutY="20.0"/>
+
+            <!-- Tabla con productos -->
+            <TableView fx:id="cartTable" layoutX="50.0" layoutY="100.0" prefWidth="1266.0" prefHeight="500.0" styleClass="table-view">
+                <columns>
+                    <TableColumn text="Product" />
+                    <TableColumn text="Artist" />
+                    <TableColumn text="Name" />
+                    <TableColumn text="Description" />
+                    <TableColumn text="Order Date" />
+                    <TableColumn text="Price (€)" />
+                    <TableColumn text="Quantity" />
+                    <TableColumn text="Sub Total" />
+                </columns>
+            </TableView>
+            
+            <!-- Fila de Total -->
+            <HBox layoutX="850.0" layoutY="610.0" spacing="20.0">
+                <Label text="TOTAL:" styleClass="totalLabel" />
+                <Label fx:id="totalPriceLabel" text="0.00" styleClass="totalValueLabel" />
+            </HBox>
+            
+            <!-- Botones inferiores -->
+            <HBox layoutX="50.0" layoutY="650.0" spacing="20.0">
+                <Button fx:id="clearCartButton" text="CLEAR CART" styleClass="yellow-button"/>
+                <Button fx:id="buyButton" text="BUY" styleClass="yellow-button"/>
+            </HBox>
+        </children>
+    </AnchorPane>
+</VBox>
+
+
+    
