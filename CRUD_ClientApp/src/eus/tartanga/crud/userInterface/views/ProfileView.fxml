@@ -1,14 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.net.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eus.tartanga.crud.userInterface.controllers.ProfileViewController">
-    <stylesheets>
-        <URL value="@/eus/tartanga/crud/userInterface/css/styles.css"/>
-    </stylesheets>
-</AnchorPane>
+<VBox prefHeight="768.0" prefWidth="1366.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eus.tartanga.crud.userInterface.ProfileController">
+  <children>
+    <MenuBar stylesheets="@styles.css" VBox.vgrow="NEVER">
+      <menus>
+        <Menu mnemonicParsing="false" text="Profile">
+        </Menu>
+        <Menu mnemonicParsing="false" text="Artist">
+        </Menu>
+        <Menu mnemonicParsing="false" text="Help">
+        </Menu>
+        <Menu mnemonicParsing="false" text="---">
+               <items>
+                  <MenuItem mnemonicParsing="false" text="LogOut" />
+                  <MenuItem mnemonicParsing="false" text="Exit" />
+               </items></Menu>
+      </menus>
+    </MenuBar>
+    <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="742.0" prefWidth="1369.0" styleClass="background-pane" stylesheets="@profileview.css" VBox.vgrow="ALWAYS">
+      <children>
+        <VBox layoutX="403.0" layoutY="100.0" prefHeight="514.0" prefWidth="591.0" styleClass="profile-box">
+          <children>
+
+            <Label styleClass="label-header" text="Full Name" />
+            <TextField fx:id="fullNameField" promptText="Name Surname Surname" />
+
+            <Label styleClass="label-header" text="E-mail" />
+            <TextField fx:id="emailField" promptText="example@example.com" />
+
+            <Label styleClass="label-header" text="Password" />
+            <PasswordField fx:id="passwordField" promptText="***************" />
+
+            <Label styleClass="label-header" text="Phone" />
+            <TextField fx:id="phoneField" promptText="123456789" />
+
+            <Label styleClass="label-header" text="City" />
+            <TextField fx:id="cityField" promptText="City Name" />
+
+            <Label styleClass="label-header" text="Street" />
+            <TextField fx:id="streetField" promptText="Street 1 Nº12" />
+
+            <Label styleClass="label-header" text="Postal Code" />
+            <TextField fx:id="postalCodeField" promptText="12399" />
+
+            <Button styleClass="button-change" text="Change Password" />
+          </children>
+        </VBox>
+      </children>
+    </AnchorPane>
+  </children>
+</VBox>

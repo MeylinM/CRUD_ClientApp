@@ -5,23 +5,23 @@
  */
 package eus.tartanga.crud.userInterface.controllers;
 
-import eus.tartanga.crud.model.FanetixUser;
-import java.util.logging.Logger;
-import javafx.stage.Stage;
-
-
+import java.net.URL;
+import java.util.ResourceBundle;
+import javafx.fxml.Initializable;
 
 /**
  * FXML Controller class
  *
- * @author meyli
+ * @author 2dam
  */
-public class ProfileViewController  {
+public class ProfileViewController implements Initializable {
 
-    private static final Logger LOGGER = Logger.getLogger("package view.subject");
-
-    private Stage stage;
-    private FanetixUser user; 
-    //private SubjectManager subjectManager;
+    /**
+     * Initializes the controller class.
+     */
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        // TODO
+    }    
     
 }

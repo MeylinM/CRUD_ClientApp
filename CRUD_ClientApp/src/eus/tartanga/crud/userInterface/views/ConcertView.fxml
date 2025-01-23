@@ -17,7 +17,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefHeight="768.0" prefWidth="1366.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eus.tartanga.crud.userInterface.controllers.ConcertViewController">
+<VBox prefHeight="768.0" prefWidth="1366.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eus.tartanga.crud.userInterface.ConcertController">
   <children>
     <MenuBar stylesheets="@styles.css" VBox.vgrow="NEVER">
       <menus>
@@ -38,7 +38,7 @@
          <children>
             <ImageView fitHeight="524.0" fitWidth="709.0" layoutX="330.0" layoutY="-118.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../resources/DISEÑO_APPCRUD-removebg-preview.png" />
+                  <Image url="@../resources/concert.png" />
                </image>
             </ImageView>
             <VBox alignment="CENTER" fillWidth="false" layoutX="45.0" layoutY="148.0" prefHeight="557.0" prefWidth="1278.0" spacing="10.0" stylesheets="@styles.css">
