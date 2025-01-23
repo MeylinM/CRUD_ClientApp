@@ -3,4 +3,4 @@
  * To change this template file, choose Tools | Templates
  * and ospen the template in the editor.
  */
-package eus.tartanga.crud.userInterface;
+package eus.tartanga.crud.userInterface.controllers;

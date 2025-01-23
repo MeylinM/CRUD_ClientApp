@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package eus.tartanga.crud.userInterface;
+package eus.tartanga.crud.userInterface.controllers;
 
 import java.net.URL;
 import java.util.ResourceBundle;
