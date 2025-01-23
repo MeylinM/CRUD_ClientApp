@@ -38,7 +38,7 @@
          <children>
             <ImageView fitHeight="524.0" fitWidth="709.0" layoutX="330.0" layoutY="-118.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../resources/DISEÑO_APPCRUD-removebg-preview.png" />
+                  <Image url="@../resources/concert.png" />
                </image>
             </ImageView>
             <VBox alignment="CENTER" fillWidth="false" layoutX="45.0" layoutY="148.0" prefHeight="557.0" prefWidth="1278.0" spacing="10.0" stylesheets="@styles.css">
