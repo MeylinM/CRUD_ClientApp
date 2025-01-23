@@ -149,9 +149,10 @@ public class ProductViewController {
             //Para obtener la lista de artistas se usará el método de lógica findAllArtist
             artistList = FXCollections.observableArrayList(artistInterface.findAllArtist(new GenericType<List<Artist>>() {
             }));
-            
+
             final Callback<TableColumn<Product, Date>, TableCell<Product, Date>> dateCell
-                = (TableColumn<Product, Date> param) -> new ProductDateEditingCell();
+                    = (TableColumn<Product, Date> param) -> new ProductDateEditingCell();
+            releaseDateColumn.setCellFactory(dateCell);
 
             // Hacer las columnas editables
             titleColumn.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -199,7 +200,9 @@ public class ProductViewController {
                 protected void updateItem(byte[] imageBytes, boolean empty) {
                     super.updateItem(imageBytes, empty);
                     if (empty || imageBytes == null) {
-                        setGraphic(null);
+                        Image noImage = new Image(getClass().getClassLoader().getResourceAsStream("eus/tartanga/crud/app/resources/noImage.png")); // Ruta de la imagen predeterminada
+                        imageView.setImage(noImage);
+                        setGraphic(imageView);
                     } else {
                         // Convertir byte[] a Image
                         Image image = new Image(new ByteArrayInputStream(imageBytes));
@@ -208,22 +211,6 @@ public class ProductViewController {
                     }
                 }
             });
-            releaseDateColumn.setCellFactory(dateCell);
-            /*releaseDateColumn.setCellFactory(column -> new TableCell<Product, Date>() {
-                @Override
-                protected void updateItem(Date date, boolean empty) {
-                    super.updateItem(date, empty);
-                    if (empty || date == null) {
-                        setText(null);
-                    } else {
-                        // Convertir la fecha
-                        LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                        // Formatear la fecha
-                        String formattedDate = localDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-                        setText(formattedDate);
-                    }
-                }
-            });*/
 
             priceColumn.setCellFactory(column -> new TableCell<Product, Float>() {
                 @Override
@@ -249,6 +236,9 @@ public class ProductViewController {
             productAnchorPane.setOnMouseClicked(this::handleRightClick);
             //Obtener una lista de todos los productos de mi base de datos
             productList.addAll(findAllProducts());
+            for (Product product : productList) {
+                System.out.println(product.getImage());
+            }
             //Cargar la tabla Products con la información de los productos
             productTable.setItems(productList);
 
