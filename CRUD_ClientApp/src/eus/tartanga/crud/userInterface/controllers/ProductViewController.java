@@ -5,8 +5,11 @@
  */
 package eus.tartanga.crud.userInterface.controllers;
 
+import eus.tartanga.crud.logic.ArtistFactory;
+import eus.tartanga.crud.logic.ArtistManager;
 import eus.tartanga.crud.logic.ProductFactory;
 import eus.tartanga.crud.logic.ProductManager;
+import eus.tartanga.crud.model.Artist;
 import eus.tartanga.crud.model.Product;
 import java.io.ByteArrayInputStream;
 import java.time.LocalDate;
@@ -38,6 +41,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -47,7 +51,6 @@ import javafx.stage.Stage;
 import javafx.util.converter.FloatStringConverter;
 import javafx.util.converter.IntegerStringConverter;
 import javax.ws.rs.core.GenericType;
-
 
 /**
  * FXML Controller class
@@ -63,7 +66,7 @@ public class ProductViewController {
     private TableColumn<Product, String> titleColumn;
 
     @FXML
-    private TableColumn<Product, String> artistColumn;
+    private TableColumn<Product, Artist> artistColumn;
 
     @FXML
     private TableColumn<Product, String> descriptionColumn;
@@ -88,18 +91,20 @@ public class ProductViewController {
 
     @FXML
     private CheckBox cbxStock;
-    
+
     @FXML
     private Button btnAddProduct;
-    
+
     @FXML
     private Button btnDeleteButton;
-    
+
     private Stage stage;
     private Logger logger = Logger.getLogger(ProductViewController.class.getName());
     private ContextMenu contextMenuInside;
     private ContextMenu contextMenuOutside;
     private ObservableList<Product> productList = FXCollections.observableArrayList();
+    private ArtistManager artistInterface;
+    private ObservableList<Artist> artistList = FXCollections.observableArrayList();
 
     public void setStage(Stage stage) {
         this.stage = stage;
@@ -120,7 +125,9 @@ public class ProductViewController {
             stage.setTitle("Shop");
             stage.setResizable(false);
             stage.show();
-            
+
+            artistInterface = ArtistFactory.getArtistManager();
+
             //Hacer la tabla editable
             productTable.setEditable(true);
 
@@ -133,6 +140,8 @@ public class ProductViewController {
             stockColumn.setCellValueFactory(new PropertyValueFactory<>("stock"));
             priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
 
+            artistList = FXCollections.observableArrayList(artistInterface.findAllArtist(new GenericType<List<Artist>>() {
+            }));
             // Hacer las columnas editables
             titleColumn.setCellFactory(TextFieldTableCell.forTableColumn());
             titleColumn.setOnEditCommit(event -> {
@@ -157,6 +166,16 @@ public class ProductViewController {
                 Product product = event.getRowValue();
                 product.setPrice(event.getNewValue());
             });
+
+            artistColumn.setCellFactory(ComboBoxTableCell.forTableColumn(artistList));
+            /*artistColumn.setOnEditCommit((TableColumn.CellEditEvent<Product, Artist> t) -> {
+                ((Product) t.getTableView().getItems()
+                        .get(t.getTablePosition().getRow()))
+                        .setArtist(t.getNewValue());
+                Product product = (Product) t.getTableView().getItems().get(t.getTablePosition().getRow());
+                Artist originalValueLevel = product.getArtist();
+            });*/
+
             imageColumn.setCellFactory(column -> new TableCell<Product, byte[]>() {
                 private final ImageView imageView = new ImageView();
 
@@ -219,7 +238,7 @@ public class ProductViewController {
             productList.addAll(findAllProducts());
             //Cargar la tabla Products con la información de los productos
             productTable.setItems(productList);
-            
+
             //Gestion de los diferentes filtrados con barra de busqueda, stock y por fechas
             filterProducts();
             //Configurar estilos de cada fila de la tabla
@@ -264,7 +283,6 @@ public class ProductViewController {
             contextMenuOutside.hide();
         }
     }
-
 
     public FilteredList<Product> getProductsBySearchField(String searchText, boolean inStock) {
         // Crea un FilteredList con la lista de productos original
@@ -316,10 +334,8 @@ public class ProductViewController {
         printItemOutside.setOnAction(this::printItems);
         MenuItem addItemOutside = new MenuItem("Add new product");
         addItemOutside.setOnAction(this::handleAddProduct);
-        contextMenuOutside.getItems().addAll(printItemOutside,addItemOutside);
+        contextMenuOutside.getItems().addAll(printItemOutside, addItemOutside);
     }
-    
-    
 
     private void deleteItem(ActionEvent event) {
         System.out.println("Delete item");
@@ -328,12 +344,11 @@ public class ProductViewController {
     private void printItems(ActionEvent event) {
         System.out.println("Table Items: ");
     }
-    
+
     private void handleAddProduct(ActionEvent event) {
-        Product product=new Product();
+        Product product = new Product();
         productTable.getItems().add(product);
     }
-    
 
     private void filterProducts() {
         //Mientras el usuario está escribiendo ese valor se usará para filtrar los productos de la tabla
@@ -357,8 +372,8 @@ public class ProductViewController {
             productTable.setItems(sortedData);
         });
     }
-    
-        private void configureRowStyling() {
+
+    private void configureRowStyling() {
         productTable.setRowFactory(tv -> {
             TableRow<Product> row = new TableRow<>();
 

@@ -19,7 +19,7 @@ import javafx.stage.Stage;
 /**
  * FXML Controller class for MenuBarView.fxml.
  *
- * @author 
+ * @author
  */
 public class MenuBarViewController {
 
@@ -58,7 +58,8 @@ public class MenuBarViewController {
     private static FanetixUser loggedUser;
     private static Stage stageMenu;
     private static final Logger LOGGER = Logger.getLogger("package view");
-
+    
+    @FXML
     public void openProfile() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ProfileView.fxml"));
@@ -72,36 +73,47 @@ public class MenuBarViewController {
             Logger.getLogger(MenuBarViewController.class.getName()).log(Level.SEVERE, null, e);
         }
     }
-
+    @FXML
     public void openMyOrders() {
 
     }
-
+    @FXML
     public void logOut() {
 
     }
-
+    @FXML
     public void openArtist() {
 
-    }
+        try {
+            // Cargar el archivo FXML de la vista ArtistView
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../views/ArtistView.fxml"));
+            Parent root = (Parent) loader.load();
+            ArtistViewController controller = ((ArtistViewController) loader.getController());
+            controller.initStage(root);
 
+        } catch (IOException e) {
+            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error loading ArtistView.fxml", e);
+        }
+    }
+    @FXML
     public void openMyCart() {
 
     }
-
+    @FXML
     private void showHelpArtist() {
 
     }
-
+    @FXML
     private void showHelpConcert() {
     }
-
+    @FXML
     private void showHelpProduct() {
     }
-
+    @FXML
     private void showHelpCart() {
     }
-
+    @FXML
     private void showHelpOrder() {
     }
 
