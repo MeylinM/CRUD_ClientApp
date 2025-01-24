@@ -23,9 +23,9 @@ import javax.ws.rs.core.GenericType;
 
     public <T> T findByArtist_JSON(Class<T> responseType, String artistName) throws ReadException;
 
-    public <T> T findAllNotBoughtProducts_XML(Class<T> responseType) throws ReadException;
+    public <T> T findAllNotBoughtProducts_XML(GenericType<T> responseType) throws ReadException;
 
-    public <T> T findAllNotBoughtProducts_JSON(Class<T> responseType) throws ReadException;
+    public <T> T findAllNotBoughtProducts_JSON(GenericType<T> responseType) throws ReadException;
 
     public <T> T findCart_XML(Class<T> responseType, String email, String productId) throws ReadException;
 

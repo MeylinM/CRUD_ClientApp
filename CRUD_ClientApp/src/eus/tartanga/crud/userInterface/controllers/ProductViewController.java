@@ -235,9 +235,6 @@ public class ProductViewController {
             productAnchorPane.setOnMouseClicked(this::handleRightClick);
             //Obtener una lista de todos los productos de mi base de datos
             productList.addAll(findAllProducts());
-            for (Product product : productList) {
-                System.out.println(product.getImage());
-            }
             //Cargar la tabla Products con la información de los productos
             productTable.setItems(productList);
 

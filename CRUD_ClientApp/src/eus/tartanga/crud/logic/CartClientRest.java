@@ -52,14 +52,14 @@ public class CartClientRest implements CartManager {
     }
 
     @Override
-    public <T> T findAllNotBoughtProducts_XML(Class<T> responseType) throws ReadException {
+    public <T> T findAllNotBoughtProducts_XML(GenericType<T> responseType) throws ReadException {
         WebTarget resource = webTarget;
         resource = resource.path("notbought");
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
     }
 
     @Override
-    public <T> T findAllNotBoughtProducts_JSON(Class<T> responseType) throws ReadException {
+    public <T> T findAllNotBoughtProducts_JSON(GenericType<T> responseType) throws ReadException {
         WebTarget resource = webTarget;
         resource = resource.path("notbought");
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);

@@ -1,5 +1,6 @@
 package eus.tartanga.crud.userInterface.controllers;
 
+import eus.tartanga.crud.exception.ReadException;
 import eus.tartanga.crud.logic.ArtistFactory;
 import eus.tartanga.crud.logic.CartFactory;
 import eus.tartanga.crud.logic.CartManager;
@@ -11,6 +12,7 @@ import eus.tartanga.crud.model.Product;
 import java.util.logging.Logger;
 import javafx.fxml.FXML;
 import java.util.Date;
+import java.util.List;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -30,6 +32,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import javax.ws.rs.core.GenericType;
 
 /**
  *
@@ -109,7 +112,7 @@ public class CartOrdersViewController extends Application {
     public void initStage(Parent root, boolean isCartView) {
 
         //Añadir a la ventana el ícono “FanetixLogo.png”.
-        stage.getIcons().add(new Image("/resources/logo.png"));
+        //stage.getIcons().add(new Image("/resources/logo.png"));
         //Ventana no redimensionable
         stage.setResizable(false);
         /*La tabla mostrará las propiedades Image,ArtistName,Description,
@@ -158,13 +161,13 @@ public class CartOrdersViewController extends Application {
         cartManager = CartFactory.getCartManager();
         productManager = ProductFactory.getProductManager();
         stage.setResizable(false);
-        btnInfo.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/resources/btnInfo.png"))));
+        btnInfo.setGraphic(new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("eus/tartanga/crud/app/resources/btnInfo.png"))));
         // Si se accede desde el botón My Cart situado en el menubar
         if (isCartView) {
             logger.info("Initializing Cart stage");
             // Establecer el título de la ventana con el valor "My Cart".
             stage.setTitle("My Cart");
-            titleImage.setImage(new Image(getClass().getResourceAsStream("/resources/MyCart.png")));
+            titleImage.setImage(new Image(getClass().getClassLoader().getResourceAsStream("eus/tartanga/crud/app/resources/MyCart.png")));
             //"btnBuy". (Botón por defecto)
             btnBuy.setDefaultButton(true);
             // Los filtros por artista y fecha estarán ocultos.
@@ -178,7 +181,7 @@ public class CartOrdersViewController extends Application {
             logger.info("Initializing Orders stage");
             //Establecer el título de la ventana con el valor "My Orders"
             stage.setTitle("My Orders");
-            titleImage.setImage(new Image(getClass().getResourceAsStream("/resources/MyOrders.png")));
+            titleImage.setImage(new Image(getClass().getClassLoader().getResourceAsStream("eus/tartanga/crud/app/resources/MyOrders.png")));
             //Ocultar botones btnClearCart, btnBuy y el footer con el total.
             btnBuy.setVisible(false);
             btnClearCart.setVisible(false);
@@ -186,6 +189,10 @@ public class CartOrdersViewController extends Application {
         }
         stage.setScene(scene);
         stage.show();
+        
+        cartList.addAll(findAllCartProducts());
+            //Cargar la tabla Products con la información de los productos
+        tbCart.setItems(cartList);
     }
 
     private void configureView() {
@@ -239,5 +246,18 @@ public class CartOrdersViewController extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    private List<Cart> findAllCartProducts() {
+        List<Cart> carts = null;
+        try {
+            carts = cartManager.findAllNotBoughtProducts_XML(new GenericType<List<Cart>>() {
+            });
+            return carts;
+        } catch (ReadException e) {
+            System.out.println("Problemo");
+        }
+        return carts;
+        //findAllNotBoughtProducts_XML
     }
 }
