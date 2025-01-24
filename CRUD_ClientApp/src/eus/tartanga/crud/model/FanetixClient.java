@@ -24,6 +24,11 @@ public class FanetixClient extends FanetixUser {
     private Integer mobile;
     private List<Cart> products;
 
+    public FanetixClient(String email, String passwrd) {
+       super.setEmail(email);
+       super.setPasswd(passwrd);
+    }
+
     public String getFullName() {
         return fullName;
     }

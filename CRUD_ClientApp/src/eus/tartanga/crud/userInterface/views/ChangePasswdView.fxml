@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox prefHeight="768.0" prefWidth="1366.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eus.tartanga.crud.userInterface.controllers.ChangePasswdViewController">
+    <children>
+        <fx:include fx:id="menuBar" source="MenuBarView.fxml" />
+        <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="742.0" prefWidth="1369.0" styleClass="background-pane" stylesheets="@../css/profileview.css" VBox.vgrow="ALWAYS">
+            <children>
+                <ImageView fitHeight="404.0" fitWidth="723.0" layoutX="325.0" layoutY="-2.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <Image url="@../../app/resources/passwdView.png" />
+                    </image>
+                </ImageView>
+                <VBox layoutX="349.0" layoutY="295.0" prefHeight="300.0" prefWidth="671.0" styleClass="profile-box">
+                    <children>
+                        <Label prefHeight="31.0" prefWidth="124.0" styleClass="label-header" text="Old password" />
+                        <PasswordField fx:id="oldPasswd" alignment="CENTER" promptText="***************" />
+        
+                        <Label styleClass="label-header" text="New password" />
+                        <PasswordField fx:id="newPasswd" alignment="CENTER" promptText="***************" />
+        
+                        <Label styleClass="label-header" text="Repeat password" />
+                        <PasswordField fx:id="repeatPasswd" alignment="CENTER" promptText="***************" />
+
+                        <VBox alignment="CENTER_RIGHT" spacing="10" VBox.vgrow="NEVER">
+                            <Button fx:id="btnSave" prefHeight="40.0" prefWidth="111.0" styleClass="button-change" text="Save" textAlignment="CENTER">
+                        <VBox.margin>
+                           <Insets top="30.0" />
+                        </VBox.margin></Button>
+                        </VBox>
+                    </children>
+                </VBox>
+            </children>
+        </AnchorPane>
+    </children>
+</VBox>

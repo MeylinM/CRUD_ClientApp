@@ -10,9 +10,7 @@ import eus.tartanga.crud.logic.ConcertManager;
 import eus.tartanga.crud.model.Concert;
 
 import java.io.ByteArrayInputStream;
-import java.sql.Time;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import javafx.collections.FXCollections;

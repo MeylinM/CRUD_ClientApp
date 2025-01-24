@@ -1,0 +1,57 @@
+/* Estilo general para el fondo del AnchorPane */
+#signIn {
+    -fx-background-color: black;
+}
+
+/* Estilo para todas las imágenes */
+.image-view {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 10, 0.5, 0, 0);
+}
+
+/* Estilo específico para blancoImg */
+#blancoImg {
+    -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 0.5), 10, 0.5, 0, 0);
+    -fx-border-color: white;
+    -fx-border-width: 2px;
+}
+
+/* Botón de aceptar */
+#btnAccept {
+    -fx-background-color: #fff7ad;
+    -fx-text-fill: black;
+    -fx-font-family: 'Berlin Sans FB Demi Bold';
+    -fx-font-size: 24px;
+    -fx-cursor: hand;
+    -fx-border-radius: 15px;
+    -fx-background-radius: 15px;
+}
+
+/* Hipervínculos */
+.hyperlink {
+    -fx-text-fill: #eddf64;
+    -fx-font-size: 24px;
+    -fx-underline: true;
+    -fx-cursor: hand;
+}
+
+/* Campos de texto */
+.text-field, .password-field {
+    -fx-font-size: 16px;
+    -fx-padding: 5px;
+    -fx-border-color: gray;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+}
+
+/* Botón Toggle (icono ojo) */
+.toggle-button {
+    -fx-background-color: transparent;
+    -fx-padding: 5px;
+    -fx-cursor: hand;
+}
+
+/* Etiquetas */
+.label {
+    -fx-font-size: 24px;
+    -fx-text-fill: black;
+}
