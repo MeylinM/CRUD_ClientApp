@@ -1,6 +1,6 @@
 package eus.tartanga.crud.userInterface.factories;
 
-import eus.tartanga.crud.model.Product;
+import eus.tartanga.crud.model.Cart;
 import java.text.DateFormat;
 import java.time.ZoneId;
 import java.util.Date;
@@ -12,12 +12,12 @@ import javafx.scene.control.TableCell;
  *
  * @author 2dam
  */
-public class ProductDateEditingCell extends TableCell<Product, Date> {
+public class CartDateEditingCell extends TableCell<Cart, Date> {
 
     private DatePicker dpProductCell;
     private DateFormat dateFormatter;
 
-    public ProductDateEditingCell() {
+    public CartDateEditingCell() {
         dpProductCell = new DatePicker();
     }
 

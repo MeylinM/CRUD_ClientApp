@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefHeight="768.0" prefWidth="1366.0" stylesheets="@../css/styles.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eus.tartanga.crud.userInterface.controllers.CartOrdersViewController"> 
+<VBox prefHeight="768.0" prefWidth="1366.0" stylesheets="@../css/styles.css" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eus.tartanga.crud.userInterface.controllers.CartOrdersViewController"> 
     <!-- Menú superior -->
     <fx:include fx:id="menuBar" source="MenuBarView.fxml" />
     <!-- Contenido principal -->
@@ -23,7 +23,7 @@
             <!-- Titulo de la ventana -->
             <ImageView fx:id="titleImage" fitHeight="95.0" fitWidth="590.0" layoutX="388.0" layoutY="6.0" pickOnBounds="true" preserveRatio="true" />
             <!-- Boton de Informacion -->
-            <Button fx:id="btnInfo" layoutX="1276.0" layoutY="14.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="78.0" />
+            <Button fx:id="btnInfo" layoutX="1260.0" layoutY="14.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="55.0" />
             <!-- Filtros de la ventana My Orders -->
             <ChoiceBox fx:id="cbxArtist" layoutX="53.0" layoutY="101.0" prefHeight="36.0" prefWidth="398.0" styleClass="myChoiceBox" />
             <HBox alignment="CENTER_RIGHT" layoutX="499.0" layoutY="86.0" prefHeight="66.0" prefWidth="816.0">
