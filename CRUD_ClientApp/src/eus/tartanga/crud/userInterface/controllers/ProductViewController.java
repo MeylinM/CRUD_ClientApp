@@ -27,7 +27,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
@@ -59,7 +58,7 @@ import javax.ws.rs.core.GenericType;
 /**
  * FXML Controller class
  *
- * @author meyli
+ * @author Elbire
  */
 public class ProductViewController {
 

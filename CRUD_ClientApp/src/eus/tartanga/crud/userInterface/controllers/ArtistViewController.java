@@ -39,7 +39,7 @@ import javax.ws.rs.core.GenericType;
 /**
  * FXML Controller class
  *
- * @author meyli
+ * @author Olaia
  */
 public class ArtistViewController {
 

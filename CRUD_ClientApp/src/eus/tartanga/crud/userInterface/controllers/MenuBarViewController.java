@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package eus.tartanga.crud.userInterface.controllers;
 
 import eus.tartanga.crud.model.FanetixUser;
@@ -58,7 +53,7 @@ public class MenuBarViewController {
     private static FanetixUser loggedUser;
     private static Stage stageMenu;
     private static final Logger LOGGER = Logger.getLogger("package view");
-    
+
     @FXML
     public void openProfile() {
         try {
@@ -73,14 +68,29 @@ public class MenuBarViewController {
             Logger.getLogger(MenuBarViewController.class.getName()).log(Level.SEVERE, null, e);
         }
     }
+
     @FXML
     public void openMyOrders() {
+        try {
+            // Cargar el archivo FXML de la vista CartOrdersView
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/CartOrdersView.fxml"));
+            Parent root = loader.load();
+            //Obtener el controlador y configurar la vista como "MyOrders"
+            CartOrdersViewController cartOrdersController = loader.getController();
+            cartOrdersController.initStage(root,false); //False indica que es "MyOrders"
+            
 
+        } catch (IOException e) {
+            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error loading CartOrdersView.fxml for My Orders", e);
+        }
     }
+
     @FXML
     public void logOut() {
 
     }
+
     @FXML
     public void openArtist() {
 
@@ -96,23 +106,39 @@ public class MenuBarViewController {
             LOGGER.log(Level.SEVERE, "Error loading ArtistView.fxml", e);
         }
     }
+
     @FXML
     public void openMyCart() {
-
+        try {
+            // Cargar el archivo FXML de la vista CartOrdersView
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/CartOrdersView.fxml"));
+            Parent root = loader.load();
+            //Obtener el controlador y configurar la vista como "MyCart"
+            CartOrdersViewController cartOrdersController = loader.getController();
+            cartOrdersController.initStage(root,true); //True indica que es "MyCart"
+        } catch (IOException e) {
+            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error loading CartOrdersView.fxml for My Cart", e);
+        }
     }
+
     @FXML
     private void showHelpArtist() {
 
     }
+
     @FXML
     private void showHelpConcert() {
     }
+
     @FXML
     private void showHelpProduct() {
     }
+
     @FXML
     private void showHelpCart() {
     }
+
     @FXML
     private void showHelpOrder() {
     }
