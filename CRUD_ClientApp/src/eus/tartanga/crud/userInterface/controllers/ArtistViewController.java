@@ -5,6 +5,7 @@
  */
 package eus.tartanga.crud.userInterface.controllers;
 
+import eus.tartanga.crud.exception.ReadException;
 import eus.tartanga.crud.logic.ArtistFactory;
 import eus.tartanga.crud.logic.ArtistManager;
 import eus.tartanga.crud.model.Artist;
@@ -177,7 +178,7 @@ public class ArtistViewController {
         }
     }
 
-    private List<Artist> findAllArtists() {
+    private List<Artist> findAllArtists() throws ReadException {
         ArtistManager artistManager = ArtistFactory.getArtistManager();
         return artistManager.findAllArtist(new GenericType<List<Artist>>() {
         });
