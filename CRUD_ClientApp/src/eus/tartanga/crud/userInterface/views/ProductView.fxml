@@ -88,6 +88,7 @@
                   <Image url="@../../app/resources/ShopTittle.png" />
                </image>
             </ImageView>
+         <Button fx:id="btnInfo" layoutX="1199.0" layoutY="56.0" mnemonicParsing="false" prefHeight="66.0" prefWidth="113.0" text="Button" />
          </children>
     </AnchorPane>
 

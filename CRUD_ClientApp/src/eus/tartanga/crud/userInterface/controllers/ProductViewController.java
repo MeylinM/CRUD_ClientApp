@@ -6,7 +6,10 @@
 package eus.tartanga.crud.userInterface.controllers;
 
 import eus.tartanga.crud.exception.AddException;
+import eus.tartanga.crud.exception.MaxCharacterException;
 import eus.tartanga.crud.exception.ReadException;
+import eus.tartanga.crud.exception.TextEmptyException;
+import eus.tartanga.crud.exception.UpdateException;
 import eus.tartanga.crud.logic.ArtistFactory;
 import eus.tartanga.crud.logic.ArtistManager;
 import eus.tartanga.crud.logic.ProductFactory;
@@ -29,11 +32,13 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -100,6 +105,9 @@ public class ProductViewController {
 
     @FXML
     private Button btnDeleteProduct;
+    
+    @FXML
+    private Button btnInfo;
 
     private Stage stage;
     private Logger logger = Logger.getLogger(ProductViewController.class.getName());
@@ -157,8 +165,22 @@ public class ProductViewController {
             titleColumn.setCellFactory(TextFieldTableCell.forTableColumn());
             titleColumn.setOnEditCommit(event -> {
                 Product product = event.getRowValue();
+                try{
+                    System.out.println(product.getTitle());
+                    if(product.getTitle()==null){
+                        throw new TextEmptyException("El campo de Titulo no puede estár vacio");
+                    }else if (product.getTitle().length()>50){
+                        throw new MaxCharacterException("El titulo no puede tener más de 50 caracteres");
+                    }
+                    updateProduct(product);
+                }catch(TextEmptyException e){
+                    Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
+                }catch (MaxCharacterException e) {
+                    Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
+                }
                 product.setTitle(event.getNewValue());
-            });
+            }   
+);
 
             descriptionColumn.setCellFactory(TextFieldTableCell.forTableColumn());
             descriptionColumn.setOnEditCommit(event -> {
@@ -224,6 +246,7 @@ public class ProductViewController {
             });
             btnAddProduct.setOnAction(this::handleAddProduct);
             btnDeleteProduct.setOnAction(this::handleDeleteProduct);
+            btnInfo.setOnAction(this::handleInfoButton);
             //Inicializar los menu contextuales
             createContextMenu();
             // Mostrará el Menú contextual con las opciones mIAddToCart, 
@@ -350,6 +373,25 @@ public class ProductViewController {
         }
         productTable.getItems().add(product);
     }
+    
+    private void handleInfoButton(ActionEvent event) {
+        try{
+            //LOGGER.info("Loading help view...");
+            //Load node graph from fxml file
+            FXMLLoader loader=
+                new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/HelpView.fxml"));
+                Parent root = (Parent)loader.load();
+                HelpController helpController=
+                        ((HelpController)loader.getController());
+                //Initializes and shows help stage
+                helpController.initAndShowStage(root);
+        }catch(Exception ex){
+                //If there is an error show message and
+                //log it.
+                System.out.println(ex.getMessage());
+                
+        }
+    }
 
     private void handleDeleteProduct(ActionEvent event) {
         Product selectedProduct = productTable.getSelectionModel().getSelectedItem();
@@ -421,5 +463,14 @@ public class ProductViewController {
 
             return row;
         });
+    }
+
+    private void updateProduct(Product product) {
+        try {
+            System.out.println("Intento de update");
+            productManager.edit_XML(product, product.getProductId().toString());
+        } catch (UpdateException e) {
+            System.out.println(e);
+        }
     }
 }
