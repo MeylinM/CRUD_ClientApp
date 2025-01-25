@@ -10,6 +10,7 @@ import eus.tartanga.crud.exception.MaxCharacterException;
 import eus.tartanga.crud.exception.ReadException;
 import eus.tartanga.crud.exception.TextEmptyException;
 import eus.tartanga.crud.exception.UpdateException;
+import eus.tartanga.crud.exception.WrongStockFormatException;
 import eus.tartanga.crud.logic.ArtistFactory;
 import eus.tartanga.crud.logic.ArtistManager;
 import eus.tartanga.crud.logic.ProductFactory;
@@ -41,6 +42,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContextMenu;
@@ -95,7 +97,7 @@ public class ProductViewController {
     private AnchorPane productAnchorPane;
 
     @FXML
-    private TextField searchField;
+    private TextField tfSearch;
 
     @FXML
     private CheckBox cbxStock;
@@ -105,7 +107,7 @@ public class ProductViewController {
 
     @FXML
     private Button btnDeleteProduct;
-    
+
     @FXML
     private Button btnInfo;
 
@@ -165,33 +167,74 @@ public class ProductViewController {
             titleColumn.setCellFactory(TextFieldTableCell.forTableColumn());
             titleColumn.setOnEditCommit(event -> {
                 Product product = event.getRowValue();
-                try{
-                    System.out.println(product.getTitle());
-                    if(product.getTitle()==null){
-                        throw new TextEmptyException("El campo de Titulo no puede estár vacio");
-                    }else if (product.getTitle().length()>50){
-                        throw new MaxCharacterException("El titulo no puede tener más de 50 caracteres");
+                String originalTitle = product.getTitle();
+                try {
+                    product.setTitle(event.getNewValue());
+                    if (product.getTitle() == null || product.getTitle().isEmpty()) {
+                        throw new TextEmptyException("El campo de Titulo no puede estar vacío");
+                    } else if (product.getTitle().length() > 50) {
+                        throw new MaxCharacterException("El título no puede tener más de 50 caracteres");
                     }
                     updateProduct(product);
-                }catch(TextEmptyException e){
+                } catch (TextEmptyException | MaxCharacterException e) {
                     Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
-                }catch (MaxCharacterException e) {
-                    Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
+                    product.setTitle(originalTitle);
+                    productTable.refresh();
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setHeaderText("Error de validación");
+                    alert.setContentText(e.getMessage());
+                    alert.showAndWait();
                 }
-                product.setTitle(event.getNewValue());
-            }   
-);
+            });
 
             descriptionColumn.setCellFactory(TextFieldTableCell.forTableColumn());
             descriptionColumn.setOnEditCommit(event -> {
                 Product product = event.getRowValue();
+                String originalDescription = product.getDescription();
+                try {
+                    product.setDescription(event.getNewValue());
+                    if (product.getDescription() == null || product.getTitle().isEmpty()) {
+                        throw new TextEmptyException("El campo de description no puede estar vacío");
+                    } else if (product.getDescription().length() > 250) {
+                        throw new MaxCharacterException("La descripcion no puede tener más de 250 caracteres");
+                    }
+                    updateProduct(product);
+                } catch (TextEmptyException | MaxCharacterException e) {
+                    Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
+                    product.setTitle(originalDescription);
+                    productTable.refresh();
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setHeaderText("Error de validación");
+                    alert.setContentText(e.getMessage());
+                    alert.showAndWait();
+                }
                 product.setDescription(event.getNewValue());
             });
 
-            stockColumn.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
+            /*stockColumn.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
             stockColumn.setOnEditCommit(event -> {
                 Product product = event.getRowValue();
                 product.setStock(event.getNewValue());
+            });*/
+            stockColumn.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
+            stockColumn.setOnEditCommit(event -> {
+                Product product = event.getRowValue();
+                int originalStock = product.getStock();
+                try {
+                    product.setStock(event.getNewValue());
+                    updateProduct(product);
+                } catch (NumberFormatException e) {
+                    Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
+
+                    // Notificar al usuario que el formato es incorrecto
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setHeaderText("Formato incorrecto en el stock");
+                    alert.setContentText("El valor del stock debe ser un número válido.");
+                    alert.showAndWait();
+                }
             });
 
             priceColumn.setCellFactory(TextFieldTableCell.forTableColumn(new FloatStringConverter()));
@@ -200,6 +243,43 @@ public class ProductViewController {
                 product.setPrice(event.getNewValue());
             });
 
+            /*priceColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+priceColumn.setOnEditCommit(event -> {
+    Product product = event.getRowValue();
+    String newValue = event.getNewValue();
+
+    try {
+        // Intenta convertir el nuevo valor a Float
+        float newPrice = Float.parseFloat(newValue);
+
+        // Realiza alguna validación adicional si es necesario
+        if (newPrice < 0) {
+            throw new IllegalArgumentException("El precio no puede ser negativo");
+        }
+
+        // Si es válido, actualiza el producto
+        product.setPrice(newPrice);
+        updateProduct(product);
+    } catch (NumberFormatException e) {
+        // Maneja la excepción si el formato no es válido
+        Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, "El precio debe ser un número válido", e);
+        // Aquí podrías notificar al usuario que el formato es incorrecto
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText("Formato incorrecto en el precio");
+        alert.setContentText("Por favor, introduce un precio válido.");
+        alert.showAndWait();
+    } catch (IllegalArgumentException e) {
+        // Maneja la excepción si el precio es negativo
+        Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, e.getMessage(), e);
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText("Precio inválido");
+        alert.setContentText(e.getMessage());
+        alert.showAndWait();
+    }
+});
+             */
             artistColumn.setCellFactory(ComboBoxTableCell.forTableColumn(artistList));
             artistColumn.setOnEditCommit((TableColumn.CellEditEvent<Product, Artist> t) -> {
                 ((Product) t.getTableView().getItems()
@@ -220,7 +300,11 @@ public class ProductViewController {
                 @Override
                 protected void updateItem(byte[] imageBytes, boolean empty) {
                     super.updateItem(imageBytes, empty);
-                    if (empty || imageBytes == null) {
+                    if (empty || getTableRow() == null || getTableRow().getItem() == null) {
+                        setGraphic(null);
+                        return;
+                    }
+                    if (imageBytes == null) {
                         Image noImage = new Image(getClass().getClassLoader().getResourceAsStream("eus/tartanga/crud/app/resources/noImage.png")); // Ruta de la imagen predeterminada
                         imageView.setImage(noImage);
                         setGraphic(imageView);
@@ -373,23 +457,23 @@ public class ProductViewController {
         }
         productTable.getItems().add(product);
     }
-    
+
     private void handleInfoButton(ActionEvent event) {
-        try{
+        try {
             //LOGGER.info("Loading help view...");
             //Load node graph from fxml file
-            FXMLLoader loader=
-                new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/HelpView.fxml"));
-                Parent root = (Parent)loader.load();
-                HelpController helpController=
-                        ((HelpController)loader.getController());
-                //Initializes and shows help stage
-                helpController.initAndShowStage(root);
-        }catch(Exception ex){
-                //If there is an error show message and
-                //log it.
-                System.out.println(ex.getMessage());
-                
+            FXMLLoader loader
+                    = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/HelpView.fxml"));
+            Parent root = (Parent) loader.load();
+            HelpController helpController
+                    = ((HelpController) loader.getController());
+            //Initializes and shows help stage
+            helpController.initAndShowStage(root);
+        } catch (Exception ex) {
+            //If there is an error show message and
+            //log it.
+            System.out.println(ex.getMessage());
+
         }
     }
 
@@ -423,7 +507,7 @@ public class ProductViewController {
     private void filterProducts() {
         //Mientras el usuario está escribiendo ese valor se usará para filtrar los productos de la tabla
         //que filtrara ese valor en base a los atributos tittle, artist y description de todos los productos.
-        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+        tfSearch.textProperty().addListener((observable, oldValue, newValue) -> {
             // Mientras el usuario está escribiendo ese valor se usará para filtrar los productos de la tabla
             FilteredList<Product> filteredProducts = getProductsBySearchField(newValue, cbxStock.isSelected());
 
@@ -435,7 +519,7 @@ public class ProductViewController {
 
         // Filtra los elementos de la tabla en base de si hay stock o no.
         cbxStock.setOnAction(event -> {
-            FilteredList<Product> filteredProducts = getProductsBySearchField(searchField.getText(), cbxStock.isSelected());
+            FilteredList<Product> filteredProducts = getProductsBySearchField(tfSearch.getText(), cbxStock.isSelected());
             //Actualiza la tabla con los productos filtrados
             SortedList<Product> sortedData = new SortedList<>(filteredProducts);
             sortedData.comparatorProperty().bind(productTable.comparatorProperty());
