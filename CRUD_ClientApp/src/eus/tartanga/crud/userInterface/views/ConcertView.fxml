@@ -14,9 +14,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefHeight="768.0" prefWidth="1366.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eus.tartanga.crud.userInterface.controllers.ConcertViewController">
+<VBox prefHeight="768.0" prefWidth="1366.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eus.tartanga.crud.userInterface.controllers.ConcertViewController">
   <fx:include fx:id="menuBar" source="MenuBarView.fxml" />
-    <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="742.0" prefWidth="1369.0" styleClass="background-pane" stylesheets="@../css/styles.css" VBox.vgrow="ALWAYS">
+    <AnchorPane fx:id="concertAnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="742.0" prefWidth="1369.0" styleClass="background-pane" stylesheets="@../css/styles.css" VBox.vgrow="ALWAYS">
          <children>
             <ImageView fitHeight="524.0" fitWidth="709.0" layoutX="330.0" layoutY="-118.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -27,7 +27,7 @@
                <children>
                   <HBox alignment="CENTER_LEFT" prefHeight="66.0" prefWidth="1278.0">
                      <children>
-                        <TextField fx:id="searchField" prefHeight="42.0" prefWidth="429.0" promptText="Search concert..." stylesheets="@../css/styles.css">
+                        <TextField fx:id="tfSearch" prefHeight="42.0" prefWidth="429.0" promptText="Search concert..." stylesheets="@../css/styles.css">
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>
@@ -64,19 +64,19 @@
                      <children>
                         <HBox prefHeight="30.0" prefWidth="697.0" spacing="30.0">
                            <children>
-                              <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="125.0" styleClass="yellow-button" stylesheets="@../css/styles.css" text="Add Concert">
+                              <Button fx:id="btnAddConcert" mnemonicParsing="false" prefHeight="26.0" prefWidth="125.0" styleClass="yellow-button" stylesheets="@../css/styles.css" text="Add Concert">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
                               </Button>
-                              <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="125.0" styleClass="yellow-button" stylesheets="@../css/styles.css" text="Delete Concert">
+                              <Button fx:id="btnDeleteConcert" mnemonicParsing="false" prefHeight="26.0" prefWidth="125.0" styleClass="yellow-button" stylesheets="@../css/styles.css" text="Delete Concert">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
                               </Button>
                            </children>
                         </HBox>
-                        <CheckBox alignment="CENTER" mnemonicParsing="false" prefHeight="30.0" prefWidth="185.0" stylesheets="@../css/styles.css" text="Coming soon">
+                        <CheckBox fx:id="cbxComingSoon" alignment="CENTER" mnemonicParsing="false" prefHeight="30.0" prefWidth="185.0" stylesheets="@../css/styles.css" text="Coming soon">
                            <font>
                               <Font size="14.0" />
                            </font>

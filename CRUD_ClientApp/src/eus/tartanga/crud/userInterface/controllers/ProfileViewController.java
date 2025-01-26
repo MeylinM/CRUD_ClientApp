@@ -106,7 +106,7 @@ public class ProfileViewController {
     private FanetixClient findClient(String email) {
         clientManager = FanetixClientFactory.getFanetixClientManager();
         client = clientManager.findClient_XML(new GenericType<FanetixClient>() {
-        }, email); //esto no funciona
+        }, email); //esto no funciona RESIVAR EL SERVIDOR NECESITO LA ULTIMA VERSION!!
         loadClientData(client);
         return client;
 
