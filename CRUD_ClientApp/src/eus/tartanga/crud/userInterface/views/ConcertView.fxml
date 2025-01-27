@@ -17,7 +17,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefHeight="768.0" prefWidth="1366.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eus.tartanga.crud.userInterface.ConcertController">
+<VBox prefHeight="768.0" prefWidth="1366.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eus.tartanga.crud.userInterface.ConcertViewController">
   <children>
     <MenuBar stylesheets="@styles.css" VBox.vgrow="NEVER">
       <menus>

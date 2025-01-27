@@ -33,10 +33,10 @@ public class CRUD_ClientApp extends Application {
     
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ProductView.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ArtistView.fxml"));
         Parent root = (Parent) loader.load();
         //Scene scene = new Scene(root);
-        ProductViewController controller = ((ProductViewController) loader.getController());
+        ArtistViewController controller = ((ArtistViewController) loader.getController());
         controller.setStage(stage);
         controller.initStage(root);
         

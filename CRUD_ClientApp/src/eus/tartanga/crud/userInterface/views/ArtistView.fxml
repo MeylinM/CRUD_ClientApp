@@ -15,7 +15,7 @@
 
 <VBox prefHeight="768.0" prefWidth="1366.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eus.tartanga.crud.userInterface.controllers.ArtistViewController">
     <fx:include fx:id="menuBar" source="MenuBarView.fxml" />
-    <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="742.0" prefWidth="1369.0" styleClass="background-pane" stylesheets="@../css/styles.css" VBox.vgrow="ALWAYS">
+    <AnchorPane fx:id="artistAnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="742.0" prefWidth="1369.0" styleClass="background-pane" stylesheets="@../css/styles.css" VBox.vgrow="ALWAYS">
          <children>
             <VBox alignment="CENTER" fillWidth="false" layoutX="45.0" layoutY="148.0" prefHeight="557.0" prefWidth="1278.0" spacing="10.0" stylesheets="@styles.css">
                <children>
