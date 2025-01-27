@@ -6,13 +6,13 @@
 package eus.tartanga.crud.model;
 
 import java.util.List;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
  * @author Meylin and Irati
  */
-
 @XmlRootElement
 public class FanetixClient extends FanetixUser {
 
@@ -24,6 +24,15 @@ public class FanetixClient extends FanetixUser {
     private Integer mobile;
     private List<Cart> products;
 
+    public FanetixClient(String email, String passwrd) {
+        super.setEmail(email);
+        super.setPasswd(passwrd);
+    }
+
+    public FanetixClient() {
+    }
+    
+    @XmlElement
     public String getFullName() {
         return fullName;
     }
@@ -32,6 +41,7 @@ public class FanetixClient extends FanetixUser {
         this.fullName = fullName;
     }
 
+    @XmlElement
     public String getStreet() {
         return street;
     }
@@ -40,6 +50,7 @@ public class FanetixClient extends FanetixUser {
         this.street = street;
     }
 
+    @XmlElement
     public Integer getZip() {
         return zip;
     }
@@ -48,6 +59,7 @@ public class FanetixClient extends FanetixUser {
         this.zip = zip;
     }
 
+    @XmlElement
     public String getCity() {
         return city;
     }
@@ -56,6 +68,7 @@ public class FanetixClient extends FanetixUser {
         this.city = city;
     }
 
+    @XmlElement
     public Integer getMobile() {
         return mobile;
     }

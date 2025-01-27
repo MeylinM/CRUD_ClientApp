@@ -76,9 +76,9 @@ public class MenuBarViewController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/CartOrdersView.fxml"));
             Parent root = loader.load();
             //Obtener el controlador y configurar la vista como "MyOrders"
-            CartOrdersViewController cartOrdersController = loader.getController();
-            cartOrdersController.initStage(root,false); //False indica que es "MyOrders"
-            
+            CartOrdersViewController cartOrdersController = ((CartOrdersViewController) loader.getController());
+
+            cartOrdersController.initStage(root, false); //False indica que es "MyOrders"
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -115,7 +115,7 @@ public class MenuBarViewController {
             Parent root = loader.load();
             //Obtener el controlador y configurar la vista como "MyCart"
             CartOrdersViewController cartOrdersController = loader.getController();
-            cartOrdersController.initStage(root,true); //True indica que es "MyCart"
+            cartOrdersController.initStage(root, true); //True indica que es "MyCart"
         } catch (IOException e) {
             e.printStackTrace();
             LOGGER.log(Level.SEVERE, "Error loading CartOrdersView.fxml for My Cart", e);
