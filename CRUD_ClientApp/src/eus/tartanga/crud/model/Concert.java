@@ -8,14 +8,13 @@ package eus.tartanga.crud.model;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
  * @author Irati
  */
-
-
 @XmlRootElement
 public class Concert implements Serializable {
 
@@ -34,10 +33,9 @@ public class Concert implements Serializable {
         this.location = "Concert location";
         this.city = "Concert location city";
         this.concertDate = new Date();
-        this.concertTime =new Date();
+        this.concertTime = new Date();
     }
 
-    
     public Integer getConcertId() {
         return concertId;
     }
@@ -126,4 +124,14 @@ public class Concert implements Serializable {
     public String toString() {
         return "eus.tartanga.crud.entities.Concert[ id=" + concertId + " ]";
     }
+    /*
+    public String getArtistsNames() {
+    if (artistList == null || artistList.isEmpty()) {
+        return ""; // Si no hay artistas, devuelve una cadena vacía
+    }
+    return artistList.stream()
+                     .map(Artist::getName) 
+                     .collect(Collectors.joining(", "));
+    }*/
+
 }
