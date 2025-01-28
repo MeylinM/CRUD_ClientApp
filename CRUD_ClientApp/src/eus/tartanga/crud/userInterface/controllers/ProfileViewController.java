@@ -8,6 +8,7 @@ package eus.tartanga.crud.userInterface.controllers;
 import eus.tartanga.crud.logic.FanetixClientFactory;
 import eus.tartanga.crud.logic.FanetixClientManager;
 import eus.tartanga.crud.model.FanetixClient;
+import eus.tartanga.crud.model.FanetixUser;
 import eus.tartanga.crud.model.Product;
 import java.util.List;
 import java.util.logging.Logger;
@@ -66,7 +67,7 @@ public class ProfileViewController {
      * @param root
      * @param user
      */
-    public void initStage(Parent root, FanetixClient user) {
+    public void initStage(Parent root, FanetixUser user) {
         try {
             logger.info("Initializizng profile stage");
             Scene scene = new Scene(root);
