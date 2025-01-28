@@ -9,6 +9,7 @@ import eus.tartanga.crud.model.Artist;
 import eus.tartanga.crud.model.Cart;
 import eus.tartanga.crud.model.Product;
 import eus.tartanga.crud.userInterface.factories.CartDateEditingCell;
+import eus.tartanga.crud.userInterface.factories.CartSpinnerEditingCell;
 import java.io.ByteArrayInputStream;
 import java.text.DateFormat;
 import java.text.NumberFormat;
@@ -46,58 +47,58 @@ import javafx.beans.property.SimpleStringProperty;
  * @author Meylin
  */
 public class CartOrdersViewController extends Application {
-    
+
     @FXML
     private ImageView titleImage;
-    
+
     @FXML
     private Button btnInfo;
-    
+
     @FXML
     private ChoiceBox cbxArtist;
-    
+
     @FXML
     private DatePicker dpFrom;
-    
+
     @FXML
     private DatePicker dpTo;
-    
+
     @FXML
     private TableView<Cart> tbCart;
-    
+
     @FXML
     private TableColumn<Cart, byte[]> tbcProduct;
-    
+
     @FXML
     private TableColumn<Cart, String> tbcArtist;
-    
+
     @FXML
     private TableColumn<Cart, String> tbcName;
-    
+
     @FXML
     private TableColumn<Cart, String> tbcDescription;
-    
+
     @FXML
     private TableColumn<Cart, Date> tbcOrderDate;
-    
+
     @FXML
     private TableColumn<Cart, String> tbcPrice;
-    
+
     @FXML
     private TableColumn<Cart, Integer> tbcQuantity;
-    
+
     @FXML
     private TableColumn<Cart, Float> tbcSubTotal;
-    
+
     @FXML
     private HBox footer;
-    
+
     @FXML
     private Button btnBuy;
-    
+
     @FXML
     private Button btnClearCart;
-    
+
     @FXML
     private Button btnPrint;
 
@@ -111,11 +112,11 @@ public class CartOrdersViewController extends Application {
     private ObservableList<Artist> artistList = FXCollections.observableArrayList();
     private Stage stage;
     private Logger logger = Logger.getLogger(ArtistViewController.class.getName());
-    
+
     public void setStage(Stage stage) {
         this.stage = stage;
     }
-    
+
     public void initStage(Parent root, boolean isCartView) {
 
         //Añadir a la ventana el ícono “FanetixLogo.png”.
@@ -129,19 +130,19 @@ public class CartOrdersViewController extends Application {
         tbcProduct.setCellValueFactory(cellData
                 -> new SimpleObjectProperty<>(cellData.getValue().getProduct().getImage())
         );
-        
+
         tbcProduct.setCellFactory(column -> new TableCell<Cart, byte[]>() {
             private final ImageView imageView = new ImageView();
-            
+
             {
                 imageView.setFitHeight(90);
                 imageView.setPreserveRatio(true);
             }
-            
+
             @Override
             protected void updateItem(byte[] imageBytes, boolean empty) {
                 super.updateItem(imageBytes, empty);
-                if(empty || getTableRow()==null||getTableRow().getItem()==null){
+                if (empty || getTableRow() == null || getTableRow().getItem() == null) {
                     setGraphic(null);
                     return;
                 }
@@ -172,7 +173,10 @@ public class CartOrdersViewController extends Application {
         tbcDescription.setCellValueFactory(cellData
                 -> new SimpleStringProperty(cellData.getValue().getProduct().getDescription())
         );
-        /*Lascolumnas price, subtotal y total deberán estar formateadas con el patrón “###.###,##”.*/
+        /*Lascolumnas price, subtotal y total deberán estar formateadas 
+         *con el patrón “###.###,##”.
+         */
+
         // Precio del producto
         tbcPrice.setCellValueFactory(cellData -> {
             Float price = cellData.getValue().getProduct().getPrice(); // Obtener el precio
@@ -186,7 +190,7 @@ public class CartOrdersViewController extends Application {
         /* - Lacolumna“Order Date” deberá estar formateada con el patrón “dd/mm/yyyy”*/
         tbcOrderDate.setCellFactory(column -> new TableCell<Cart, Date>() {
             private final DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-            
+
             @Override
             protected void updateItem(Date date, boolean empty) {
                 super.updateItem(date, empty);
@@ -227,7 +231,14 @@ public class CartOrdersViewController extends Application {
             tbcOrderDate.setCellFactory(dateCell);
 
             /*Validar que la fecha seleccionada no sea anterior a la actual.*/
- /*○ Columna"Quantity": Configurar como editable con un Spinner, donde el valor mínimo será 1 y el máximo será el stock disponible (Product.getStock()).Estas ediciones estarán habilitadas únicamente si el atributo bought del producto es false.*/
+ /*○ Columna"Quantity": 
+             * Configurar como editable con un Spinner, 
+             * donde el valor mínimo será 1 y el máximo será el stock 
+             * disponible (Product.getStock()).
+             */
+            // Columna Quantity: Configurar como editable con un Spinner
+            final Callback<TableColumn<Cart, Integer>, TableCell<Cart, Integer>> quantityCellFactory = (TableColumn<Cart, Integer> param) -> new CartSpinnerEditingCell();
+            tbcQuantity.setCellFactory(quantityCellFactory);
             tbcQuantity.setEditable(true);
             titleImage.setImage(new Image(getClass().getClassLoader().getResourceAsStream("eus/tartanga/crud/app/resources/MyCart.png")));
             //"btnBuy". (Botón por defecto)
@@ -238,7 +249,7 @@ public class CartOrdersViewController extends Application {
             dpTo.setVisible(false);
             // El botón“btnPrint” estará oculto.
             btnPrint.setVisible(false);
-            
+
         } else {
             // Configuración para "My Orders"
             logger.info("Initializing Orders stage");
@@ -252,12 +263,12 @@ public class CartOrdersViewController extends Application {
         }
         stage.setScene(scene);
         stage.show();
-        
+
         cartList.addAll(findAllNotBoughtCartProducts());
         //Cargar la tabla Products con la información de los productos
         tbCart.setItems(cartList);
     }
-    
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         // Cargar el archivo FXML
@@ -276,11 +287,11 @@ public class CartOrdersViewController extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
     }
-    
+
     public static void main(String[] args) {
         launch(args);
     }
-    
+
     private List<Cart> findAllNotBoughtCartProducts() {
         List<Cart> carts = null;
         try {
