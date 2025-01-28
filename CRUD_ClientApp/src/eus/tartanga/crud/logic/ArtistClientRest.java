@@ -61,7 +61,7 @@ public class ArtistClientRest implements ArtistManager{
     }
 
     @Override
-    public <T> T searchByTerm_XML(Class<T> responseType, String searchTerm) throws ReadException {
+    public <T> T searchByTerm_XML(GenericType<T> responseType, String searchTerm) throws ReadException {
         WebTarget resource = webTarget;
         resource = resource.path(java.text.MessageFormat.format("search/{0}", new Object[]{searchTerm}));
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);

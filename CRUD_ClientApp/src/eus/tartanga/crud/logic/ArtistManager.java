@@ -27,7 +27,7 @@ public interface ArtistManager {
 
     public void removeArtist(String id) throws DeleteException ;
 
-    public <T> T searchByTerm_XML(Class<T> responseType, String searchTerm) throws ReadException ;
+    public <T> T searchByTerm_XML(GenericType<T> responseType, String searchTerm) throws ReadException ;
 
     public <T> T findArtist(Class<T> responseType, String id) throws ReadException ;
 
