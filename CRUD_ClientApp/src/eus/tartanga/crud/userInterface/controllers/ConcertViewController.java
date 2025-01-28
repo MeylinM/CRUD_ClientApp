@@ -21,6 +21,7 @@ import eus.tartanga.crud.userInterface.factories.ConcertDateEditingCell;
 import eus.tartanga.crud.userInterface.factories.ConcertTimeEditingCell;
 
 import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -42,14 +43,20 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javax.ws.rs.WebApplicationException;
@@ -200,15 +207,7 @@ public class ConcertViewController {
                     alert.showAndWait();
                 }
             });
-            /* CAMBIAR ESTO PARA UNA CHOICE BOX, ESTA COMO SI FUERA PARA UN COMBOBOX
-            artistColumn.setCellFactory(ChoiceBoxTableCell.forTableColumn(artistList));
-            artistColumn.setOnEditCommit((TableColumn.CellEditEvent<Concert, Artist> t) -> {
-                ((Concert) t.getTableView().getItems()
-                        .get(t.getTablePosition().getRow()))
-                        .setArtistList(t.getNewValue());
-                Concert concert = (Concert) t.getTableView().getItems.get(t.getTablePosition().getRow());
-                Artist originalValueLevel = concert.getArtistList();
-            }); */
+            //artistColumn
 
             locationColumn.setCellFactory(TextFieldTableCell.forTableColumn());
             locationColumn.setOnEditCommit(event -> {
@@ -312,6 +311,7 @@ public class ConcertViewController {
         concertTable.getItems().add(concert);
         refreshConcertList();
     }
+
     private void refreshConcertList() {
         List<Concert> updatedConcerts = findAllConcerts();
         concertList.setAll(updatedConcerts);
@@ -364,7 +364,14 @@ public class ConcertViewController {
         deleteItem.setOnAction(this::handleDeleteConcert);
         MenuItem printItemInside = new MenuItem("Print");
         printItemInside.setOnAction(this::printItems);
-        contextMenuInside.getItems().addAll(addItem, deleteItem, printItemInside);
+        MenuItem selectArtistItem = new MenuItem("Select artist/s");
+        selectArtistItem.setOnAction(event -> {
+            Concert selectedArtist = concertTable.getSelectionModel().getSelectedItem();
+            if (selectedArtist != null) {
+                showArtistSelectionDialog(selectedArtist);
+            }
+        });
+        contextMenuInside.getItems().addAll(addItem, deleteItem, printItemInside, selectArtistItem);
 
         // Crear menú contextual para clics fuera de la tabla
         contextMenuOutside = new ContextMenu();
@@ -373,6 +380,73 @@ public class ConcertViewController {
         MenuItem addItemOutside = new MenuItem("Add new concert");
         addItemOutside.setOnAction(this::handleAddConcert);
         contextMenuOutside.getItems().addAll(printItemOutside, addItemOutside);
+    }
+
+    private void showArtistSelectionDialog(Concert concert) {
+        Stage artistStage = new Stage();
+        artistStage.setTitle("Select Artists");
+        ListView<Artist> artistListView = new ListView<>();
+        ObservableList<Artist> selectedArtist = FXCollections.observableArrayList(); // Lista de elementos seleccionados manualmente
+
+        try {
+            List<Artist> artists = artistList;
+            // Agregar las categorías a la lista de categorías disponibles
+            artistListView.setItems(FXCollections.observableArrayList(artists));
+            // Agregar manejador de clics personalizados
+            artistListView.setCellFactory(lv -> {
+                ListCell<Artist> cell = new ListCell<Artist>() {
+                    @Override
+                    protected void updateItem(Artist item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item != null) {
+                            setText(item.getName()); // Mostrar el nombre de la categoría
+                        } else {
+                            setText(null);
+                        }
+                    }
+                };
+                cell.setOnMouseClicked(event -> {
+                    if (cell.getItem() != null) {
+                        Artist clickedCategory = cell.getItem();
+                        if (selectedArtist.contains(clickedCategory)) {
+                            selectedArtist.remove(clickedCategory); // Deseleccionar si ya está seleccionado
+                            cell.setStyle(""); // Restablecer estilo
+                        } else {
+                            selectedArtist.add(clickedCategory); // Seleccionar si no está seleccionado
+                            cell.setStyle("-fx-background-color: #fdd3e1;");
+                        }
+                    }
+                });
+                return cell;
+            });
+
+            Button confirmButton = new Button("Save");
+            confirmButton.setStyle("-fx-background-color: #f9eccf");
+            confirmButton.setOnAction(e -> {
+                if (!selectedArtist.isEmpty()) {
+                    try {
+                        concert.setArtistList(selectedArtist);
+                        concertManager.updateConcert_XML(concert, String.valueOf(concert.getConcertId()));
+                        artistStage.close();
+                        concertTable.refresh();
+                        logger.log(Level.INFO, "Selected Artist: {0}", concert.getConcertName());
+                    } catch (UpdateException ex) {
+                        logger.log(Level.SEVERE, "Error", ex);
+                    }
+                }
+            });
+            VBox layout = new VBox(10);
+            layout.setPadding(new javafx.geometry.Insets(10));
+            layout.getChildren().addAll(artistListView, confirmButton);
+            Scene scene = new Scene(layout);
+            artistStage.setScene(scene);
+            artistStage.setWidth(400);
+            artistStage.setHeight(400);
+
+            artistStage.show();
+        } catch (Exception ex) {
+            logger.log(Level.SEVERE, "Error", ex);
+        }
     }
 
     private void printItems(ActionEvent event) {
