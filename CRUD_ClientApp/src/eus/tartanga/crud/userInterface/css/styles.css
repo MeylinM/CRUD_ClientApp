@@ -8,6 +8,7 @@
     -fx-pink-darker:#ffb6c1;
     -fx-yellow: #f9eccf;
     -fx-yellow-darker: #f7dc9e;
+    
 }
 
 /* ------------------ Estilos de Fondo ------------------ */
@@ -60,6 +61,11 @@
 .yellow-button:hover {
     -fx-background-color: -fx-yellow-darker;
 }
+.info-button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
 
 /* ------------------ Estilos de DatePicker ------------------ */
 .date-picker {
@@ -70,7 +76,7 @@
 .date-picker .arrow-button {
     -fx-background-color: -fx-blue;
     -fx-background-radius: 0;
-    -fx-border-color: #7573d6;     
+    -fx-border-color: -fx-darker-blue;     
     -fx-border-width: 1px; 
 }
 .date-picker .arrow-button:hover {
@@ -216,4 +222,17 @@
     -fx-text-fill: black; /* Asegura que el texto siga siendo visible */
     -fx-border-color: #bfbadd;
 
+}
+
+/*------------------ Estilos para el ChoiceBox ------------------*/
+
+.myChoiceBox {
+    -fx-background-color: -fx-blue;  /* Color de fondo */
+    -fx-text-fill: #000000;  /* Color del texto (negro) */
+    -fx-border-color: -fx-darker-blue;     
+    -fx-border-width: 1px; 
+}
+
+.myChoiceBox .arrow-button {
+    -fx-background-color: -fx-darker-blue;  /* Color del botón de la flecha */
 }

@@ -6,7 +6,9 @@
 package eus.tartanga.crud.userInterface.controllers;
 
 import eus.tartanga.crud.exception.AddException;
+import eus.tartanga.crud.exception.DeleteException;
 import eus.tartanga.crud.exception.MaxCharacterException;
+import eus.tartanga.crud.exception.ReadException;
 import eus.tartanga.crud.exception.TextEmptyException;
 import eus.tartanga.crud.exception.UpdateException;
 import eus.tartanga.crud.logic.ArtistFactory;
@@ -16,11 +18,9 @@ import eus.tartanga.crud.logic.ConcertManager;
 import eus.tartanga.crud.model.Artist;
 import eus.tartanga.crud.model.Concert;
 import eus.tartanga.crud.userInterface.factories.ConcertDateEditingCell;
+import eus.tartanga.crud.userInterface.factories.ConcertTimeEditingCell;
 
 import java.io.ByteArrayInputStream;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -32,6 +32,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
@@ -42,18 +43,16 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.ChoiceBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.GenericType;
 
 /**
@@ -266,45 +265,12 @@ public class ConcertViewController {
             final Callback<TableColumn<Concert, Date>, TableCell<Concert, Date>> dateCell
                     = (TableColumn<Concert, Date> param) -> new ConcertDateEditingCell();
             dateColumn.setCellFactory(dateCell);
-            /*
-            // Formateao de la fecha ESTA EN LA FACTORIA DE CONCERTDATE
-            dateColumn.setCellFactory(column -> new TableCell<Concert, Date>() {
-                @Override
-                protected void updateItem(Date date, boolean empty) {
-                    super.updateItem(date, empty);
-                    if (empty || date == null) {
-                        setText(null);
-                    } else {
-                        // Convertir la fecha
-                        LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                        // Formatear la fecha
-                        String formattedDate = localDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-                        setText(formattedDate);
-                    }
-                }
-            });
-             */
-            // Formateo de la hora TENDRE QUE HACERLE UNA FACTORIA A ESTA VAINA?
-            timeColumn.setCellFactory(column -> new TableCell<Concert, Date>() {
-                @Override
-                protected void updateItem(Date date, boolean empty) {
-                    super.updateItem(date, empty);
-                    if (empty || date == null) {
-                        setText(null);
-                    } else {
-                        // Si el valor es un Date y la columna es de tipo Time
-                        java.sql.Time time = new java.sql.Time(date.getTime());  // Convierte Date a Time
 
-                        // Extraer hora y minutos
-                        int hours = time.getHours();
-                        int minutes = time.getMinutes();
+            //ME FALTA CAMBIAR LA FACTORY PARA QUE ME DEJE METER UN CAMPO DE TEXTO Y ME LO FORMATE A 00:00
+            final Callback<TableColumn<Concert, Date>, TableCell<Concert, Date>> timeCell
+                    = (TableColumn<Concert, Date> param) -> new ConcertTimeEditingCell();
+            timeColumn.setCellFactory(timeCell);
 
-                        // Formatear la hora (por ejemplo, "HH:mm")
-                        String formattedTime = String.format("%02d:%02d", hours, minutes);
-                        setText(formattedTime);
-                    }
-                }
-            });
             //REVISAR BIEN QUE TIENE QUE HACER ESTE METODO Y QUE NECESITO
             btnAddConcert.setOnAction(this::handleAddConcert);
             //REVISAR QUE EL METODO BORRA DE LA BASE DE DATOS, QUE LA QUERY NO IBA ( SE SUPONE)
@@ -329,7 +295,7 @@ public class ConcertViewController {
             //Configurar estilos de cada fila de la tabla
             configureRowStyling();
 
-        } catch (Exception e) {
+        } catch (WebApplicationException e) {
             String errorMsg = "Error" + e.getMessage();
             logger.severe(errorMsg);
         }
@@ -338,11 +304,18 @@ public class ConcertViewController {
     private void handleAddConcert(ActionEvent event) {
         Concert concert = new Concert();
         concert.setArtistList(artistList);
-        //  try {
-        concertManager.createConcert_XML(concert);
-        //  } catch (AddException e){
-        //      logger.severe(e.getMessage());
-        // }
+        try {
+            concertManager.createConcert_XML(concert);
+        } catch (AddException e) {
+            logger.severe(e.getMessage());
+        }
+        concertTable.getItems().add(concert);
+        refreshConcertList();
+    }
+    private void refreshConcertList() {
+        List<Concert> updatedConcerts = findAllConcerts();
+        concertList.setAll(updatedConcerts);
+        concertTable.refresh();
     }
 
     private void handleDeleteConcert(ActionEvent event) {
@@ -354,9 +327,9 @@ public class ConcertViewController {
                 concertManager.removeConcert(selectedConcert.getConcertId().toString());
                 //Elimina el producto de la lista observable
                 concertList.remove(selectedConcert);
-                logger.info("Concierto eliminado con exito" + selectedConcert.getConcertName());
-            } catch (Exception e) {
-                logger.severe("Error al eliminar el concierto" + e.getMessage());
+                logger.log(Level.INFO, "Concierto eliminado con exito{0}", selectedConcert.getConcertName());
+            } catch (DeleteException e) {
+                logger.log(Level.SEVERE, "Error al eliminar el concierto{0}", e.getMessage());
             }
         } else {
             logger.warning("No se ha seleccionado ningun concieto para eliminar");
@@ -364,23 +337,23 @@ public class ConcertViewController {
     }
 
     private List<Concert> findAllConcerts() {
-        ConcertManager concertManager = ConcertFactory.getConcertManager();
-        List<Concert> concerts = concertManager.findAllConcerts_XML(new GenericType<List<Concert>>() {
-        });
-
+        List<Concert> concerts = null;
+        try {
+            concerts = concertManager.findAllConcerts_XML(new GenericType<List<Concert>>() {
+            });
+            return concerts;
+        } catch (ReadException ex) {
+            Logger.getLogger(ConcertViewController.class.getName()).log(Level.SEVERE, null, ex);
+        }
         return concerts;
     }
 
-    /*private void createDatePickerField(){
-        DatePicker datePicker = new DatePicker();
-        datePicker.valueProperty.addListener(LocalDate,LocalDate,LocalDate);
-    }*/
     private void updateConcert(Concert concert) {
-        //try {
-        concertManager.updateConcert_XML(concert, concert.getConcertId().toString());
-        //  } catch (UpdateException e) {
-        //     logger.severe(e.getMessage());
-        //   }
+        try {
+            concertManager.updateConcert_XML(concert, concert.getConcertId().toString());
+        } catch (UpdateException e) {
+            logger.severe(e.getMessage());
+        }
     }
 
     private void createContextMenu() {
