@@ -50,6 +50,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TextField;
@@ -119,6 +120,12 @@ public class ProductViewController {
 
     @FXML
     private Button btnInfo;
+
+    @FXML
+    private DatePicker dpFrom;
+
+    @FXML
+    private DatePicker dpTo;
 
     private Stage stage;
     private Logger logger = Logger.getLogger(ProductViewController.class.getName());
@@ -374,33 +381,41 @@ public class ProductViewController {
         }
     }
 
-    public FilteredList<Product> getProductsBySearchField(String searchText, boolean inStock) {
+    public FilteredList<Product> getProductsBySearchField(String searchText, boolean inStock, LocalDate fromDate, LocalDate toDate) {
         // Crea un FilteredList con la lista de productos original
         FilteredList<Product> filteredData = new FilteredList<>(productList, p -> true);
 
-        // Si el texto de búsqueda no es nulo o vacío, filtra los productos
-        if (searchText != null && !searchText.isEmpty()) {
-            // Convierte el texto de búsqueda a minúsculas para hacer la comparación insensible a mayúsculas/minúsculas
-            String lowerCaseFilter = searchText.toLowerCase();
-
-            // Aplica el predicado de filtrado en función de los atributos de cada producto
-            filteredData.setPredicate(product -> {
-                boolean matchesSearch = product.getTitle().toLowerCase().contains(lowerCaseFilter)
+        // Aplica los filtros combinados (búsqueda, stock y fecha)
+        filteredData.setPredicate(product -> {
+            // Filtra por el texto de búsqueda
+            boolean matchesSearch = true;
+            if (searchText != null && !searchText.isEmpty()) {
+                String lowerCaseFilter = searchText.toLowerCase();
+                matchesSearch = product.getTitle().toLowerCase().contains(lowerCaseFilter)
                         || product.getDescription().toLowerCase().contains(lowerCaseFilter)
                         || product.getArtist().getName().toLowerCase().contains(lowerCaseFilter);
+            }
 
-                // Además, filtra por stock si se requiere
-                boolean matchesStock = !inStock || Integer.parseInt(product.getStock()) > 0;
+            // Filtra por stock
+            boolean matchesStock = !inStock || Integer.parseInt(product.getStock()) > 0;
 
-                // Solo se incluye el producto si coincide con ambos filtros (búsqueda y stock)
-                return matchesSearch && matchesStock;
-            });
-        } else {
-            // Si no hay texto de búsqueda, filtra solo por el stock
-            filteredData.setPredicate(product -> !inStock || Integer.parseInt(product.getStock()) > 0);
-        }
+            // Filtra por fechas (si las fechas están definidas)
+            boolean matchesDate = true;
+            if (fromDate != null && toDate != null) {
+                Date productReleaseDate = product.getReleaseDate();  // Esto es Date
+                // Convertimos LocalDate a Date para la comparación
+                java.sql.Date fromSQLDate = java.sql.Date.valueOf(fromDate);
+                java.sql.Date toSQLDate = java.sql.Date.valueOf(toDate);
 
-        return filteredData; // Devuelve el filtro aplicado
+                // Comparamos las fechas
+                matchesDate = !productReleaseDate.before(fromSQLDate) && !productReleaseDate.after(toSQLDate);
+            }
+
+            // Devuelve true solo si el producto cumple con todos los filtros
+            return matchesSearch && matchesStock && matchesDate;
+        });
+
+        return filteredData;
     }
 
     private void createContextMenu() {
@@ -485,26 +500,41 @@ public class ProductViewController {
     }
 
     private void filterProducts() {
-        //Mientras el usuario está escribiendo ese valor se usará para filtrar los productos de la tabla
-        //que filtrara ese valor en base a los atributos tittle, artist y description de todos los productos.
+        // Mientras el usuario está escribiendo ese valor se usará para filtrar los productos de la tabla
         tfSearch.textProperty().addListener((observable, oldValue, newValue) -> {
-            // Mientras el usuario está escribiendo ese valor se usará para filtrar los productos de la tabla
-            FilteredList<Product> filteredProducts = getProductsBySearchField(newValue, cbxStock.isSelected());
-
-            // Actualiza la tabla con los productos filtrados
-            SortedList<Product> sortedData = new SortedList<>(filteredProducts);
-            sortedData.comparatorProperty().bind(productTable.comparatorProperty());
-            productTable.setItems(sortedData);
+            // Se filtra aplicando todos los filtros (búsqueda, stock, fechas)
+            applyFilter();
         });
 
         // Filtra los elementos de la tabla en base de si hay stock o no.
         cbxStock.setOnAction(event -> {
-            FilteredList<Product> filteredProducts = getProductsBySearchField(tfSearch.getText(), cbxStock.isSelected());
-            //Actualiza la tabla con los productos filtrados
-            SortedList<Product> sortedData = new SortedList<>(filteredProducts);
-            sortedData.comparatorProperty().bind(productTable.comparatorProperty());
-            productTable.setItems(sortedData);
+            applyFilter();
         });
+
+        // Filtra por rango de fechas cuando cambian los DatePickers
+        dpFrom.valueProperty().addListener((observable, oldValue, newValue) -> {
+            applyFilter();
+        });
+
+        dpTo.valueProperty().addListener((observable, oldValue, newValue) -> {
+            applyFilter();
+        });
+    }
+
+    private void applyFilter() {
+        // Obtener el texto de búsqueda y las fechas seleccionadas
+        String searchText = tfSearch.getText();
+        boolean inStock = cbxStock.isSelected();
+        LocalDate fromDate = dpFrom.getValue();
+        LocalDate toDate = dpTo.getValue();
+
+        // Aplicar el filtrado de productos
+        FilteredList<Product> filteredProducts = getProductsBySearchField(searchText, inStock, fromDate, toDate);
+
+        // Actualizar la tabla con los productos filtrados
+        SortedList<Product> sortedData = new SortedList<>(filteredProducts);
+        sortedData.comparatorProperty().bind(productTable.comparatorProperty());
+        productTable.setItems(sortedData);
     }
 
     private void configureRowStyling() {
@@ -550,6 +580,7 @@ public class ProductViewController {
         alert.setContentText(message);
         alert.showAndWait();
     }
+
     private void showAlertWarning(String message) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle("Warning");
