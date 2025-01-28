@@ -21,7 +21,7 @@ import javafx.stage.WindowEvent;
  *
  * @author javi
  */
-public class HelpController {
+public class HelpProductController {
     /**
      * The control that shows the help page.
      */
