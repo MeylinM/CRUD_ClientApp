@@ -141,7 +141,11 @@ public class CartOrdersViewController extends Application {
             @Override
             protected void updateItem(byte[] imageBytes, boolean empty) {
                 super.updateItem(imageBytes, empty);
-                if (empty || imageBytes == null) {
+                if(empty || getTableRow()==null||getTableRow().getItem()==null){
+                    setGraphic(null);
+                    return;
+                }
+                if (imageBytes == null) {
                     // Mostrar una imagen predeterminada si no hay datos
                     Image noImage = new Image(getClass().getClassLoader().getResourceAsStream("eus/tartanga/crud/app/resources/noImage.png"));
                     imageView.setImage(noImage);

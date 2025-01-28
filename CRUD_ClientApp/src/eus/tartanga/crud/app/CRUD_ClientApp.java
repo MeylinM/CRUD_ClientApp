@@ -54,7 +54,7 @@ public class CRUD_ClientApp extends Application {
         //Scene scene = new Scene(root);
         CartOrdersViewController controller = ((CartOrdersViewController) loader.getController());
         controller.setStage(stage);
-        controller.initStage(root,true);
+        controller.initStage(root,false);
         
         /*FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ArtistView.fxml"));
         Parent root = (Parent) loader.load();
