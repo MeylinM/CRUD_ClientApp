@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.XmlElement;
 
 /**
  *
- * @author Meylin
+ * @author Meylin, Elbire
  */
 public class FanetixUser implements Serializable {
 
@@ -18,6 +18,14 @@ public class FanetixUser implements Serializable {
 
     private String email;
     private String passwd;
+    
+    public FanetixUser(){
+        
+    }
+    public FanetixUser(String email, String passwrd) {
+        this.email=email;
+        this.passwd=passwrd;
+    }
 
     @XmlElement
 

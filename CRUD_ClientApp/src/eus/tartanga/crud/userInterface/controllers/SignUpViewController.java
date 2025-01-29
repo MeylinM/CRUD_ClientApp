@@ -42,10 +42,14 @@ import eus.tartanga.crud.exception.PatternFullNameIncorrectException;
 import eus.tartanga.crud.exception.PatternMobileIncorrectException;
 import eus.tartanga.crud.exception.PatternPasswordIncorrectException;
 import eus.tartanga.crud.exception.PatternZipIncorrectException;
+import eus.tartanga.crud.exception.ReadException;
 import eus.tartanga.crud.exception.TextEmptyException;
 import eus.tartanga.crud.exception.UserExistErrorException;
+import eus.tartanga.crud.logic.FanetixClientFactory;
+import eus.tartanga.crud.logic.FanetixClientManager;
 import eus.tartanga.crud.model.FanetixClient;
 import java.util.regex.Pattern;
+import javax.ws.rs.core.GenericType;
 
 /**
  * @author Meylin, Elbire
@@ -237,6 +241,10 @@ public class SignUpViewController {
      * @param root The root node to be used for creating the scene of the
      * window.
      */
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
+
     public void initStage(Parent root) {
         Scene scene = new Scene(root);
         stage = new Stage();
@@ -345,6 +353,7 @@ public class SignUpViewController {
         Image hiddenEyeIcon = new Image(getClass().getResourceAsStream("eus/tartanga/crud/app/resources/HidePasswdSignUp.png"));
         Image visibleEyeIcon = new Image(getClass().getResourceAsStream("eus/tartanga/crud/app/resources/ShowPasswdSignUp.png"));
 
+
         if (tgbEyePasswd.isSelected()) {
             // PasswordField “pfHiddenPassword” will become invisible.
             pfHiddenPassword.setVisible(false);
@@ -393,7 +402,7 @@ public class SignUpViewController {
      * the system.
      */
     @FXML
-    private void handleSignUp(ActionEvent event) throws AddException, UserExistErrorException {
+    private void handleSignUp(ActionEvent event) {
         // Clear error messages each time btnSignUp is clicked.
         clearErrorLabels();
         FanetixClient newUser;
@@ -413,226 +422,195 @@ public class SignUpViewController {
                 // Throw exception if any field is empty
                 throw new TextEmptyException("You must fill all the parameters");
             }
-            try {
-                // Validate that the "tfFullName" field does not contain any numbers.
-                if (!Pattern.matches("^[A-Za-zÀ-ÿ'\\s]+$", tfFullName.getText())) {
-                    // Throw the exception if the full name contains numbers or invalid characters
-                    throw new PatternFullNameIncorrectException("The full name can't contain numbers");
-                } else {
-                    name = tfFullName.getText();
-                    clearErrorStyle(tfFullName, labelErrorFullName);
-                }
-            } catch (PatternFullNameIncorrectException e) {
-                // If it contains numbers, show "PatternFullNameIncorrectException" in labelErrorFullName.
-                setErrorStyle(tfFullName, labelErrorFullName, e.getMessage());
-                if (!focused) {
-                    tfFullName.requestFocus();
-                    focused = true;
-                }
-            }
-            try {
-                // Validate that the "tfEmail" field follows correct email format and has a maximum of 320 characters.
-                if (!Pattern.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$", tfEmail.getText())
-                        || tfEmail.getText().length() > 320) {
-
-                    // Throw the exception if the email format is invalid or too long
-                    throw new PatternEmailIncorrectException("The email must have a valid format");
-                } else {
-                    email = tfEmail.getText();
-                    clearErrorStyle(tfEmail, labelErrorEmail);
-                }
-            } catch (PatternEmailIncorrectException e) {
-                // If invalid, show "PatternEmailIncorrectException" in labelErrorEmail.
-                setErrorStyle(tfEmail, labelErrorEmail, e.getMessage());
-                if (!focused) {
-                    tfEmail.requestFocus();
-                    focused = true;
-                }
+            // Validate that the "tfFullName" field does not contain any numbers.
+            if (!Pattern.matches("^[A-Za-zÀ-ÿ'\\s]+$", tfFullName.getText())) {
+                // Throw the exception if the full name contains numbers or invalid characters
+                throw new PatternFullNameIncorrectException("The full name can't contain numbers");
+            } else {
+                name = tfFullName.getText();
+                clearErrorStyle(tfFullName, labelErrorFullName);
             }
 
-            try {
-                // Validate that the password format in "tfShowPassword" meets criteria.
-                String passwordValidate = tfShowPassword.getText();
+            // Validate that the "tfEmail" field follows correct email format and has a maximum of 320 characters.
+            if (!Pattern.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$", tfEmail.getText())
+                    || tfEmail.getText().length() > 320) {
 
-                // Check if password has at least 8 characters
-                if (passwordValidate.length() < 8) {
-                    throw new PatternPasswordIncorrectException("Password must be at least 8 characters long");
-                }
-
-                // Check if password contains at least one uppercase letter
-                if (!passwordValidate.matches(".*[A-Z].*")) {
-                    throw new PatternPasswordIncorrectException("Password must contain at least one uppercase letter");
-                }
-
-                // Check if password contains at least one lowercase letter
-                if (!passwordValidate.matches(".*[a-z].*")) {
-                    throw new PatternPasswordIncorrectException("Password must contain at least one lowercase letter");
-                }
-
-                // Check if password contains at least one digit
-                if (!passwordValidate.matches(".*\\d.*")) {
-                    throw new PatternPasswordIncorrectException("Password must contain at least one digit");
-                }
-
-                // Check if password contains at least one special character
-                if (!passwordValidate.matches(".*[!@#$%^&*(),.?\":{}|<>].*")) {
-                    throw new PatternPasswordIncorrectException("Password must contain at least one special character");
-                }
-                if (tfShowPassword.isVisible()) {
-                    clearErrorStyle(tfShowPassword, labelErrorPasswd);
-                } else {
-                    clearErrorStylePassword(pfHiddenPassword, labelErrorPasswd);
-                }
-                try {
-                    // Validate that "pfHiddenConfirmPassword" matches "pfHiddenPassword".
-
-                    if (!pfHiddenPassword.getText().equals(pfHiddenConfirmPassword.getText())) {
-                        // Throw exception if the passwords don't match
-                        throw new PasswdsDontMatchException("The passwords don't match");
-                    } else {
-                        password = pfHiddenPassword.getText();
-                    }
-                    if (pfHiddenConfirmPassword.isVisible()) {
-                        clearErrorStylePassword(pfHiddenConfirmPassword, labelErrorConfirmPasswd);
-                    } else {
-                        clearErrorStyle(tfShowConfirmPassword, labelErrorConfirmPasswd);
-                    }
-                } catch (PasswdsDontMatchException e) {
-                    // If not matching, show "PasswdsDontMatchException" in labelErrorConfirmPasswd.
-                    if (tfShowConfirmPassword.isVisible()) {
-                        setErrorStyle(tfShowConfirmPassword, labelErrorConfirmPasswd, e.getMessage());
-                    } else {
-                        setErrorStylePassword(pfHiddenConfirmPassword, labelErrorConfirmPasswd, e.getMessage());
-                    }
-                    if (!focused) {
-                        if (tfShowConfirmPassword.isVisible()) {
-                            tfShowConfirmPassword.requestFocus();
-                        } else {
-                            pfHiddenConfirmPassword.requestFocus();
-                        }
-                        focused = true;
-                    }
-                }
-            } catch (PatternPasswordIncorrectException e) {
-                if (tfShowPassword.isVisible()) {
-                    setErrorStyle(tfShowPassword, labelErrorPasswd, e.getMessage());
-                } else {
-                    setErrorStylePassword(pfHiddenPassword, labelErrorPasswd, e.getMessage());
-                }
-                if (!focused) {
-                    if (tfShowPassword.isVisible()) {
-                        tfShowPassword.requestFocus();
-                    } else {
-                        pfHiddenPassword.requestFocus();
-                    }
-                    focused = true;
-                }
+                // Throw the exception if the email format is invalid or too long
+                throw new PatternEmailIncorrectException("The email must have a valid format");
+            } else {
+                email = tfEmail.getText();
+                clearErrorStyle(tfEmail, labelErrorEmail);
             }
 
-            try {
-                // Validate that "tfStreet" does not exceed 255 characters.
-                if (tfStreet.getText().length() > 255) {
-                    // Throw exception if the street length exceeds 255 characters
-                    throw new MaxStreetCharacterException("Street must be shorter");
-                } else {
-                    street = tfStreet.getText();
-                    clearErrorStyle(tfStreet, labelErrorStreet);
-                }
-            } catch (MaxStreetCharacterException e) {
-                // If exceeded, show "MaxStreetCharacterException" in labelErrorStreet.
-                setErrorStyle(tfStreet, labelErrorStreet, e.getMessage());
-                if (!focused) {
-                    tfStreet.requestFocus();
-                    focused = true;
-                }
-            }
-            try {
-                // Validate that "tfZip" contains only digits and is a maximum of 5 numbers.
-                if (!tfZip.getText().matches("\\d{5}$")) {
-                    // Throw exception if the ZIP code is not a valid 5-digit number
-                    throw new PatternZipIncorrectException("ZIP must be 5 digits.");
-                } else {
-                    zip = Integer.parseInt(tfZip.getText());
-                    clearErrorStyle(tfZip, labelErrorZip);
-                }
-            } catch (PatternZipIncorrectException e) {
-                // If invalid, show "PatternZipIncorrectException" in labelErrorZip.
-                setErrorStyle(tfZip, labelErrorZip, e.getMessage());
-                if (!focused) {
-                    tfZip.requestFocus();
-                    focused = true;
-                }
-            }
-            try {
-                // Validate that "tfCity" does not exceed 58 characters.
-                if (tfCity.getText().length() > 58) {
-                    // Throw exception if the city name length exceeds 58 characters
-                    throw new MaxCityCharacterException("City must be shorter");
-                } else {
-                    city = tfCity.getText();
-                    clearErrorStyle(tfCity, labelErrorCity);
-                }
-            } catch (MaxCityCharacterException e) {
-                // If exceeded, show "MaxCityCharacterException" in labelErrorCity.
-                setErrorStyle(tfCity, labelErrorCity, e.getMessage());
-                if (!focused) {
-                    tfCity.requestFocus();
-                    focused = true;
-                }
-            }
-            try {
-                // Validate that "tfMobile" contains only digits and has a maximum of 9 characters.
-                if (!tfMobile.getText().matches("\\d{9}$")) {
-                    // Throw exception if the mobile number is not 9 digits
-                    throw new PatternMobileIncorrectException("Mobile must be 9 digits.");
-                } else {
-                    mobile = Integer.parseInt(tfMobile.getText());
-                    clearErrorStyle(tfMobile, labelErrorMobile);
-                }
-            } catch (PatternMobileIncorrectException e) {
-                // If invalid, show "PatternMobileIncorrectException" in labelErrorMobile.
-                setErrorStyle(tfMobile, labelErrorMobile, e.getMessage());
-                if (!focused) {
-                    tfMobile.requestFocus();
-                    focused = true;
-                }
+            // Validate that the password format in "tfShowPassword" meets criteria.
+            String passwordValidate = tfShowPassword.getText();
+
+            // Check if password has at least 8 characters
+            if (passwordValidate.length() < 8) {
+                throw new PatternPasswordIncorrectException("Password must be at least 8 characters long");
             }
 
-            // If selected, the user will be considered active; otherwise, inactive.
-            active = cbxStatus.selectedProperty().getValue();
+            // Check if password contains at least one uppercase letter
+            if (!passwordValidate.matches(".*[A-Z].*")) {
+                throw new PatternPasswordIncorrectException("Password must contain at least one uppercase letter");
+            }
 
-            // Once all validations pass, load the data from fields into a User object.
+            // Check if password contains at least one lowercase letter
+            if (!passwordValidate.matches(".*[a-z].*")) {
+                throw new PatternPasswordIncorrectException("Password must contain at least one lowercase letter");
+            }
+
+            // Check if password contains at least one digit
+            if (!passwordValidate.matches(".*\\d.*")) {
+                throw new PatternPasswordIncorrectException("Password must contain at least one digit");
+            }
+
+            // Check if password contains at least one special character
+            if (!passwordValidate.matches(".*[!@#$%^&*(),.?\":{}|<>].*")) {
+                throw new PatternPasswordIncorrectException("Password must contain at least one special character");
+            }
+            if (tfShowPassword.isVisible()) {
+                clearErrorStyle(tfShowPassword, labelErrorPasswd);
+            } else {
+                clearErrorStylePassword(pfHiddenPassword, labelErrorPasswd);
+            }
+            // Validate that "pfHiddenConfirmPassword" matches "pfHiddenPassword".
+
+            if (!pfHiddenPassword.getText().equals(pfHiddenConfirmPassword.getText())) {
+                // Throw exception if the passwords don't match
+                throw new PasswdsDontMatchException("The passwords don't match");
+            } else {
+                password = pfHiddenPassword.getText();
+            }
+            if (pfHiddenConfirmPassword.isVisible()) {
+                clearErrorStylePassword(pfHiddenConfirmPassword, labelErrorConfirmPasswd);
+            } else {
+                clearErrorStyle(tfShowConfirmPassword, labelErrorConfirmPasswd);
+            }
+
+            // Validate that "tfStreet" does not exceed 255 characters.
+            if (tfStreet.getText().length() > 255) {
+                // Throw exception if the street length exceeds 255 characters
+                throw new MaxStreetCharacterException("Street must be shorter");
+            } else {
+                street = tfStreet.getText();
+                clearErrorStyle(tfStreet, labelErrorStreet);
+            }
+            // Validate that "tfZip" contains only digits and is a maximum of 5 numbers.
+            if (!tfZip.getText().matches("\\d{5}$")) {
+                // Throw exception if the ZIP code is not a valid 5-digit number
+                throw new PatternZipIncorrectException("ZIP must be 5 digits.");
+            } else {
+                zip = Integer.parseInt(tfZip.getText());
+                clearErrorStyle(tfZip, labelErrorZip);
+            }
+            // Validate that "tfCity" does not exceed 58 characters.
+            if (tfCity.getText().length() > 58) {
+                // Throw exception if the city name length exceeds 58 characters
+                throw new MaxCityCharacterException("City must be shorter");
+            } else {
+                city = tfCity.getText();
+                clearErrorStyle(tfCity, labelErrorCity);
+            }
+            // Validate that "tfMobile" contains only digits and has a maximum of 9 characters.
+            if (!tfMobile.getText().matches("\\d{9}$")) {
+                // Throw exception if the mobile number is not 9 digits
+                throw new PatternMobileIncorrectException("Mobile must be 9 digits.");
+            } else {
+                mobile = Integer.parseInt(tfMobile.getText());
+                clearErrorStyle(tfMobile, labelErrorMobile);
+            }
+
             if (!(email == null || password == null || name == null || street == null || mobile == 0 || city == null || zip == 0)) {
-                newUser = new FanetixClient();
-                newUser.setEmail(email);
-                newUser.setPasswd(password);
-                newUser.setFullName(name);
-                newUser.setStreet(street);
-                newUser.setMobile(mobile);
-                newUser.setCity(city);
-                newUser.setZip(zip);
-                /*
-                try {
-                    // Call the signUp method, passing the User object.
-                    /*newUserValidate = signable.signUp(newUser);
-                    if (newUserValidate != null) {
-                        // Show an INFORMATION alert with the message "Registration successful."
-                        new Alert(Alert.AlertType.CONFIRMATION, "You have successfully registered.", ButtonType.OK).showAndWait();
-                        // After accepting the message, close the SignUp window and return control to the SignIn window.
-                        stage.close();
-                    }
-                } catch (AddException e) {
-                    // Handle server-related errors with an alert message.
-                    new Alert(Alert.AlertType.ERROR, "At this moment server is not available. Please try later.", ButtonType.OK).showAndWait();
-                    LOGGER.severe(e.getLocalizedMessage());
-                } catch (UserExistErrorException e) {
-                    new Alert(Alert.AlertType.ERROR, "The email entered is already in use.", ButtonType.OK).showAndWait();
-                    LOGGER.severe(e.getLocalizedMessage());
-                } catch (MaxThreadsErrorException e) {
-                    new Alert(Alert.AlertType.ERROR, "Your request can't be attended. Please try later.", ButtonType.OK).showAndWait();
-                    LOGGER.severe(e.getLocalizedMessage());
+                newUser = new FanetixClient(email, password, name, street, mobile, city, zip);
+
+                // Get an implementation of the "Signable" interface from the "ClientFactory".
+                FanetixClientManager clientManager = FanetixClientFactory.getFanetixClientManager();
+                clientManager.createClient_XML(newUser);
+                newUserValidate = clientManager.findClient_XML(new GenericType<FanetixClient>() {
+                }, email);
+                if (newUserValidate != null) {
+                    // Show an INFORMATION alert with the message "Registration successful."
+                    new Alert(Alert.AlertType.CONFIRMATION, "You have successfully registered.", ButtonType.OK).showAndWait();
+                    // After accepting the message, close the SignUp window and return control to the SignIn window.
+                    stage.close();
                 }
-                 */
+
+            }
+        } catch (ReadException | AddException e) {
+            // Handle server-related errors with an alert message.
+            new Alert(Alert.AlertType.ERROR, e.getLocalizedMessage(), ButtonType.OK).showAndWait();
+
+        } catch (PatternMobileIncorrectException e) {
+            // If invalid, show "PatternMobileIncorrectException" in labelErrorMobile.
+            setErrorStyle(tfMobile, labelErrorMobile, e.getMessage());
+            if (!focused) {
+                tfMobile.requestFocus();
+                focused = true;
+            }
+        } catch (MaxCityCharacterException e) {
+            // If exceeded, show "MaxCityCharacterException" in labelErrorCity.
+            setErrorStyle(tfCity, labelErrorCity, e.getMessage());
+            if (!focused) {
+                tfCity.requestFocus();
+                focused = true;
+            }
+        } catch (PatternZipIncorrectException e) {
+            // If invalid, show "PatternZipIncorrectException" in labelErrorZip.
+            setErrorStyle(tfZip, labelErrorZip, e.getMessage());
+            if (!focused) {
+                tfZip.requestFocus();
+                focused = true;
+            }
+        } catch (MaxStreetCharacterException e) {
+            // If exceeded, show "MaxStreetCharacterException" in labelErrorStreet.
+            setErrorStyle(tfStreet, labelErrorStreet, e.getMessage());
+            if (!focused) {
+                tfStreet.requestFocus();
+                focused = true;
+            }
+        } catch (PasswdsDontMatchException e) {
+            // If not matching, show "PasswdsDontMatchException" in labelErrorConfirmPasswd.
+            if (tfShowConfirmPassword.isVisible()) {
+                setErrorStyle(tfShowConfirmPassword, labelErrorConfirmPasswd, e.getMessage());
+            } else {
+                setErrorStylePassword(pfHiddenConfirmPassword, labelErrorConfirmPasswd, e.getMessage());
+            }
+            if (!focused) {
+                if (tfShowConfirmPassword.isVisible()) {
+                    tfShowConfirmPassword.requestFocus();
+                } else {
+                    pfHiddenConfirmPassword.requestFocus();
+                }
+                focused = true;
+            }
+        } catch (PatternPasswordIncorrectException e) {
+            if (tfShowPassword.isVisible()) {
+                setErrorStyle(tfShowPassword, labelErrorPasswd, e.getMessage());
+            } else {
+                setErrorStylePassword(pfHiddenPassword, labelErrorPasswd, e.getMessage());
+            }
+            if (!focused) {
+                if (tfShowPassword.isVisible()) {
+                    tfShowPassword.requestFocus();
+                } else {
+                    pfHiddenPassword.requestFocus();
+                }
+                focused = true;
+            }
+        } catch (PatternEmailIncorrectException e) {
+            // If invalid, show "PatternEmailIncorrectException" in labelErrorEmail.
+            setErrorStyle(tfEmail, labelErrorEmail, e.getMessage());
+            if (!focused) {
+                tfEmail.requestFocus();
+                focused = true;
+            }
+        } catch (PatternFullNameIncorrectException e) {
+            // If it contains numbers, show "PatternFullNameIncorrectException" in labelErrorFullName.
+            setErrorStyle(tfFullName, labelErrorFullName, e.getMessage());
+            if (!focused) {
+                tfFullName.requestFocus();
+                focused = true;
             }
         } catch (TextEmptyException e) {
             // If fields are missing, trigger "TextEmptyException" in labelErrorEmpty.
