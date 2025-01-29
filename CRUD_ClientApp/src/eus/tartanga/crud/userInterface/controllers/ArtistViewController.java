@@ -54,7 +54,6 @@ import javax.ws.rs.core.GenericType;
  *
  * @author olaia
  */
-
 public class ArtistViewController {
 
     @FXML
@@ -144,9 +143,11 @@ public class ArtistViewController {
             artistColumn.setCellValueFactory(new PropertyValueFactory<>("image"));
 
             // Hacer la columna 'debutColumn' editable
+            //NO HACE UPDATE
             final Callback<TableColumn<Artist, Date>, TableCell<Artist, Date>> dateCell
                     = (TableColumn<Artist, Date> param) -> new ArtistDateEditingCell();
             debutColumn.setCellFactory(dateCell);
+            
 
             // Hacer la columna 'nameColumn' editable
             nameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -260,6 +261,7 @@ public class ArtistViewController {
 
             artistTable.setItems(artistList);
             btnAddArtist.setOnAction(this::handleAddArtist);
+            //ARREGLAR DELETE DEL SERVIDOR
             btnDeleteArtist.setOnAction(this::handleDeleteArtist);
             btnInfo.setOnAction(this::handleInfoButton);
             //Inicializar los menu contextuales
@@ -448,7 +450,7 @@ public class ArtistViewController {
     }
 
     private void printItems(ActionEvent event) {
-    /*  try {
+        /*  try {
             JasperReport report = JasperCompileManager.compileReport(getClass().getResourceAsStream("/eus/tartanga/crud/userInterface/report/productReport.jrxml"));
             JRBeanCollectionDataSource dataItems = new JRBeanCollectionDataSource((Collection<Product>) this.productTable.getItems());
             Map<String, Object> parameters = new HashMap<>();

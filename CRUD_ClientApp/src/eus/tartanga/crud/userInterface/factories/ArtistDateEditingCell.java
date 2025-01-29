@@ -25,7 +25,7 @@ public class ArtistDateEditingCell extends TableCell<Artist, Date> {
     public ArtistDateEditingCell() {
         dpArtistCell = new DatePicker();
     }
-
+    
     @Override
     protected void updateItem(Date date, boolean empty) {
         super.updateItem(date, empty);
@@ -42,13 +42,14 @@ public class ArtistDateEditingCell extends TableCell<Artist, Date> {
                         : null);
                 setText(null);
                 setGraphic(dpArtistCell);
-            } else if (date != null) {
+              } else if (date != null) {
                 String dateText = dateFormatter.format(date);
                 setText(dateText);
                 setGraphic(null);
             }
         }
     }
+    
 
     @Override
     public void startEdit() {
@@ -71,4 +72,6 @@ public class ArtistDateEditingCell extends TableCell<Artist, Date> {
         super.cancelEdit();
         setGraphic(null);
     }
+    
+    
 }
