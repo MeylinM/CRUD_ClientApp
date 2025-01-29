@@ -342,8 +342,8 @@ public class SignUpViewController {
     @FXML
     private void handelEyeIconToggleButtonAction(ActionEvent event) {
 
-        Image hiddenEyeIcon = new Image(getClass().getResourceAsStream("/resources/images/HidePasswdOrange.png"));
-        Image visibleEyeIcon = new Image(getClass().getResourceAsStream("/resources/images/ShowPasswdOrange.png"));
+        Image hiddenEyeIcon = new Image(getClass().getResourceAsStream("eus/tartanga/crud/app/resources/HidePasswdSignUp.png"));
+        Image visibleEyeIcon = new Image(getClass().getResourceAsStream("eus/tartanga/crud/app/resources/ShowPasswdSignUp.png"));
 
         if (tgbEyePasswd.isSelected()) {
             // PasswordField “pfHiddenPassword” will become invisible.
