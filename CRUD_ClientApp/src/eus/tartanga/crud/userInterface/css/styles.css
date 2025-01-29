@@ -61,6 +61,11 @@
 .yellow-button:hover {
     -fx-background-color: -fx-yellow-darker;
 }
+.info-button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
 
 /* ------------------ Estilos de DatePicker ------------------ */
 .date-picker {

@@ -6,7 +6,12 @@
 package eus.tartanga.crud.userInterface.controllers;
 
 import eus.tartanga.crud.exception.AddException;
+import eus.tartanga.crud.exception.DeleteException;
+import eus.tartanga.crud.exception.MaxCharacterException;
 import eus.tartanga.crud.exception.ReadException;
+import eus.tartanga.crud.exception.TextEmptyException;
+import eus.tartanga.crud.exception.UpdateException;
+import eus.tartanga.crud.exception.WrongStockFormatException;
 import eus.tartanga.crud.logic.ArtistFactory;
 import eus.tartanga.crud.logic.ArtistManager;
 import eus.tartanga.crud.logic.ProductFactory;
@@ -18,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -28,18 +34,23 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Label;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TextField;
@@ -48,12 +59,18 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.converter.FloatStringConverter;
 import javafx.util.converter.IntegerStringConverter;
 import javax.ws.rs.core.GenericType;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  * FXML Controller class
@@ -81,16 +98,16 @@ public class ProductViewController {
     private TableColumn<Product, Date> releaseDateColumn;
 
     @FXML
-    private TableColumn<Product, Integer> stockColumn;
+    private TableColumn<Product, String> stockColumn;
 
     @FXML
-    private TableColumn<Product, Float> priceColumn;
+    private TableColumn<Product, String> priceColumn;
 
     @FXML
     private AnchorPane productAnchorPane;
 
     @FXML
-    private TextField searchField;
+    private TextField tfSearch;
 
     @FXML
     private CheckBox cbxStock;
@@ -101,11 +118,20 @@ public class ProductViewController {
     @FXML
     private Button btnDeleteProduct;
 
+    @FXML
+    private Button btnInfo;
+
+    @FXML
+    private DatePicker dpFrom;
+
+    @FXML
+    private DatePicker dpTo;
+
     private Stage stage;
     private Logger logger = Logger.getLogger(ProductViewController.class.getName());
     private ContextMenu contextMenuInside;
     private ContextMenu contextMenuOutside;
-    ProductManager productManager;
+    private ProductManager productManager;
     private ObservableList<Product> productList = FXCollections.observableArrayList();
     private ArtistManager artistInterface;
     private ObservableList<Artist> artistList = FXCollections.observableArrayList();
@@ -156,26 +182,89 @@ public class ProductViewController {
             // Hacer las columnas editables
             titleColumn.setCellFactory(TextFieldTableCell.forTableColumn());
             titleColumn.setOnEditCommit(event -> {
-                Product product = event.getRowValue();
-                product.setTitle(event.getNewValue());
+                try {
+                    Product product = event.getRowValue();
+                    Product productCopy = product.clone();
+                    productCopy.setTitle(event.getNewValue());
+                    if (productCopy.getTitle() == null || productCopy.getTitle().isEmpty()) {
+                        throw new TextEmptyException("El campo de Titulo no puede estar vacío");
+                    } else if (productCopy.getTitle().length() > 50) {
+                        throw new MaxCharacterException("El título no puede tener más de 50 caracteres");
+                    }
+                    updateProduct(productCopy);
+                    product.setTitle(event.getNewValue());
+                } catch (TextEmptyException | MaxCharacterException e) {
+                    Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
+                    showAlertWarning(e.getMessage());
+                    productTable.refresh();
+                } catch (Exception e) {
+                    Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
+                }
             });
 
             descriptionColumn.setCellFactory(TextFieldTableCell.forTableColumn());
             descriptionColumn.setOnEditCommit(event -> {
-                Product product = event.getRowValue();
-                product.setDescription(event.getNewValue());
+                try {
+                    Product product = event.getRowValue();
+                    Product productCopy = product.clone();
+                    productCopy.setDescription(event.getNewValue());
+                    System.out.println(productCopy.getDescription());
+                    if (productCopy.getDescription() == null || productCopy.getDescription().isEmpty()) {
+                        throw new TextEmptyException("El campo de description no puede estar vacío");
+                    } else if (productCopy.getDescription().length() > 250) {
+                        throw new MaxCharacterException("La descripcion no puede tener más de 250 caracteres");
+                    }
+                    updateProduct(productCopy);
+                    product.setDescription(event.getNewValue());
+                } catch (TextEmptyException | MaxCharacterException e) {
+                    Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
+                    showAlertWarning(e.getMessage());
+                    productTable.refresh();
+                } catch (Exception e) {
+                    //Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
+                }
             });
 
-            stockColumn.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
+            stockColumn.setCellFactory(TextFieldTableCell.forTableColumn());
             stockColumn.setOnEditCommit(event -> {
-                Product product = event.getRowValue();
-                product.setStock(event.getNewValue());
+                try {
+                    Product product = event.getRowValue();
+                    //int originalStock = product.getStock();
+                    Product productCopy = product.clone();
+                    if (Integer.parseInt(event.getNewValue()) >= 0) {
+                        productCopy.setStock(event.getNewValue());
+                    } else {
+                        throw new NumberFormatException();
+                    }
+                    updateProduct(productCopy);
+                    product.setStock(event.getNewValue());
+                } catch (NumberFormatException ex) {
+                    showAlertWarning("El valor del stock debe ser un número válido y mayor o igual a 0");
+                    productTable.refresh();
+                } catch (Exception e) {
+                    Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
+                }
             });
 
-            priceColumn.setCellFactory(TextFieldTableCell.forTableColumn(new FloatStringConverter()));
+            priceColumn.setCellFactory(TextFieldTableCell.forTableColumn());
             priceColumn.setOnEditCommit(event -> {
-                Product product = event.getRowValue();
-                product.setPrice(event.getNewValue());
+                try {
+                    Product product = event.getRowValue();
+                    //int originalStock = product.getStock();
+                    Product productCopy = product.clone();
+                    if (Float.parseFloat(event.getNewValue()) > 0 && event.getNewValue().matches("^[1-9][0-9]*(\\.[0-9]{1,2})?$")) {
+                        productCopy.setPrice(event.getNewValue());
+                    } else {
+                        throw new NumberFormatException();
+                    }
+                    updateProduct(productCopy);
+                    product.setPrice(event.getNewValue());
+                } catch (NumberFormatException ex) {
+                    showAlertWarning("El valor del precio debe ser un número válido y mayor a 0");
+                    productTable.refresh();
+                } catch (Exception e) {
+                    Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
+                }
             });
 
             artistColumn.setCellFactory(ComboBoxTableCell.forTableColumn(artistList));
@@ -198,7 +287,11 @@ public class ProductViewController {
                 @Override
                 protected void updateItem(byte[] imageBytes, boolean empty) {
                     super.updateItem(imageBytes, empty);
-                    if (empty || imageBytes == null) {
+                    if (empty || getTableRow() == null || getTableRow().getItem() == null) {
+                        setGraphic(null);
+                        return;
+                    }
+                    if (imageBytes == null) {
                         Image noImage = new Image(getClass().getClassLoader().getResourceAsStream("eus/tartanga/crud/app/resources/noImage.png")); // Ruta de la imagen predeterminada
                         imageView.setImage(noImage);
                         setGraphic(imageView);
@@ -211,19 +304,20 @@ public class ProductViewController {
                 }
             });
 
-            priceColumn.setCellFactory(column -> new TableCell<Product, Float>() {
+            /*priceColumn.setCellFactory(column -> new TableCell<Product, String>() {
                 @Override
-                protected void updateItem(Float price, boolean empty) {
+                protected void updateItem(String price, boolean empty) {
                     super.updateItem(price, empty);
                     if (empty || price == null) {
                         setText(null);
                     } else {
-                        setText(String.format("%.2f €", price)); // Formato con dos decimales
+                        setText(price + " €"); 
                     }
                 }
-            });
+            });*/
             btnAddProduct.setOnAction(this::handleAddProduct);
             btnDeleteProduct.setOnAction(this::handleDeleteProduct);
+            btnInfo.setOnAction(this::handleInfoButton);
             //Inicializar los menu contextuales
             createContextMenu();
             // Mostrará el Menú contextual con las opciones mIAddToCart, 
@@ -256,7 +350,7 @@ public class ProductViewController {
             });
             return products;
         } catch (ReadException e) {
-
+            showAlert("An error occurred while getting the product list");
         }
         return products;
     }
@@ -287,40 +381,43 @@ public class ProductViewController {
         }
     }
 
-    public FilteredList<Product> getProductsBySearchField(String searchText, boolean inStock) {
+    public FilteredList<Product> getProductsBySearchField(String searchText, boolean inStock, LocalDate fromDate, LocalDate toDate) {
         // Crea un FilteredList con la lista de productos original
         FilteredList<Product> filteredData = new FilteredList<>(productList, p -> true);
 
-        // Si el texto de búsqueda no es nulo o vacío, filtra los productos
-        if (searchText != null && !searchText.isEmpty()) {
-            // Convierte el texto de búsqueda a minúsculas para hacer la comparación insensible a mayúsculas/minúsculas
-            String lowerCaseFilter = searchText.toLowerCase();
-
-            // Aplica el predicado de filtrado en función de los atributos de cada producto
-            filteredData.setPredicate(product -> {
-                boolean matchesSearch = product.getTitle().toLowerCase().contains(lowerCaseFilter)
+        // Aplica los filtros combinados (búsqueda, stock y fecha)
+        filteredData.setPredicate(product -> {
+            // Filtra por el texto de búsqueda
+            boolean matchesSearch = true;
+            if (searchText != null && !searchText.isEmpty()) {
+                String lowerCaseFilter = searchText.toLowerCase();
+                matchesSearch = product.getTitle().toLowerCase().contains(lowerCaseFilter)
                         || product.getDescription().toLowerCase().contains(lowerCaseFilter)
                         || product.getArtist().getName().toLowerCase().contains(lowerCaseFilter);
+            }
 
-                // Además, filtra por stock si se requiere
-                boolean matchesStock = !inStock || product.getStock() > 0;
+            // Filtra por stock
+            boolean matchesStock = !inStock || Integer.parseInt(product.getStock()) > 0;
 
-                // Solo se incluye el producto si coincide con ambos filtros (búsqueda y stock)
-                return matchesSearch && matchesStock;
-            });
-        } else {
-            // Si no hay texto de búsqueda, filtra solo por el stock
-            filteredData.setPredicate(product -> !inStock || product.getStock() > 0);
-        }
+            // Filtra por fechas (si las fechas están definidas)
+            boolean matchesDate = true;
+            if (fromDate != null && toDate != null) {
+                Date productReleaseDate = product.getReleaseDate();  // Esto es Date
+                // Convertimos LocalDate a Date para la comparación
+                java.sql.Date fromSQLDate = java.sql.Date.valueOf(fromDate);
+                java.sql.Date toSQLDate = java.sql.Date.valueOf(toDate);
 
-        return filteredData; // Devuelve el filtro aplicado
+                // Comparamos las fechas
+                matchesDate = !productReleaseDate.before(fromSQLDate) && !productReleaseDate.after(toSQLDate);
+            }
+
+            // Devuelve true solo si el producto cumple con todos los filtros
+            return matchesSearch && matchesStock && matchesDate;
+        });
+
+        return filteredData;
     }
 
-
-    /*private void createDatePickerField(){
-        DatePicker datePicker = new DatePicker();
-        datePicker.valueProperty.addListener(LocalDate,LocalDate,LocalDate);
-    }*/
     private void createContextMenu() {
         contextMenuInside = new ContextMenu();
         MenuItem addItem = new MenuItem("Add new product");
@@ -341,14 +438,35 @@ public class ProductViewController {
     }
 
     private void handleAddProduct(ActionEvent event) {
-        Product product = new Product();
-        product.setArtist(artistList.get(0));
         try {
+            Product product = new Product();
+            product.setArtist(artistList.get(0));
             productManager.create_XML(product);
+            productTable.getItems().add(product);
+            refreshProductList();
         } catch (AddException e) {
-            System.out.println(e);
+            showAlert("An error occurred while creating the product(s)");
         }
-        productTable.getItems().add(product);
+
+    }
+
+    private void handleInfoButton(ActionEvent event) {
+        try {
+            //LOGGER.info("Loading help view...");
+            //Load node graph from fxml file
+            FXMLLoader loader
+                    = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/HelpProductView.fxml"));
+            Parent root = (Parent) loader.load();
+            HelpProductController helpController
+                    = ((HelpProductController) loader.getController());
+            //Initializes and shows help stage
+            helpController.initAndShowStage(root);
+        } catch (Exception ex) {
+            //If there is an error show message and
+            //log it.
+            System.out.println(ex.getMessage());
+
+        }
     }
 
     private void handleDeleteProduct(ActionEvent event) {
@@ -358,47 +476,65 @@ public class ProductViewController {
             try {
                 // Elimina el producto de la base de datos
                 productManager.remove(selectedProduct.getProductId().toString());
-
                 // Elimina el producto de la lista observable
                 productList.remove(selectedProduct);
-
-                // Muestra un mensaje de confirmación
-                logger.info("Producto eliminado con éxito: " + selectedProduct.getTitle());
-            } catch (Exception e) {
-                // Maneja errores, como problemas de conexión o restricciones de la base de datos
-                logger.severe("Error al eliminar el producto: " + e.getMessage());
+            } catch (DeleteException e) {
+                showAlert("An error occurred while deleting the product(s)");
             }
         } else {
-            // Maneja el caso en el que no se ha seleccionado ningún producto
-            logger.warning("No se ha seleccionado ningún producto para eliminar.");
+            showAlert("No se ha seleccionado ningún producto para eliminar.");
         }
     }
 
     private void printItems(ActionEvent event) {
-        System.out.println("Table Items: ");
+        try {
+            JasperReport report = JasperCompileManager.compileReport(getClass().getResourceAsStream("/eus/tartanga/crud/userInterface/report/productReport.jrxml"));
+            JRBeanCollectionDataSource dataItems = new JRBeanCollectionDataSource((Collection<Product>) this.productTable.getItems());
+            Map<String, Object> parameters = new HashMap<>();
+            JasperPrint jasperPrint = JasperFillManager.fillReport(report, parameters, dataItems);
+            JasperViewer jasperViewer = new JasperViewer(jasperPrint, false);
+            jasperViewer.setVisible(true);
+        } catch (JRException ex) {
+            //EXCEPCIONES DE ESAS
+        }
     }
 
     private void filterProducts() {
-        //Mientras el usuario está escribiendo ese valor se usará para filtrar los productos de la tabla
-        //que filtrara ese valor en base a los atributos tittle, artist y description de todos los productos.
-        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
-            // Mientras el usuario está escribiendo ese valor se usará para filtrar los productos de la tabla
-            FilteredList<Product> filteredProducts = getProductsBySearchField(newValue, cbxStock.isSelected());
-
-            // Actualiza la tabla con los productos filtrados
-            SortedList<Product> sortedData = new SortedList<>(filteredProducts);
-            sortedData.comparatorProperty().bind(productTable.comparatorProperty());
-            productTable.setItems(sortedData);
+        // Mientras el usuario está escribiendo ese valor se usará para filtrar los productos de la tabla
+        tfSearch.textProperty().addListener((observable, oldValue, newValue) -> {
+            // Se filtra aplicando todos los filtros (búsqueda, stock, fechas)
+            applyFilter();
         });
 
         // Filtra los elementos de la tabla en base de si hay stock o no.
         cbxStock.setOnAction(event -> {
-            FilteredList<Product> filteredProducts = getProductsBySearchField(searchField.getText(), cbxStock.isSelected());
-            //Actualiza la tabla con los productos filtrados
-            SortedList<Product> sortedData = new SortedList<>(filteredProducts);
-            sortedData.comparatorProperty().bind(productTable.comparatorProperty());
-            productTable.setItems(sortedData);
+            applyFilter();
         });
+
+        // Filtra por rango de fechas cuando cambian los DatePickers
+        dpFrom.valueProperty().addListener((observable, oldValue, newValue) -> {
+            applyFilter();
+        });
+
+        dpTo.valueProperty().addListener((observable, oldValue, newValue) -> {
+            applyFilter();
+        });
+    }
+
+    private void applyFilter() {
+        // Obtener el texto de búsqueda y las fechas seleccionadas
+        String searchText = tfSearch.getText();
+        boolean inStock = cbxStock.isSelected();
+        LocalDate fromDate = dpFrom.getValue();
+        LocalDate toDate = dpTo.getValue();
+
+        // Aplicar el filtrado de productos
+        FilteredList<Product> filteredProducts = getProductsBySearchField(searchText, inStock, fromDate, toDate);
+
+        // Actualizar la tabla con los productos filtrados
+        SortedList<Product> sortedData = new SortedList<>(filteredProducts);
+        sortedData.comparatorProperty().bind(productTable.comparatorProperty());
+        productTable.setItems(sortedData);
     }
 
     private void configureRowStyling() {
@@ -421,5 +557,35 @@ public class ProductViewController {
 
             return row;
         });
+    }
+
+    private void updateProduct(Product product) {
+        try {
+            productManager.edit_XML(product, product.getProductId().toString());
+        } catch (UpdateException e) {
+            showAlert("An error occurred while updating the product");
+        }
+    }
+
+    private void refreshProductList() {
+        List<Product> updatedProducts = findAllProducts();
+        productList.setAll(updatedProducts);
+        productTable.refresh();
+    }
+
+    private void showAlert(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText("Error de servidor");
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private void showAlertWarning(String message) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Warning");
+        alert.setHeaderText("Error de validación");
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }
