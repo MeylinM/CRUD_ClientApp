@@ -28,6 +28,16 @@ public class FanetixClient extends FanetixUser {
         super.setEmail(email);
         super.setPasswd(passwrd);
     }
+    
+    public FanetixClient(String email, String passwrd,String fullName, String street, Integer mobile, String city, Integer zip) {
+        super.setEmail(email);
+        super.setPasswd(passwrd);
+        this.fullName=fullName;
+        this.street=street;
+        this.mobile=mobile;
+        this.city=city;
+        this.zip=zip;
+    }
 
     public FanetixClient() {
     }

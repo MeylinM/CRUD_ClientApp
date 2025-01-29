@@ -21,6 +21,7 @@ import eus.tartanga.crud.userInterface.controllers.CartOrdersViewController;
 import eus.tartanga.crud.userInterface.controllers.ProductViewController;
 import eus.tartanga.crud.userInterface.controllers.ProfileViewController;
 import eus.tartanga.crud.userInterface.controllers.SignInViewController;
+import eus.tartanga.crud.userInterface.controllers.SignUpViewController;
 import java.io.IOException;
 import java.util.List;
 import javafx.fxml.FXMLLoader;
@@ -51,10 +52,10 @@ public class CRUD_ClientApp extends Application {
         controller.setStage(stage);
         controller.initStage(root); */
         
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ProfileView.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/SignUpView.fxml"));
         Parent root = (Parent) loader.load();
         //Scene scene = new Scene(root);
-        ProfileViewController controller = ((ProfileViewController) loader.getController());
+        SignUpViewController controller = ((SignUpViewController) loader.getController());
         controller.setStage(stage);
         controller.initStage(root);
         
