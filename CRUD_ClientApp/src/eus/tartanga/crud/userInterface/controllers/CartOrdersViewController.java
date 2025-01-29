@@ -236,7 +236,7 @@ public class CartOrdersViewController extends Application {
             tbcOrderDate.setCellFactory(dateCell);
 
             /*Validar que la fecha seleccionada no sea anterior a la actual.*/
- /*○ Columna"Quantity": 
+            /*○ Columna"Quantity": 
              * Configurar como editable con un Spinner, 
              * donde el valor mínimo será 1 y el máximo será el stock 
              * disponible (Product.getStock()).
@@ -296,10 +296,6 @@ public class CartOrdersViewController extends Application {
         primaryStage.show();
     }
 
-    public static void main(String[] args) {
-        launch(args);
-    }
-    
     private void handleAddProduct(ActionEvent event) {
         try {
             //LOGICA DE CONSEGUIR EL PRODUCTO/CARRITO ESPECIFICO?

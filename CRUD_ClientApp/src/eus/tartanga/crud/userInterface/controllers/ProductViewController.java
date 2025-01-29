@@ -79,14 +79,14 @@ import javafx.util.Callback;
 import javafx.util.converter.FloatStringConverter;
 import javafx.util.converter.IntegerStringConverter;
 import javax.ws.rs.core.GenericType;
-import net.sf.jasperreports.engine.JRException;
+/*import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.view.JasperViewer;
-
+*/
 /**
  * FXML Controller class
  *
@@ -386,13 +386,13 @@ public class ProductViewController {
         MenuItem deleteItem = new MenuItem("Delete");
         deleteItem.setOnAction(this::handleDeleteProduct);
         MenuItem printItemInside = new MenuItem("Print");
-        printItemInside.setOnAction(this::printItems);
+       // printItemInside.setOnAction(this::printItems);
         contextMenuInside.getItems().addAll(addItem, deleteItem, printItemInside);
 
         // Crear menú contextual para clics fuera de la tabla
         contextMenuOutside = new ContextMenu();
         MenuItem printItemOutside = new MenuItem("Print");
-        printItemOutside.setOnAction(this::printItems);
+       // printItemOutside.setOnAction(this::printItems);
         MenuItem addItemOutside = new MenuItem("Add new product");
         addItemOutside.setOnAction(this::handleAddProduct);
         contextMenuOutside.getItems().addAll(printItemOutside, addItemOutside);
@@ -509,7 +509,7 @@ public class ProductViewController {
         productTable.refresh();
     }
 
-    private void printItems(ActionEvent event) {
+   /* private void printItems(ActionEvent event) {
         try {
             JasperReport report = JasperCompileManager.compileReport(getClass().getResourceAsStream("/eus/tartanga/crud/userInterface/report/productReport.jrxml"));
             JRBeanCollectionDataSource dataItems = new JRBeanCollectionDataSource((Collection<Product>) this.productTable.getItems());
@@ -520,7 +520,7 @@ public class ProductViewController {
         } catch (JRException ex) {
             //EXCEPCIONES DE ESAS
         }
-    }
+    }*/
 
     private void handleInfoButton(ActionEvent event) {
         try {
