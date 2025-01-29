@@ -87,6 +87,7 @@ public class ProfileViewController {
             stage.setScene(scene);
             stage.setTitle("Profile");
             stage.setResizable(false);
+            stage.show();
             fullNameField.setEditable(false);
             emailField.setEditable(false);
             passwordField.setEditable(false);
@@ -94,11 +95,9 @@ public class ProfileViewController {
             cityField.setEditable(false);
             streetField.setEditable(false);
             postalCodeField.setEditable(false);
-            stage.show();
-            clientManager = FanetixClientFactory.getFanetixClientManager();
             FanetixUser user = MenuBarViewController.getLoggedUser();
+            clientManager = FanetixClientFactory.getFanetixClientManager();  
             findClient(user.getEmail());
-
         } catch (Exception e) {
             String errorMsg = "Error" + e.getMessage();
             logger.severe(errorMsg);
@@ -106,11 +105,9 @@ public class ProfileViewController {
     }
 
     private FanetixClient findClient(String email) {
-        try {
-            
+        try {      
             client = clientManager.findClient_XML(new GenericType<FanetixClient>() {
             }, email);
-           // System.out.println("Llego aqui");
             loadClientData(client);
             return client;
         } catch (ReadException ex) {
@@ -121,6 +118,7 @@ public class ProfileViewController {
 
     private void loadClientData(FanetixClient client) {
         if (client != null) {
+            System.out.println(client.getFullName());
             fullNameField.setText(client.getFullName());
             emailField.setText(client.getEmail());
             phoneField.setText(String.valueOf(client.getMobile()));
