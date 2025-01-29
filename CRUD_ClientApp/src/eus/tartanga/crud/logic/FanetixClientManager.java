@@ -14,7 +14,7 @@ import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.core.GenericType;
 /**
  *
- * @author meyli
+ * @author Elbire and Meylin
  */
 public interface FanetixClientManager {
 
@@ -28,9 +28,9 @@ public interface FanetixClientManager {
 
     public void updateClient_JSON(Object requestEntity, String email) throws UpdateException;
 
-    public <T> T signIn_XML(Class<T> responseType, String email, String passwd) throws SignInException;
+    public <T> T signIn_XML(GenericType<T> responseType, String email, String passwd) throws SignInException;
 
-    public <T> T signIn_JSON(Class<T> responseType, String email, String passwd) throws SignInException;
+    public <T> T signIn_JSON(GenericType<T> responseType, String email, String passwd) throws SignInException;
 
     public <T> T findClient_XML(GenericType<T> responseType, String email) throws ReadException;
 

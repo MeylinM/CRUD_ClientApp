@@ -168,5 +168,13 @@ public class MenuBarViewController {
     @FXML
     private void showHelpOrder() {
     }
+    
+    public static void setUser(FanetixUser user) {
+        loggedUser = user;
+    }
 
+    public static FanetixUser getLoggedUser() {
+        return loggedUser;
+    }
+    
 }

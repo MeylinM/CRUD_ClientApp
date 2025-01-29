@@ -5,11 +5,14 @@
  */
 package eus.tartanga.crud.userInterface.controllers;
 
+import eus.tartanga.crud.exception.ReadException;
+import eus.tartanga.crud.exception.SignInException;
 import eus.tartanga.crud.logic.AdministratorFactory;
 import eus.tartanga.crud.logic.AdministratorManager;
 import eus.tartanga.crud.logic.FanetixClientFactory;
 import eus.tartanga.crud.logic.FanetixClientManager;
 import eus.tartanga.crud.model.FanetixClient;
+import eus.tartanga.crud.model.FanetixUser;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,7 +25,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import javax.ws.rs.core.GenericType;
 
+/**
+ * @author Elbire
+ */
 public class SignInViewController {
 
     // Elementos de la vista
@@ -59,6 +66,7 @@ public class SignInViewController {
             stage.setScene(scene);
             stage.setTitle("SignIn");
             stage.setResizable(false);
+            clientManager= FanetixClientFactory.getFanetixClientManager();
             tfPassword.setVisible(false);
             pfPassword.textProperty().addListener(this::textPropertyChange);
             tfPassword.textProperty().addListener(this::textPropertyChange);
@@ -68,7 +76,6 @@ public class SignInViewController {
             // hypSignUp.setOnAction(this::handlerHyperlink);
             // hypForgotPassword.setOnAction(this::handlerHyperlink);
             //  adminManager = AdministratorFactory.getAdministratorManager();
-            // clientManager = FanetixClientFactory.getFanetixClientManager();
             stage.show();
             logger.info("Showing the SignIn window.");
         } catch (Exception e) {
@@ -79,20 +86,25 @@ public class SignInViewController {
 
     @FXML
     public void handelAcceptButtonAction(ActionEvent event) {
-        String email = this.tfEmail.getText().trim();
-        String passwrd = this.pfPassword.getText().trim();
+        String email = this.tfEmail.getText();
+        String passwrd = this.pfPassword.getText();
         try {
             logger.info("Handeling the accept button.");
-            FanetixClient user = new FanetixClient(email, passwrd);
+            FanetixClient user= clientManager.signIn_XML(new GenericType<FanetixClient>() {
+            }, email, passwrd);
             //Sign in falseado
-            if (email.equals("client@gmail.com") && passwrd.equals("abcd*1234")) {
+            if(user!=null){              
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ProfileView.fxml"));
+                FanetixUser userGeneral = new FanetixUser(email, passwrd);
+                MenuBarViewController.setUser(userGeneral);
                 Parent root = (Parent) loader.load();
                 ProfileViewController controller = (ProfileViewController) loader.getController();
                 controller.setStage(stage);
-                //controller.initStage(root, user);
+                controller.initStage(root);
             }
-        } catch (IOException ex) {
+        }catch( SignInException e){
+            new Alert(Alert.AlertType.ERROR, "At this moment server is not available. Please try later.", ButtonType.OK).showAndWait();
+        }catch (IOException ex) {
             Logger.getLogger(SignInViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

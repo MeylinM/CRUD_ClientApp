@@ -10,6 +10,7 @@ import eus.tartanga.crud.exception.SignInException;
 import eus.tartanga.crud.logic.FanetixClientFactory;
 import eus.tartanga.crud.logic.FanetixClientManager;
 import eus.tartanga.crud.model.FanetixClient;
+import eus.tartanga.crud.model.FanetixUser;
 import eus.tartanga.crud.model.Product;
 import java.util.List;
 import java.util.logging.Level;
@@ -30,7 +31,7 @@ import javax.ws.rs.core.GenericType;
 /**
  * FXML Controller class
  *
- * @author 2dam
+ * @author Elbire
  */
 public class ProfileViewController {
 
@@ -94,10 +95,9 @@ public class ProfileViewController {
             streetField.setEditable(false);
             postalCodeField.setEditable(false);
             stage.show();
-
-            String email = "blackpink@fanetix.com";
-
-            findClient(email);
+            clientManager = FanetixClientFactory.getFanetixClientManager();
+            FanetixUser user = MenuBarViewController.getLoggedUser();
+            findClient(user.getEmail());
 
         } catch (Exception e) {
             String errorMsg = "Error" + e.getMessage();
@@ -107,7 +107,7 @@ public class ProfileViewController {
 
     private FanetixClient findClient(String email) {
         try {
-            clientManager = FanetixClientFactory.getFanetixClientManager();
+            
             client = clientManager.findClient_XML(new GenericType<FanetixClient>() {
             }, email);
            // System.out.println("Llego aqui");

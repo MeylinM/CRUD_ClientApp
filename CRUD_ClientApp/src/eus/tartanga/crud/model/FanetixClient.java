@@ -11,7 +11,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
- * @author Meylin and Irati
+ * @author Meylin, Irati and Elbire
  */
 @XmlRootElement
 public class FanetixClient extends FanetixUser {
@@ -39,9 +39,9 @@ public class FanetixClient extends FanetixUser {
         this.zip=zip;
     }
 
-    public FanetixClient() {
+    public FanetixClient(){
+        
     }
-    
     @XmlElement
     public String getFullName() {
         return fullName;
