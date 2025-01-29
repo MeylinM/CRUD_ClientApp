@@ -88,24 +88,26 @@ public class ArtistViewController {
     }
 
     public void initStage(Parent root) {
-        
+
         try {
             logger.info("Initializing Artist stage");
             Scene scene = new Scene(root);
             stage.setScene(scene);
             // The window title is "Sign In".
             stage.setTitle("Artist");
+            //Añadir a la ventana el ícono “FanetixLogo.png”.
+            stage.getIcons().add(new Image("eus/tartanga/crud/app/resources/logo.png"));
             // The window is not resizable.
             stage.setResizable(false);
             stage.show();
-            
+
             // Configurar columnas de tabla
             nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
             companyColumn.setCellValueFactory(new PropertyValueFactory<>("company"));
             lastAlbumColumn.setCellValueFactory(new PropertyValueFactory<>("lastAlbum"));
             debutColumn.setCellValueFactory(new PropertyValueFactory<>("debut"));
             artistColumn.setCellValueFactory(new PropertyValueFactory<>("image"));
-            
+
             debutColumn.setCellFactory(column -> new TableCell<Artist, Date>() {
                 @Override
                 protected void updateItem(Date date, boolean empty) {

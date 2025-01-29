@@ -25,6 +25,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javax.ws.rs.core.GenericType;
 
@@ -86,6 +87,8 @@ public class ProfileViewController {
             Scene scene = new Scene(root);
             stage.setScene(scene);
             stage.setTitle("Profile");
+            //Añadir a la ventana el ícono “FanetixLogo.png”.
+            stage.getIcons().add(new Image("eus/tartanga/crud/app/resources/logo.png"));
             stage.setResizable(false);
             stage.show();
             fullNameField.setEditable(false);
@@ -96,7 +99,7 @@ public class ProfileViewController {
             streetField.setEditable(false);
             postalCodeField.setEditable(false);
             FanetixUser user = MenuBarViewController.getLoggedUser();
-            clientManager = FanetixClientFactory.getFanetixClientManager();  
+            clientManager = FanetixClientFactory.getFanetixClientManager();
             findClient(user.getEmail());
         } catch (Exception e) {
             String errorMsg = "Error" + e.getMessage();
@@ -105,7 +108,7 @@ public class ProfileViewController {
     }
 
     private FanetixClient findClient(String email) {
-        try {      
+        try {
             client = clientManager.findClient_XML(new GenericType<FanetixClient>() {
             }, email);
             loadClientData(client);

@@ -98,6 +98,8 @@ public class ConcertViewController {
             Scene scene = new Scene(root);
             stage.setScene(scene);
             stage.setTitle("Concert");
+            //Añadir a la ventana el ícono “FanetixLogo.png”.
+            stage.getIcons().add(new Image("eus/tartanga/crud/app/resources/logo.png"));
             stage.setResizable(false);
             stage.show();
 
