@@ -6,7 +6,7 @@
 package eus.tartanga.crud.model;
 
 import java.io.Serializable;
-
+import javax.xml.bind.annotation.XmlElement;
 
 /**
  *
@@ -15,9 +15,11 @@ import java.io.Serializable;
 public class FanetixUser implements Serializable {
 
     private static final long serialVersionUID = 1L;
-  
+
     private String email;
     private String passwd;
+
+    @XmlElement
 
     public String getEmail() {
         return email;
@@ -26,6 +28,8 @@ public class FanetixUser implements Serializable {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    @XmlElement
 
     public String getPasswd() {
         return passwd;

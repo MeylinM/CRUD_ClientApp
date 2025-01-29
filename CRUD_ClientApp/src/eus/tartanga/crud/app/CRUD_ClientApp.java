@@ -19,6 +19,7 @@ import eus.tartanga.crud.model.Cart;
 import eus.tartanga.crud.userInterface.controllers.ArtistViewController;
 import eus.tartanga.crud.userInterface.controllers.CartOrdersViewController;
 import eus.tartanga.crud.userInterface.controllers.ProductViewController;
+import eus.tartanga.crud.userInterface.controllers.SignInViewController;
 import java.io.IOException;
 import java.util.List;
 import javafx.fxml.FXMLLoader;
@@ -33,7 +34,16 @@ public class CRUD_ClientApp extends Application {
     
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ProductView.fxml"));
+        
+        /*FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/SignInView.fxml"));
+        Parent root = (Parent) loader.load();
+        //Scene scene = new Scene(root);
+        SignInViewController controller = ((SignInViewController) loader.getController());
+        controller.setStage(stage);
+        controller.initStage(root);
+        */
+        /*FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ProductView.fxml"));
+
         Parent root = (Parent) loader.load();
         //Scene scene = new Scene(root);
         ProductViewController controller = ((ProductViewController) loader.getController());

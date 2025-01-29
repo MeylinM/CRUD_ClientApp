@@ -1,7 +1,6 @@
 package eus.tartanga.crud.userInterface.controllers;
 
 import eus.tartanga.crud.exception.ReadException;
-import eus.tartanga.crud.logic.ArtistFactory;
 import eus.tartanga.crud.logic.CartFactory;
 import eus.tartanga.crud.logic.CartManager;
 import eus.tartanga.crud.logic.ProductFactory;
@@ -9,11 +8,19 @@ import eus.tartanga.crud.logic.ProductManager;
 import eus.tartanga.crud.model.Artist;
 import eus.tartanga.crud.model.Cart;
 import eus.tartanga.crud.model.Product;
+import eus.tartanga.crud.userInterface.factories.CartDateEditingCell;
+import eus.tartanga.crud.userInterface.factories.CartSpinnerEditingCell;
+import java.io.ByteArrayInputStream;
+import java.text.DateFormat;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.logging.Logger;
 import javafx.fxml.FXML;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import javafx.application.Application;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
@@ -23,7 +30,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.image.ImageView;
-import javafx.scene.control.TableRow;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -33,6 +39,8 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javax.ws.rs.core.GenericType;
+import javafx.util.Callback;
+import javafx.beans.property.SimpleStringProperty;
 
 /**
  *
@@ -59,22 +67,22 @@ public class CartOrdersViewController extends Application {
     private TableView<Cart> tbCart;
 
     @FXML
-    private TableColumn<Cart, Product> tbcProduct;
+    private TableColumn<Cart, byte[]> tbcProduct;
 
     @FXML
-    private TableColumn<Cart, Product> tbcArtist;
+    private TableColumn<Cart, String> tbcArtist;
 
     @FXML
-    private TableColumn<Cart, Product> tbcName;
+    private TableColumn<Cart, String> tbcName;
 
     @FXML
-    private TableColumn<Cart, Product> tbcDescription;
+    private TableColumn<Cart, String> tbcDescription;
 
     @FXML
     private TableColumn<Cart, Date> tbcOrderDate;
 
     @FXML
-    private TableColumn<Cart, Product> tbcPrice;
+    private TableColumn<Cart, String> tbcPrice;
 
     @FXML
     private TableColumn<Cart, Integer> tbcQuantity;
@@ -112,61 +120,126 @@ public class CartOrdersViewController extends Application {
     public void initStage(Parent root, boolean isCartView) {
 
         //Añadir a la ventana el ícono “FanetixLogo.png”.
-        //stage.getIcons().add(new Image("/resources/logo.png"));
+        stage.getIcons().add(new Image("eus/tartanga/crud/app/resources/logo.png"));
         //Ventana no redimensionable
         stage.setResizable(false);
         /*La tabla mostrará las propiedades Image,ArtistName,Description,
          *Price obtenidos de cada producto
          */
-        tbcProduct.setCellValueFactory(new PropertyValueFactory<>("product"));
-        tbcArtist.setCellValueFactory(new PropertyValueFactory<>("product"));
-        tbcDescription.setCellValueFactory(new PropertyValueFactory<>("product"));
-        tbcPrice.setCellValueFactory(new PropertyValueFactory<>("product"));
-        /*Mostrará además las propiedades OrderDate.Quantity y 
-         *subToral obtenidas del carrito
+        //Imagen del producto
+        tbcProduct.setCellValueFactory(cellData
+                -> new SimpleObjectProperty<>(cellData.getValue().getProduct().getImage())
+        );
+
+        tbcProduct.setCellFactory(column -> new TableCell<Cart, byte[]>() {
+            private final ImageView imageView = new ImageView();
+
+            {
+                imageView.setFitHeight(90);
+                imageView.setPreserveRatio(true);
+            }
+
+            @Override
+            protected void updateItem(byte[] imageBytes, boolean empty) {
+                super.updateItem(imageBytes, empty);
+                if (empty || getTableRow() == null || getTableRow().getItem() == null) {
+                    setGraphic(null);
+                    return;
+                }
+                if (imageBytes == null) {
+                    // Mostrar una imagen predeterminada si no hay datos
+                    Image noImage = new Image(getClass().getClassLoader().getResourceAsStream("eus/tartanga/crud/app/resources/noImage.png"));
+                    imageView.setImage(noImage);
+                    setGraphic(imageView);
+                } else {
+                    // Convertir byte[] a Image
+                    Image image = new Image(new ByteArrayInputStream(imageBytes));
+                    imageView.setImage(image);
+                    setGraphic(imageView);
+                }
+            }
+        });
+
+        //Nombre del Artista
+        tbcArtist.setCellValueFactory(cellData
+                -> new SimpleStringProperty(cellData.getValue().getProduct().getArtist().getName())
+        );
+
+        //Nombre del producto
+        tbcName.setCellValueFactory(cellData
+                -> new SimpleStringProperty(cellData.getValue().getProduct().getTitle()));
+
+        //Descripcion del producto
+        tbcDescription.setCellValueFactory(cellData
+                -> new SimpleStringProperty(cellData.getValue().getProduct().getDescription())
+        );
+        /*Lascolumnas price, subtotal y total deberán estar formateadas 
+         *con el patrón “###.###,##”.
          */
+
+        // Precio del producto
+        tbcPrice.setCellValueFactory(cellData -> {
+            Float price = cellData.getValue().getProduct().getPrice(); // Obtener el precio
+            String formatPrice = NumberFormat.getInstance(Locale.ROOT).format(price); // Formatear el precio
+            return new SimpleStringProperty(formatPrice); // Devolver el precio formateado como SimpleStringProperty
+        });
+
+        /*Mostraremos además las propiedades OrderDate.Quantity obtenidas del carrito*/
+        //FECHA DE ORDEN DEL PRODUCTO
         tbcOrderDate.setCellValueFactory(new PropertyValueFactory<>("orderDate"));
+        /* - Lacolumna“Order Date” deberá estar formateada con el patrón “dd/mm/yyyy”*/
+        tbcOrderDate.setCellFactory(column -> new TableCell<Cart, Date>() {
+            private final DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+
+            @Override
+            protected void updateItem(Date date, boolean empty) {
+                super.updateItem(date, empty);
+                if (empty || date == null) {
+                    setText(null); // Deja la celda vacía si no hay datos
+                } else {
+                    setText(formatter.format(date)); // Formatea la fecha
+                }
+            }
+        });
         tbcQuantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
-
-        /*
- 
-
-
- ● Latabla mostrará las propiedades Image, Artist,
- Name, Description,price obtenidos de cada
- producto. Además de las propiedades
- OrderDate,Quantity y subTotal del carrito.
- ● Utilizar el método calculateSubtotal() de la clase
- CartManager para calcular el subtotal de cada
- producto.
- ● Tablaeditable:
- ○ Columna"Order Date": Convertir en editable
- usando un DatePicker. Validar que el formato
- sea dd/MM/yyyy y que la fecha seleccionada
- no sea anterior a la actual.
- ○ Columna"Quantity": Configurar como
- editable con un Spinner, donde el valor
- mínimo será 1 y el máximo será el stock
- disponible (Product.getStock()).
- Estas ediciones estarán habilitadas únicamente si el
- atributo bought del producto es false.
- ● Lacolumna“Order Date” deberá estar formateada
- con el patrón “dd/mm/yyyy”
- ● Lascolumnas price, subtotal y total deberán estar
- formateadas con el patrón “###.###,##”.
-        
-         */
+        /* -Sub total es una columna con un valor calculado con la cantidad y el precio*/
+        tbcSubTotal.setCellValueFactory(cellData -> {
+            Cart cart = cellData.getValue();
+            float subtotal = cart.getQuantity() * cart.getProduct().getPrice();
+            return new SimpleObjectProperty<>(subtotal);
+        });
         this.isCartView = isCartView;
         Scene scene = new Scene(root);
         cartManager = CartFactory.getCartManager();
         productManager = ProductFactory.getProductManager();
         stage.setResizable(false);
         btnInfo.setGraphic(new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("eus/tartanga/crud/app/resources/btnInfo.png"))));
+
         // Si se accede desde el botón My Cart situado en el menubar
         if (isCartView) {
             logger.info("Initializing Cart stage");
             // Establecer el título de la ventana con el valor "My Cart".
             stage.setTitle("My Cart");
+            //La tabla será editable
+            tbCart.setEditable(true);
+            //Columna"Order Date": Convertir en editableusando un DatePicker.
+            //Validar que el formato sea dd/MM/yyyy
+            //COLUMNA ORDER DATE EDITABLE
+            tbcOrderDate.setEditable(true);
+            final Callback<TableColumn<Cart, Date>, TableCell<Cart, Date>> dateCell
+                    = (TableColumn<Cart, Date> param) -> new CartDateEditingCell();
+            tbcOrderDate.setCellFactory(dateCell);
+
+            /*Validar que la fecha seleccionada no sea anterior a la actual.*/
+ /*○ Columna"Quantity": 
+             * Configurar como editable con un Spinner, 
+             * donde el valor mínimo será 1 y el máximo será el stock 
+             * disponible (Product.getStock()).
+             */
+            // Columna Quantity: Configurar como editable con un Spinner
+            final Callback<TableColumn<Cart, Integer>, TableCell<Cart, Integer>> quantityCellFactory = (TableColumn<Cart, Integer> param) -> new CartSpinnerEditingCell();
+            tbcQuantity.setCellFactory(quantityCellFactory);
+            tbcQuantity.setEditable(true);
             titleImage.setImage(new Image(getClass().getClassLoader().getResourceAsStream("eus/tartanga/crud/app/resources/MyCart.png")));
             //"btnBuy". (Botón por defecto)
             btnBuy.setDefaultButton(true);
@@ -176,6 +249,7 @@ public class CartOrdersViewController extends Application {
             dpTo.setVisible(false);
             // El botón“btnPrint” estará oculto.
             btnPrint.setVisible(false);
+
         } else {
             // Configuración para "My Orders"
             logger.info("Initializing Orders stage");
@@ -189,40 +263,10 @@ public class CartOrdersViewController extends Application {
         }
         stage.setScene(scene);
         stage.show();
-        
-        cartList.addAll(findAllCartProducts());
-            //Cargar la tabla Products con la información de los productos
+
+        cartList.addAll(findAllNotBoughtCartProducts());
+        //Cargar la tabla Products con la información de los productos
         tbCart.setItems(cartList);
-    }
-
-    private void configureView() {
-        if (isCartView) {
-            // Configuración para "Cart"
-            /*titleLabel.setText("My Cart");
-            btnClearCart.setVisible(true);
-            btnBuy.setVisible(true);
-            btnPrint.setVisible(false);
-            artistFilterComboBox.setVisible(false);
-            dateFilterFrom.setVisible(false);
-            dateFilterTo.setVisible(false);
-            // Mostrar solo productos no comprados*/
-            loadCartData(false);
-        } else {
-            // Configuración para "My Orders"
-            /*titleLabel.setText("My Orders");
-            btnClearCart.setVisible(false);
-            btnBuy.setVisible(false);
-            btnPrint.setVisible(true);
-            artistFilterComboBox.setVisible(true);
-            dateFilterFrom.setVisible(true);
-            dateFilterTo.setVisible(true);
-            // Mostrar solo productos comprados*/
-            loadCartData(true);
-        }
-    }
-
-    private void loadCartData(boolean showBought) {
-        // Lógica para cargar datos en la tabla según el atributo "bought"
     }
 
     @Override
@@ -248,7 +292,7 @@ public class CartOrdersViewController extends Application {
         launch(args);
     }
 
-    private List<Cart> findAllCartProducts() {
+    private List<Cart> findAllNotBoughtCartProducts() {
         List<Cart> carts = null;
         try {
             carts = cartManager.findAllNotBoughtProducts_XML(new GenericType<List<Cart>>() {
