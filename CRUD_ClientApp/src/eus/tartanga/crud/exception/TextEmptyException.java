@@ -7,7 +7,7 @@ package eus.tartanga.crud.exception;
 
 /**
  *
- * @author Irati
+ * @author 2dam
  */
 public class TextEmptyException extends Exception {
 

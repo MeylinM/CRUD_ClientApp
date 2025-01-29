@@ -6,7 +6,9 @@
 package eus.tartanga.crud.userInterface.controllers;
 
 import eus.tartanga.crud.exception.AddException;
+import eus.tartanga.crud.exception.DeleteException;
 import eus.tartanga.crud.exception.MaxCharacterException;
+import eus.tartanga.crud.exception.ReadException;
 import eus.tartanga.crud.exception.TextEmptyException;
 import eus.tartanga.crud.exception.UpdateException;
 import eus.tartanga.crud.logic.ArtistFactory;
@@ -16,11 +18,11 @@ import eus.tartanga.crud.logic.ConcertManager;
 import eus.tartanga.crud.model.Artist;
 import eus.tartanga.crud.model.Concert;
 import eus.tartanga.crud.userInterface.factories.ConcertDateEditingCell;
+import eus.tartanga.crud.userInterface.factories.ConcertTimeEditingCell;
 
 import java.io.ByteArrayInputStream;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collection;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -31,7 +33,10 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
@@ -41,20 +46,31 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.ChoiceBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.GenericType;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  * FXML Controller class
@@ -201,15 +217,7 @@ public class ConcertViewController {
                     alert.showAndWait();
                 }
             });
-            /* CAMBIAR ESTO PARA UNA CHOICE BOX, ESTA COMO SI FUERA PARA UN COMBOBOX
-            artistColumn.setCellFactory(ChoiceBoxTableCell.forTableColumn(artistList));
-            artistColumn.setOnEditCommit((TableColumn.CellEditEvent<Concert, Artist> t) -> {
-                ((Concert) t.getTableView().getItems()
-                        .get(t.getTablePosition().getRow()))
-                        .setArtistList(t.getNewValue());
-                Concert concert = (Concert) t.getTableView().getItems.get(t.getTablePosition().getRow());
-                Artist originalValueLevel = concert.getArtistList();
-            }); */
+            //artistColumn
 
             locationColumn.setCellFactory(TextFieldTableCell.forTableColumn());
             locationColumn.setOnEditCommit(event -> {
@@ -266,45 +274,12 @@ public class ConcertViewController {
             final Callback<TableColumn<Concert, Date>, TableCell<Concert, Date>> dateCell
                     = (TableColumn<Concert, Date> param) -> new ConcertDateEditingCell();
             dateColumn.setCellFactory(dateCell);
-            /*
-            // Formateao de la fecha ESTA EN LA FACTORIA DE CONCERTDATE
-            dateColumn.setCellFactory(column -> new TableCell<Concert, Date>() {
-                @Override
-                protected void updateItem(Date date, boolean empty) {
-                    super.updateItem(date, empty);
-                    if (empty || date == null) {
-                        setText(null);
-                    } else {
-                        // Convertir la fecha
-                        LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                        // Formatear la fecha
-                        String formattedDate = localDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-                        setText(formattedDate);
-                    }
-                }
-            });
-             */
-            // Formateo de la hora TENDRE QUE HACERLE UNA FACTORIA A ESTA VAINA?
-            timeColumn.setCellFactory(column -> new TableCell<Concert, Date>() {
-                @Override
-                protected void updateItem(Date date, boolean empty) {
-                    super.updateItem(date, empty);
-                    if (empty || date == null) {
-                        setText(null);
-                    } else {
-                        // Si el valor es un Date y la columna es de tipo Time
-                        java.sql.Time time = new java.sql.Time(date.getTime());  // Convierte Date a Time
 
-                        // Extraer hora y minutos
-                        int hours = time.getHours();
-                        int minutes = time.getMinutes();
+            //ME FALTA CAMBIAR LA FACTORY PARA QUE ME DEJE METER UN CAMPO DE TEXTO Y ME LO FORMATE A 00:00
+            final Callback<TableColumn<Concert, Date>, TableCell<Concert, Date>> timeCell
+                    = (TableColumn<Concert, Date> param) -> new ConcertTimeEditingCell();
+            timeColumn.setCellFactory(timeCell);
 
-                        // Formatear la hora (por ejemplo, "HH:mm")
-                        String formattedTime = String.format("%02d:%02d", hours, minutes);
-                        setText(formattedTime);
-                    }
-                }
-            });
             //REVISAR BIEN QUE TIENE QUE HACER ESTE METODO Y QUE NECESITO
             btnAddConcert.setOnAction(this::handleAddConcert);
             //REVISAR QUE EL METODO BORRA DE LA BASE DE DATOS, QUE LA QUERY NO IBA ( SE SUPONE)
@@ -326,10 +301,11 @@ public class ConcertViewController {
             //Gestion de los filtrados
             filterConcerts();
 
+
             //Configurar estilos de cada fila de la tabla
             configureRowStyling();
 
-        } catch (Exception e) {
+        } catch (WebApplicationException e) {
             String errorMsg = "Error" + e.getMessage();
             logger.severe(errorMsg);
         }
@@ -338,11 +314,19 @@ public class ConcertViewController {
     private void handleAddConcert(ActionEvent event) {
         Concert concert = new Concert();
         concert.setArtistList(artistList);
-        //  try {
-        concertManager.createConcert_XML(concert);
-        //  } catch (AddException e){
-        //      logger.severe(e.getMessage());
-        // }
+        try {
+            concertManager.createConcert_XML(concert);
+        } catch (AddException e) {
+            logger.severe(e.getMessage());
+        }
+        concertTable.getItems().add(concert);
+        refreshConcertList();
+    }
+
+    private void refreshConcertList() {
+        List<Concert> updatedConcerts = findAllConcerts();
+        concertList.setAll(updatedConcerts);
+        concertTable.refresh();
     }
 
     private void handleDeleteConcert(ActionEvent event) {
@@ -354,9 +338,9 @@ public class ConcertViewController {
                 concertManager.removeConcert(selectedConcert.getConcertId().toString());
                 //Elimina el producto de la lista observable
                 concertList.remove(selectedConcert);
-                logger.info("Concierto eliminado con exito" + selectedConcert.getConcertName());
-            } catch (Exception e) {
-                logger.severe("Error al eliminar el concierto" + e.getMessage());
+                logger.log(Level.INFO, "Concierto eliminado con exito{0}", selectedConcert.getConcertName());
+            } catch (DeleteException e) {
+                logger.log(Level.SEVERE, "Error al eliminar el concierto{0}", e.getMessage());
             }
         } else {
             logger.warning("No se ha seleccionado ningun concieto para eliminar");
@@ -364,23 +348,23 @@ public class ConcertViewController {
     }
 
     private List<Concert> findAllConcerts() {
-        ConcertManager concertManager = ConcertFactory.getConcertManager();
-        List<Concert> concerts = concertManager.findAllConcerts_XML(new GenericType<List<Concert>>() {
-        });
-
+        List<Concert> concerts = null;
+        try {
+            concerts = concertManager.findAllConcerts_XML(new GenericType<List<Concert>>() {
+            });
+            return concerts;
+        } catch (ReadException ex) {
+            Logger.getLogger(ConcertViewController.class.getName()).log(Level.SEVERE, null, ex);
+        }
         return concerts;
     }
 
-    /*private void createDatePickerField(){
-        DatePicker datePicker = new DatePicker();
-        datePicker.valueProperty.addListener(LocalDate,LocalDate,LocalDate);
-    }*/
     private void updateConcert(Concert concert) {
-        //try {
-        concertManager.updateConcert_XML(concert, concert.getConcertId().toString());
-        //  } catch (UpdateException e) {
-        //     logger.severe(e.getMessage());
-        //   }
+        try {
+            concertManager.updateConcert_XML(concert, concert.getConcertId().toString());
+        } catch (UpdateException e) {
+            logger.severe(e.getMessage());
+        }
     }
 
     private void createContextMenu() {
@@ -391,7 +375,14 @@ public class ConcertViewController {
         deleteItem.setOnAction(this::handleDeleteConcert);
         MenuItem printItemInside = new MenuItem("Print");
         printItemInside.setOnAction(this::printItems);
-        contextMenuInside.getItems().addAll(addItem, deleteItem, printItemInside);
+        MenuItem selectArtistItem = new MenuItem("Select artist/s");
+        selectArtistItem.setOnAction(event -> {
+            Concert selectedArtist = concertTable.getSelectionModel().getSelectedItem();
+            if (selectedArtist != null) {
+                showArtistSelectionDialog(selectedArtist);
+            }
+        });
+        contextMenuInside.getItems().addAll(addItem, deleteItem, printItemInside, selectArtistItem);
 
         // Crear menú contextual para clics fuera de la tabla
         contextMenuOutside = new ContextMenu();
@@ -402,8 +393,86 @@ public class ConcertViewController {
         contextMenuOutside.getItems().addAll(printItemOutside, addItemOutside);
     }
 
+    private void showArtistSelectionDialog(Concert concert) {
+        Stage artistStage = new Stage();
+        artistStage.setTitle("Select Artists");
+        ListView<Artist> artistListView = new ListView<>();
+        ObservableList<Artist> selectedArtist = FXCollections.observableArrayList(); // Lista de elementos seleccionados manualmente
+
+        try {
+            List<Artist> artists = artistList;
+            // Agregar las categorías a la lista de categorías disponibles
+            artistListView.setItems(FXCollections.observableArrayList(artists));
+            // Agregar manejador de clics personalizados
+            artistListView.setCellFactory(lv -> {
+                ListCell<Artist> cell = new ListCell<Artist>() {
+                    @Override
+                    protected void updateItem(Artist item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item != null) {
+                            setText(item.getName()); // Mostrar el nombre de la categoría
+                        } else {
+                            setText(null);
+                        }
+                    }
+                };
+                cell.setOnMouseClicked(event -> {
+                    if (cell.getItem() != null) {
+                        Artist clickedCategory = cell.getItem();
+                        if (selectedArtist.contains(clickedCategory)) {
+                            selectedArtist.remove(clickedCategory); // Deseleccionar si ya está seleccionado
+                            cell.setStyle(""); // Restablecer estilo
+                        } else {
+                            selectedArtist.add(clickedCategory); // Seleccionar si no está seleccionado
+                            cell.setStyle("-fx-background-color: #fdd3e1;");
+                        }
+                    }
+                });
+                return cell;
+            });
+
+            Button confirmButton = new Button("Save");
+            confirmButton.setStyle("-fx-background-color: #f9eccf");
+            confirmButton.setOnAction(e -> {
+                if (!selectedArtist.isEmpty()) {
+                    try {
+                        concert.setArtistList(selectedArtist);
+                        concertManager.updateConcert_XML(concert, String.valueOf(concert.getConcertId()));
+                        artistStage.close();
+                        concertTable.refresh();
+                        logger.log(Level.INFO, "Selected Artist: {0}", concert.getConcertName());
+                    } catch (UpdateException ex) {
+                        logger.log(Level.SEVERE, "Error", ex);
+                    }
+                }
+            });
+            VBox layout = new VBox(10);
+            layout.setPadding(new javafx.geometry.Insets(10));
+            layout.getChildren().addAll(artistListView, confirmButton);
+            Scene scene = new Scene(layout);
+            artistStage.setScene(scene);
+            artistStage.setWidth(400);
+            artistStage.setHeight(400);
+
+            artistStage.show();
+        } catch (Exception ex) {
+            logger.log(Level.SEVERE, "Error", ex);
+        }
+    }
+
     private void printItems(ActionEvent event) {
-        //HACER ESTE METODO DIGO SHO
+        try {
+            JasperReport report = JasperCompileManager.compileReport(getClass().getResourceAsStream("/eus/tartanga/crud/userInterface/report/concertReport.jrxml"));
+            JRBeanCollectionDataSource dataItems
+                    = new JRBeanCollectionDataSource((Collection<Concert>) this.concertTable.getItems());
+            Map<String, Object> parameters = new HashMap<>();
+            JasperPrint jasperPrint = JasperFillManager.fillReport(report, parameters, dataItems);
+            JasperViewer jasperViewer = new JasperViewer(jasperPrint);
+            jasperViewer.setVisible(true);
+        } catch (JRException ex) {
+            Logger.getLogger(ConcertViewController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 
     private void handleRightClickTable(MouseEvent event) {
@@ -454,7 +523,6 @@ public class ConcertViewController {
             concertTable.setItems(sortedData);
         });
     }
-
     private FilteredList<Concert> getConcertsBySearchField(String searchText, boolean comingSoon) {
         // Crea un FilteredList con la lista de conciertos original
         FilteredList<Concert> filteredData = new FilteredList<>(concertList, p -> true);
