@@ -301,6 +301,7 @@ public class ConcertViewController {
             //Gestion de los filtrados
             filterConcerts();
 
+
             //Configurar estilos de cada fila de la tabla
             configureRowStyling();
 
@@ -522,7 +523,6 @@ public class ConcertViewController {
             concertTable.setItems(sortedData);
         });
     }
-
     private FilteredList<Concert> getConcertsBySearchField(String searchText, boolean comingSoon) {
         // Crea un FilteredList con la lista de conciertos original
         FilteredList<Concert> filteredData = new FilteredList<>(concertList, p -> true);

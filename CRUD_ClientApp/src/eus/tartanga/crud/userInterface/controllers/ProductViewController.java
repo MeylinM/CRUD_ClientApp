@@ -5,12 +5,15 @@
  */
 package eus.tartanga.crud.userInterface.controllers;
 
+import eus.tartanga.crud.exception.AddException;
+import eus.tartanga.crud.exception.ReadException;
 import eus.tartanga.crud.logic.ArtistFactory;
 import eus.tartanga.crud.logic.ArtistManager;
 import eus.tartanga.crud.logic.ProductFactory;
 import eus.tartanga.crud.logic.ProductManager;
 import eus.tartanga.crud.model.Artist;
 import eus.tartanga.crud.model.Product;
+import eus.tartanga.crud.userInterface.factories.ProductDateEditingCell;
 import java.io.ByteArrayInputStream;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -48,6 +51,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import javafx.util.converter.FloatStringConverter;
 import javafx.util.converter.IntegerStringConverter;
 import javax.ws.rs.core.GenericType;
@@ -96,12 +100,13 @@ public class ProductViewController {
     private Button btnAddProduct;
 
     @FXML
-    private Button btnDeleteButton;
+    private Button btnDeleteProduct;
 
     private Stage stage;
     private Logger logger = Logger.getLogger(ProductViewController.class.getName());
     private ContextMenu contextMenuInside;
     private ContextMenu contextMenuOutside;
+    ProductManager productManager;
     private ObservableList<Product> productList = FXCollections.observableArrayList();
     private ArtistManager artistInterface;
     private ObservableList<Artist> artistList = FXCollections.observableArrayList();
@@ -126,6 +131,7 @@ public class ProductViewController {
             stage.setResizable(false);
             stage.show();
 
+            productManager = ProductFactory.getProductManager();
             artistInterface = ArtistFactory.getArtistManager();
 
             //Hacer la tabla editable
@@ -140,8 +146,14 @@ public class ProductViewController {
             stockColumn.setCellValueFactory(new PropertyValueFactory<>("stock"));
             priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
 
+            //Para obtener la lista de artistas se usará el método de lógica findAllArtist
             artistList = FXCollections.observableArrayList(artistInterface.findAllArtist(new GenericType<List<Artist>>() {
             }));
+
+            final Callback<TableColumn<Product, Date>, TableCell<Product, Date>> dateCell
+                    = (TableColumn<Product, Date> param) -> new ProductDateEditingCell();
+            releaseDateColumn.setCellFactory(dateCell);
+
             // Hacer las columnas editables
             titleColumn.setCellFactory(TextFieldTableCell.forTableColumn());
             titleColumn.setOnEditCommit(event -> {
@@ -168,13 +180,13 @@ public class ProductViewController {
             });
 
             artistColumn.setCellFactory(ComboBoxTableCell.forTableColumn(artistList));
-            /*artistColumn.setOnEditCommit((TableColumn.CellEditEvent<Product, Artist> t) -> {
+            artistColumn.setOnEditCommit((TableColumn.CellEditEvent<Product, Artist> t) -> {
                 ((Product) t.getTableView().getItems()
                         .get(t.getTablePosition().getRow()))
                         .setArtist(t.getNewValue());
                 Product product = (Product) t.getTableView().getItems().get(t.getTablePosition().getRow());
                 Artist originalValueLevel = product.getArtist();
-            });*/
+            });
 
             imageColumn.setCellFactory(column -> new TableCell<Product, byte[]>() {
                 private final ImageView imageView = new ImageView();
@@ -188,27 +200,14 @@ public class ProductViewController {
                 protected void updateItem(byte[] imageBytes, boolean empty) {
                     super.updateItem(imageBytes, empty);
                     if (empty || imageBytes == null) {
-                        setGraphic(null);
+                        Image noImage = new Image(getClass().getClassLoader().getResourceAsStream("eus/tartanga/crud/app/resources/noImage.png")); // Ruta de la imagen predeterminada
+                        imageView.setImage(noImage);
+                        setGraphic(imageView);
                     } else {
                         // Convertir byte[] a Image
                         Image image = new Image(new ByteArrayInputStream(imageBytes));
                         imageView.setImage(image);
                         setGraphic(imageView);
-                    }
-                }
-            });
-            releaseDateColumn.setCellFactory(column -> new TableCell<Product, Date>() {
-                @Override
-                protected void updateItem(Date date, boolean empty) {
-                    super.updateItem(date, empty);
-                    if (empty || date == null) {
-                        setText(null);
-                    } else {
-                        // Convertir la fecha
-                        LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                        // Formatear la fecha
-                        String formattedDate = localDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-                        setText(formattedDate);
                     }
                 }
             });
@@ -225,6 +224,7 @@ public class ProductViewController {
                 }
             });
             btnAddProduct.setOnAction(this::handleAddProduct);
+            btnDeleteProduct.setOnAction(this::handleDeleteProduct);
             //Inicializar los menu contextuales
             createContextMenu();
             // Mostrará el Menú contextual con las opciones mIAddToCart, 
@@ -236,6 +236,9 @@ public class ProductViewController {
             productAnchorPane.setOnMouseClicked(this::handleRightClick);
             //Obtener una lista de todos los productos de mi base de datos
             productList.addAll(findAllProducts());
+            for (Product product : productList) {
+                System.out.println(product.getImage());
+            }
             //Cargar la tabla Products con la información de los productos
             productTable.setItems(productList);
 
@@ -251,10 +254,14 @@ public class ProductViewController {
     }
 
     private List<Product> findAllProducts() {
-        ProductManager productManager = ProductFactory.getProductManager();
-        List<Product> products = productManager.findAll_XML(new GenericType<List<Product>>() {
-        });
+        List<Product> products = null;
+        try {
+            products = productManager.findAll_XML(new GenericType<List<Product>>() {
+            });
+            return products;
+        } catch (ReadException e) {
 
+        }
         return products;
     }
 
@@ -323,7 +330,7 @@ public class ProductViewController {
         MenuItem addItem = new MenuItem("Add new product");
         addItem.setOnAction(this::handleAddProduct);
         MenuItem deleteItem = new MenuItem("Delete");
-        deleteItem.setOnAction(this::deleteItem);
+        deleteItem.setOnAction(this::handleDeleteProduct);
         MenuItem printItemInside = new MenuItem("Print");
         printItemInside.setOnAction(this::printItems);
         contextMenuInside.getItems().addAll(addItem, deleteItem, printItemInside);
@@ -337,17 +344,42 @@ public class ProductViewController {
         contextMenuOutside.getItems().addAll(printItemOutside, addItemOutside);
     }
 
-    private void deleteItem(ActionEvent event) {
-        System.out.println("Delete item");
+    private void handleAddProduct(ActionEvent event) {
+        Product product = new Product();
+        product.setArtist(artistList.get(0));
+        try {
+            productManager.create_XML(product);
+        } catch (AddException e) {
+            System.out.println(e);
+        }
+        productTable.getItems().add(product);
+    }
+
+    private void handleDeleteProduct(ActionEvent event) {
+        Product selectedProduct = productTable.getSelectionModel().getSelectedItem();
+
+        if (selectedProduct != null) {
+            try {
+                // Elimina el producto de la base de datos
+                productManager.remove(selectedProduct.getProductId().toString());
+
+                // Elimina el producto de la lista observable
+                productList.remove(selectedProduct);
+
+                // Muestra un mensaje de confirmación
+                logger.info("Producto eliminado con éxito: " + selectedProduct.getTitle());
+            } catch (Exception e) {
+                // Maneja errores, como problemas de conexión o restricciones de la base de datos
+                logger.severe("Error al eliminar el producto: " + e.getMessage());
+            }
+        } else {
+            // Maneja el caso en el que no se ha seleccionado ningún producto
+            logger.warning("No se ha seleccionado ningún producto para eliminar.");
+        }
     }
 
     private void printItems(ActionEvent event) {
         System.out.println("Table Items: ");
-    }
-
-    private void handleAddProduct(ActionEvent event) {
-        Product product = new Product();
-        productTable.getItems().add(product);
     }
 
     private void filterProducts() {
