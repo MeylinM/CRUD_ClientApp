@@ -27,7 +27,7 @@ import javax.ws.rs.core.GenericType;
 
     public <T> T findAllNotBoughtProducts_JSON(GenericType<T> responseType) throws ReadException;
 
-    public <T> T findCart_XML(Class<T> responseType, String email, String productId) throws ReadException;
+    public <T> T findCart_XML(GenericType<T> responseType, String email, String productId) throws ReadException;
 
     public <T> T findCart_JSON(Class<T> responseType, String email, String productId) throws ReadException;
 

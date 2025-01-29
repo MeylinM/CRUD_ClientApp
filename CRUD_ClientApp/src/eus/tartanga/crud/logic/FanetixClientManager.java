@@ -8,6 +8,7 @@ package eus.tartanga.crud.logic;
 import eus.tartanga.crud.exception.SignInException;
 import eus.tartanga.crud.exception.AddException;
 import eus.tartanga.crud.exception.DeleteException;
+import eus.tartanga.crud.exception.ReadException;
 import eus.tartanga.crud.exception.UpdateException;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.core.GenericType;
@@ -31,13 +32,13 @@ public interface FanetixClientManager {
 
     public <T> T signIn_JSON(Class<T> responseType, String email, String passwd) throws SignInException;
 
-    public <T> T findClient_XML(GenericType<T> responseType, String email) throws ClientErrorException;
+    public <T> T findClient_XML(GenericType<T> responseType, String email) throws ReadException;
 
-    public <T> T findClient_JSON(Class<T> responseType, String email) throws ClientErrorException;
+    public <T> T findClient_JSON(Class<T> responseType, String email) throws ReadException;
 
-    public <T> T findAllClients_XML(Class<T> responseType) throws ClientErrorException;
+    public <T> T findAllClients_XML(Class<T> responseType) throws ReadException;
 
-    public <T> T findAllClients_JSON(Class<T> responseType) throws ClientErrorException;
+    public <T> T findAllClients_JSON(Class<T> responseType) throws ReadException;
 
     public void close();
 }

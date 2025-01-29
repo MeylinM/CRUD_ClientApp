@@ -8,15 +8,23 @@ package eus.tartanga.crud.userInterface.controllers;
 import eus.tartanga.crud.exception.AddException;
 import eus.tartanga.crud.exception.DeleteException;
 import eus.tartanga.crud.exception.MaxCharacterException;
+import eus.tartanga.crud.exception.NoStockException;
 import eus.tartanga.crud.exception.ReadException;
 import eus.tartanga.crud.exception.TextEmptyException;
 import eus.tartanga.crud.exception.UpdateException;
 import eus.tartanga.crud.exception.WrongStockFormatException;
 import eus.tartanga.crud.logic.ArtistFactory;
 import eus.tartanga.crud.logic.ArtistManager;
+import eus.tartanga.crud.logic.CartFactory;
+import eus.tartanga.crud.logic.CartManager;
+import eus.tartanga.crud.logic.FanetixClientFactory;
+import eus.tartanga.crud.logic.FanetixClientManager;
 import eus.tartanga.crud.logic.ProductFactory;
 import eus.tartanga.crud.logic.ProductManager;
 import eus.tartanga.crud.model.Artist;
+import eus.tartanga.crud.model.Cart;
+import eus.tartanga.crud.model.CartId;
+import eus.tartanga.crud.model.FanetixClient;
 import eus.tartanga.crud.model.Product;
 import eus.tartanga.crud.userInterface.factories.ProductDateEditingCell;
 import java.io.ByteArrayInputStream;
@@ -37,6 +45,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -44,14 +53,19 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Spinner;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.ComboBoxTableCell;
@@ -59,6 +73,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.converter.FloatStringConverter;
@@ -116,6 +131,9 @@ public class ProductViewController {
     private Button btnAddProduct;
 
     @FXML
+    private Button btnAddToCart;
+
+    @FXML
     private Button btnDeleteProduct;
 
     @FXML
@@ -133,8 +151,10 @@ public class ProductViewController {
     private ContextMenu contextMenuOutside;
     private ProductManager productManager;
     private ObservableList<Product> productList = FXCollections.observableArrayList();
-    private ArtistManager artistInterface;
+    private ArtistManager artistManager;
     private ObservableList<Artist> artistList = FXCollections.observableArrayList();
+    private CartManager cartManager;
+    private FanetixClientManager clientManager;
 
     public void setStage(Stage stage) {
         this.stage = stage;
@@ -157,7 +177,9 @@ public class ProductViewController {
             stage.show();
 
             productManager = ProductFactory.getProductManager();
-            artistInterface = ArtistFactory.getArtistManager();
+            artistManager = ArtistFactory.getArtistManager();
+            cartManager = CartFactory.getCartManager();
+            clientManager = FanetixClientFactory.getFanetixClientManager();
 
             //Hacer la tabla editable
             productTable.setEditable(true);
@@ -172,9 +194,9 @@ public class ProductViewController {
             priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
 
             //Para obtener la lista de artistas se usará el método de lógica findAllArtist
-            artistList = FXCollections.observableArrayList(artistInterface.findAllArtist(new GenericType<List<Artist>>() {
+            artistList = FXCollections.observableArrayList(artistManager.findAllArtist(new GenericType<List<Artist>>() {
             }));
-            
+
             //Crear la factoria de celda para releaseDate usando un DatePicker
             final Callback<TableColumn<Product, Date>, TableCell<Product, Date>> dateCell
                     = (TableColumn<Product, Date> param) -> new ProductDateEditingCell();
@@ -317,6 +339,7 @@ public class ProductViewController {
                 }
             });*/
             btnAddProduct.setOnAction(this::handleAddProduct);
+            btnAddToCart.setOnAction(this::handleAddToCart);
             btnDeleteProduct.setOnAction(this::handleDeleteProduct);
             btnInfo.setOnAction(this::handleInfoButton);
             //Inicializar los menu contextuales
@@ -356,6 +379,25 @@ public class ProductViewController {
         return products;
     }
 
+    private void createContextMenu() {
+        contextMenuInside = new ContextMenu();
+        MenuItem addItem = new MenuItem("Add new product");
+        addItem.setOnAction(this::handleAddProduct);
+        MenuItem deleteItem = new MenuItem("Delete");
+        deleteItem.setOnAction(this::handleDeleteProduct);
+        MenuItem printItemInside = new MenuItem("Print");
+        printItemInside.setOnAction(this::printItems);
+        contextMenuInside.getItems().addAll(addItem, deleteItem, printItemInside);
+
+        // Crear menú contextual para clics fuera de la tabla
+        contextMenuOutside = new ContextMenu();
+        MenuItem printItemOutside = new MenuItem("Print");
+        printItemOutside.setOnAction(this::printItems);
+        MenuItem addItemOutside = new MenuItem("Add new product");
+        addItemOutside.setOnAction(this::handleAddProduct);
+        contextMenuOutside.getItems().addAll(printItemOutside, addItemOutside);
+    }
+
     private void handleRightClickTable(MouseEvent event) {
         if (event.getButton() == MouseButton.SECONDARY) {
             // Ocultar el otro ContextMenu si está visible
@@ -382,25 +424,6 @@ public class ProductViewController {
         }
     }
 
-    private void createContextMenu() {
-        contextMenuInside = new ContextMenu();
-        MenuItem addItem = new MenuItem("Add new product");
-        addItem.setOnAction(this::handleAddProduct);
-        MenuItem deleteItem = new MenuItem("Delete");
-        deleteItem.setOnAction(this::handleDeleteProduct);
-        MenuItem printItemInside = new MenuItem("Print");
-        printItemInside.setOnAction(this::printItems);
-        contextMenuInside.getItems().addAll(addItem, deleteItem, printItemInside);
-
-        // Crear menú contextual para clics fuera de la tabla
-        contextMenuOutside = new ContextMenu();
-        MenuItem printItemOutside = new MenuItem("Print");
-        printItemOutside.setOnAction(this::printItems);
-        MenuItem addItemOutside = new MenuItem("Add new product");
-        addItemOutside.setOnAction(this::handleAddProduct);
-        contextMenuOutside.getItems().addAll(printItemOutside, addItemOutside);
-    }
-
     private void handleAddProduct(ActionEvent event) {
         try {
             Product product = new Product();
@@ -411,25 +434,47 @@ public class ProductViewController {
         } catch (AddException e) {
             showAlert("An error occurred while creating the product(s)");
         }
-
     }
 
-    private void handleInfoButton(ActionEvent event) {
+    private void handleAddToCart(ActionEvent event) {
         try {
-            //LOGGER.info("Loading help view...");
-            //Load node graph from fxml file
-            FXMLLoader loader
-                    = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/HelpProductView.fxml"));
-            Parent root = (Parent) loader.load();
-            HelpProductController helpController
-                    = ((HelpProductController) loader.getController());
-            //Initializes and shows help stage
-            helpController.initAndShowStage(root);
-        } catch (Exception ex) {
-            //If there is an error show message and
-            //log it.
-            System.out.println(ex.getMessage());
+            Product selectedProduct = productTable.getSelectionModel().getSelectedItem();
+            if (selectedProduct != null) {
+                if (Integer.parseInt(selectedProduct.getStock()) > 0) {
+                    int quantityToAdd = showQuantityDialog(Integer.parseInt(selectedProduct.getStock()));
 
+                    if (quantityToAdd > 0) {
+                        Cart cart = new Cart();
+                        CartId cartId = new CartId();
+                        cartId.setEmail("blackpink@fanetix.com");
+                        cartId.setProductId(selectedProduct.getProductId());
+                        cart.setId(cartId);
+
+                        cart.setProduct(selectedProduct);
+                        FanetixClient clientF = clientManager.findClient_XML(new GenericType<FanetixClient>() {
+                        }, "blackpink@fanetix.com");
+                        if (clientF == null) {
+                            throw new IllegalStateException("Cliente no encontrado.");
+                        }
+                        cart.setClient(clientF);
+                        cart.setOrderDate(new Date());
+                        cart.setQuantity(quantityToAdd);
+                        cart.setBought(false);
+                        cartManager.addToCart(cart);
+
+                    }
+                } else {
+                    throw new NoStockException("No queda stock de ese producto, no podrá ser añadido a su carrito");
+                }
+            } else {
+                showAlert("No se ha seleccionado ningún producto para eliminar.");
+            }
+        } catch (AddException e) {
+            showAlert("An error occurred while creating the product(s)");
+        } catch (ReadException e) {
+            showAlert("No se ha encontrado al cliente");
+        } catch (NoStockException e) {
+            showAlertWarning(e.getMessage());
         }
     }
 
@@ -450,6 +495,20 @@ public class ProductViewController {
         }
     }
 
+    private void updateProduct(Product product) {
+        try {
+            productManager.edit_XML(product, product.getProductId().toString());
+        } catch (UpdateException e) {
+            showAlert("An error occurred while updating the product");
+        }
+    }
+
+    private void refreshProductList() {
+        List<Product> updatedProducts = findAllProducts();
+        productList.setAll(updatedProducts);
+        productTable.refresh();
+    }
+
     private void printItems(ActionEvent event) {
         try {
             JasperReport report = JasperCompileManager.compileReport(getClass().getResourceAsStream("/eus/tartanga/crud/userInterface/report/productReport.jrxml"));
@@ -460,6 +519,25 @@ public class ProductViewController {
             jasperViewer.setVisible(true);
         } catch (JRException ex) {
             //EXCEPCIONES DE ESAS
+        }
+    }
+
+    private void handleInfoButton(ActionEvent event) {
+        try {
+            //LOGGER.info("Loading help view...");
+            //Load node graph from fxml file
+            FXMLLoader loader
+                    = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/HelpProductView.fxml"));
+            Parent root = (Parent) loader.load();
+            HelpProductController helpController
+                    = ((HelpProductController) loader.getController());
+            //Initializes and shows help stage
+            helpController.initAndShowStage(root);
+        } catch (Exception ex) {
+            //If there is an error show message and
+            //log it.
+            System.out.println(ex.getMessage());
+
         }
     }
 
@@ -500,7 +578,7 @@ public class ProductViewController {
         sortedData.comparatorProperty().bind(productTable.comparatorProperty());
         productTable.setItems(sortedData);
     }
-    
+
     public FilteredList<Product> getProductsBySearchField(String searchText, boolean inStock, LocalDate fromDate, LocalDate toDate) {
         // Crea un FilteredList con la lista de productos original
         FilteredList<Product> filteredData = new FilteredList<>(productList, p -> true);
@@ -560,20 +638,6 @@ public class ProductViewController {
         });
     }
 
-    private void updateProduct(Product product) {
-        try {
-            productManager.edit_XML(product, product.getProductId().toString());
-        } catch (UpdateException e) {
-            showAlert("An error occurred while updating the product");
-        }
-    }
-
-    private void refreshProductList() {
-        List<Product> updatedProducts = findAllProducts();
-        productList.setAll(updatedProducts);
-        productTable.refresh();
-    }
-
     private void showAlert(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
@@ -589,4 +653,35 @@ public class ProductViewController {
         alert.setContentText(message);
         alert.showAndWait();
     }
+
+    private int showQuantityDialog(int stock) {
+        Dialog<Integer> dialog = new Dialog<>();
+        dialog.setTitle("Select Quantity");
+        dialog.setHeaderText("Choose the quantity to add to your cart:");
+
+        // Crear el Spinner con valores desde 1 hasta el stock disponible
+        Spinner<Integer> spinner = new Spinner<>(1, stock, 1);
+        spinner.setEditable(true);
+
+        // Botón de confirmación
+        ButtonType confirmButton = new ButtonType("Confirm", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(confirmButton, ButtonType.CANCEL);
+
+        // Agregar el Spinner al contenido del diálogo
+        VBox content = new VBox(10, spinner);
+        content.setAlignment(Pos.CENTER);
+        dialog.getDialogPane().setContent(content);
+
+        // Obtener el valor seleccionado cuando se presione "Confirm"
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == confirmButton) {
+                return spinner.getValue();
+            }
+            return 0; // Si se cancela, devuelve 0
+        });
+
+        Optional<Integer> result = dialog.showAndWait();
+        return result.orElse(0); // Si no se selecciona nada, devuelve 0
+    }
+
 }
