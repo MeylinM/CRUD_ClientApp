@@ -65,7 +65,7 @@ public class MenuBarViewController {
 
             ProfileViewController controller = (ProfileViewController) loader.getController();
             controller.setStage(stageMenu);
-            controller.initStage(root, loggedUser);
+            //controller.initStage(root, loggedUser);
         } catch (IOException e) {
             e.printStackTrace();
             Logger.getLogger(MenuBarViewController.class.getName()).log(Level.SEVERE, null, e);

@@ -19,6 +19,7 @@ import eus.tartanga.crud.model.Cart;
 import eus.tartanga.crud.userInterface.controllers.ArtistViewController;
 import eus.tartanga.crud.userInterface.controllers.CartOrdersViewController;
 import eus.tartanga.crud.userInterface.controllers.ProductViewController;
+import eus.tartanga.crud.userInterface.controllers.ProfileViewController;
 import eus.tartanga.crud.userInterface.controllers.SignInViewController;
 import java.io.IOException;
 import java.util.List;
@@ -42,20 +43,20 @@ public class CRUD_ClientApp extends Application {
         controller.setStage(stage);
         controller.initStage(root);
         */
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ProductView.fxml"));
+        /*FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ProductView.fxml"));
 
         Parent root = (Parent) loader.load();
         //Scene scene = new Scene(root);
         ProductViewController controller = ((ProductViewController) loader.getController());
         controller.setStage(stage);
-        controller.initStage(root); 
+        controller.initStage(root); */
         
-        /*FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/CartOrdersView.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ProfileView.fxml"));
         Parent root = (Parent) loader.load();
         //Scene scene = new Scene(root);
-        CartOrdersViewController controller = ((CartOrdersViewController) loader.getController());
+        ProfileViewController controller = ((ProfileViewController) loader.getController());
         controller.setStage(stage);
-        controller.initStage(root,true);*/
+        controller.initStage(root);
         
     }
 

@@ -90,7 +90,7 @@ public class SignInViewController {
                 Parent root = (Parent) loader.load();
                 ProfileViewController controller = (ProfileViewController) loader.getController();
                 controller.setStage(stage);
-                controller.initStage(root, user);
+                //controller.initStage(root, user);
             }
         } catch (IOException ex) {
             Logger.getLogger(SignInViewController.class.getName()).log(Level.SEVERE, null, ex);

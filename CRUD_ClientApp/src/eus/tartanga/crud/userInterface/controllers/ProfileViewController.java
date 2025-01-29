@@ -5,12 +5,14 @@
  */
 package eus.tartanga.crud.userInterface.controllers;
 
+import eus.tartanga.crud.exception.ReadException;
+import eus.tartanga.crud.exception.SignInException;
 import eus.tartanga.crud.logic.FanetixClientFactory;
 import eus.tartanga.crud.logic.FanetixClientManager;
 import eus.tartanga.crud.model.FanetixClient;
-import eus.tartanga.crud.model.FanetixUser;
 import eus.tartanga.crud.model.Product;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -34,26 +36,36 @@ public class ProfileViewController {
 
     @FXML
     private TextField fullNameField;
+
     @FXML
     private TextField emailField;
+
     @FXML
     private PasswordField passwordField;
+
     @FXML
     private TextField phoneField;
+
     @FXML
     private TextField cityField;
+
     @FXML
     private TextField streetField;
+
     @FXML
     private TextField postalCodeField;
+
     @FXML
     private Button changePasswordButton;
+
     @FXML
     private Label statusLabel;
+
     private Stage stage;
     private Logger logger = Logger.getLogger(ProfileViewController.class.getName());
     private ContextMenu contextMenuInside;
     private ContextMenu contextMenuOutside;
+
     private FanetixClientManager clientManager;
     private FanetixClient client;
 
@@ -67,14 +79,13 @@ public class ProfileViewController {
      * @param root
      * @param user
      */
-    public void initStage(Parent root, FanetixUser user) {
+    public void initStage(Parent root) {
         try {
             logger.info("Initializizng profile stage");
             Scene scene = new Scene(root);
             stage.setScene(scene);
             stage.setTitle("Profile");
             stage.setResizable(false);
-            //Disable fields
             fullNameField.setEditable(false);
             emailField.setEditable(false);
             passwordField.setEditable(false);
@@ -82,23 +93,12 @@ public class ProfileViewController {
             cityField.setEditable(false);
             streetField.setEditable(false);
             postalCodeField.setEditable(false);
-            // Get a full client by  email
-            FanetixClient fc = findClient(user.getEmail());
-            //Load client data
-            fullNameField.setText(fc.getFullName());
-            System.out.println(fc.getFullName());
-            emailField.setText(fc.getEmail());
-            System.out.println(fc.getEmail());
-            phoneField.setText(String.valueOf(fc.getMobile()));
-            System.out.println(fc.getMobile());
-            cityField.setText(fc.getCity());
-            System.out.println(fc.getCity());
-            streetField.setText(fc.getStreet());
-            System.out.println(fc.getStreet());
-            postalCodeField.setText(String.valueOf(fc.getZip()));
-            System.out.println(fc.getZip());
-
             stage.show();
+
+            String email = "blackpink@fanetix.com";
+
+            findClient(email);
+
         } catch (Exception e) {
             String errorMsg = "Error" + e.getMessage();
             logger.severe(errorMsg);
@@ -107,23 +107,30 @@ public class ProfileViewController {
 
     private FanetixClient findClient(String email) {
         try {
-            logger.info("Fetching client data for email: " + email);
             clientManager = FanetixClientFactory.getFanetixClientManager();
             client = clientManager.findClient_XML(new GenericType<FanetixClient>() {
             }, email);
-
-            if (client != null) {
-                logger.info("Client data fetched successfully.");
-                return client;
-            } else {
-                logger.severe("Client not found.");
-                statusLabel.setText("Client not found");
-                return null;
-            }
-        } catch (Exception e) {
-            logger.severe("Error fetching client data: " + e.getMessage());
-            statusLabel.setText("Error fetching client data");
-            return null;
+           // System.out.println("Llego aqui");
+            loadClientData(client);
+            return client;
+        } catch (ReadException ex) {
+            Logger.getLogger(ProfileViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return client;
+    }
+
+    private void loadClientData(FanetixClient client) {
+        if (client != null) {
+            fullNameField.setText(client.getFullName());
+            emailField.setText(client.getEmail());
+            phoneField.setText(String.valueOf(client.getMobile()));
+            cityField.setText(client.getCity());
+            streetField.setText(client.getStreet());
+            postalCodeField.setText(String.valueOf(client.getZip()));
+            passwordField.setText(client.getPasswd());
+        } else {
+            logger.severe("El cliente es nulo");
+        }
+
     }
 }
