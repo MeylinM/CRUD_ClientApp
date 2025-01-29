@@ -350,8 +350,9 @@ public class SignUpViewController {
     @FXML
     private void handelEyeIconToggleButtonAction(ActionEvent event) {
 
-        //Image hiddenEyeIcon = new Image(getClass().getResourceAsStream("/resources/images/HidePasswdOrange.png"));
-        //Image visibleEyeIcon = new Image(getClass().getResourceAsStream("/resources/images/ShowPasswdOrange.png"));
+        Image hiddenEyeIcon = new Image(getClass().getResourceAsStream("eus/tartanga/crud/app/resources/HidePasswdSignUp.png"));
+        Image visibleEyeIcon = new Image(getClass().getResourceAsStream("eus/tartanga/crud/app/resources/ShowPasswdSignUp.png"));
+
 
         if (tgbEyePasswd.isSelected()) {
             // PasswordField “pfHiddenPassword” will become invisible.
@@ -359,14 +360,14 @@ public class SignUpViewController {
             // TextField “tfShowPassword” will become visible.
             tfShowPassword.setVisible(true);
             // The imgEyePasswd icon changes to HidePasswdOrange.png.
-            //imgEyePasswd.setImage(hiddenEyeIcon);
+            imgEyePasswd.setImage(hiddenEyeIcon);
         } else {
             // TextField “tfShowPassword” will become invisible.
             tfShowPassword.setVisible(false);
             // PasswordField “pfHiddenPassword” will become visible.
             pfHiddenPassword.setVisible(true);
             // The imgEyePasswd icon changes to ShowPasswdOrange.png.
-            //imgEyePasswd.setImage(visibleEyeIcon);
+            imgEyePasswd.setImage(visibleEyeIcon);
         }
 
         if (tgbEyeConfirmPasswd.isSelected()) {
@@ -375,14 +376,14 @@ public class SignUpViewController {
             // TextField “tfShowConfirmPassword” will become visible.
             tfShowConfirmPassword.setVisible(true);
             // The imgEyeConfirmPasswd icon changes to HidePasswdOrange.png.
-            //imgEyeConfirmPasswd.setImage(hiddenEyeIcon);
+            imgEyeConfirmPasswd.setImage(hiddenEyeIcon);
         } else {
             // TextField “tfShowConfirmPassword” will become invisible.
             tfShowConfirmPassword.setVisible(false);
             // PasswordField “pfHiddenConfirmPassword” will become visible.
             pfHiddenConfirmPassword.setVisible(true);
             // The imgEyeConfirmPasswd icon changes to ShowPasswdOrange.png.
-            //imgEyeConfirmPasswd.setImage(visibleEyeIcon);
+            imgEyeConfirmPasswd.setImage(visibleEyeIcon);
         }
     }
 
