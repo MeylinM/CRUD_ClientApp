@@ -7,7 +7,7 @@ package eus.tartanga.crud.encrypt;
 
 /**
  *
- * @author bmonc
+ * @author Irati
  */
 import static com.google.common.io.ByteStreams.toByteArray;
 import eus.tartanga.crud.exception.EncryptException;
