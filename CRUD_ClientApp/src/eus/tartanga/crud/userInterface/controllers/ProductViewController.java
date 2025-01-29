@@ -174,7 +174,8 @@ public class ProductViewController {
             //Para obtener la lista de artistas se usará el método de lógica findAllArtist
             artistList = FXCollections.observableArrayList(artistInterface.findAllArtist(new GenericType<List<Artist>>() {
             }));
-
+            
+            //Crear la factoria de celda para releaseDate usando un DatePicker
             final Callback<TableColumn<Product, Date>, TableCell<Product, Date>> dateCell
                     = (TableColumn<Product, Date> param) -> new ProductDateEditingCell();
             releaseDateColumn.setCellFactory(dateCell);
@@ -381,43 +382,6 @@ public class ProductViewController {
         }
     }
 
-    public FilteredList<Product> getProductsBySearchField(String searchText, boolean inStock, LocalDate fromDate, LocalDate toDate) {
-        // Crea un FilteredList con la lista de productos original
-        FilteredList<Product> filteredData = new FilteredList<>(productList, p -> true);
-
-        // Aplica los filtros combinados (búsqueda, stock y fecha)
-        filteredData.setPredicate(product -> {
-            // Filtra por el texto de búsqueda
-            boolean matchesSearch = true;
-            if (searchText != null && !searchText.isEmpty()) {
-                String lowerCaseFilter = searchText.toLowerCase();
-                matchesSearch = product.getTitle().toLowerCase().contains(lowerCaseFilter)
-                        || product.getDescription().toLowerCase().contains(lowerCaseFilter)
-                        || product.getArtist().getName().toLowerCase().contains(lowerCaseFilter);
-            }
-
-            // Filtra por stock
-            boolean matchesStock = !inStock || Integer.parseInt(product.getStock()) > 0;
-
-            // Filtra por fechas (si las fechas están definidas)
-            boolean matchesDate = true;
-            if (fromDate != null && toDate != null) {
-                Date productReleaseDate = product.getReleaseDate();  // Esto es Date
-                // Convertimos LocalDate a Date para la comparación
-                java.sql.Date fromSQLDate = java.sql.Date.valueOf(fromDate);
-                java.sql.Date toSQLDate = java.sql.Date.valueOf(toDate);
-
-                // Comparamos las fechas
-                matchesDate = !productReleaseDate.before(fromSQLDate) && !productReleaseDate.after(toSQLDate);
-            }
-
-            // Devuelve true solo si el producto cumple con todos los filtros
-            return matchesSearch && matchesStock && matchesDate;
-        });
-
-        return filteredData;
-    }
-
     private void createContextMenu() {
         contextMenuInside = new ContextMenu();
         MenuItem addItem = new MenuItem("Add new product");
@@ -535,6 +499,43 @@ public class ProductViewController {
         SortedList<Product> sortedData = new SortedList<>(filteredProducts);
         sortedData.comparatorProperty().bind(productTable.comparatorProperty());
         productTable.setItems(sortedData);
+    }
+    
+    public FilteredList<Product> getProductsBySearchField(String searchText, boolean inStock, LocalDate fromDate, LocalDate toDate) {
+        // Crea un FilteredList con la lista de productos original
+        FilteredList<Product> filteredData = new FilteredList<>(productList, p -> true);
+
+        // Aplica los filtros combinados (búsqueda, stock y fecha)
+        filteredData.setPredicate(product -> {
+            // Filtra por el texto de búsqueda
+            boolean matchesSearch = true;
+            if (searchText != null && !searchText.isEmpty()) {
+                String lowerCaseFilter = searchText.toLowerCase();
+                matchesSearch = product.getTitle().toLowerCase().contains(lowerCaseFilter)
+                        || product.getDescription().toLowerCase().contains(lowerCaseFilter)
+                        || product.getArtist().getName().toLowerCase().contains(lowerCaseFilter);
+            }
+
+            // Filtra por stock
+            boolean matchesStock = !inStock || Integer.parseInt(product.getStock()) > 0;
+
+            // Filtra por fechas (si las fechas están definidas)
+            boolean matchesDate = true;
+            if (fromDate != null && toDate != null) {
+                Date productReleaseDate = product.getReleaseDate();  // Esto es Date
+                // Convertimos LocalDate a Date para la comparación
+                java.sql.Date fromSQLDate = java.sql.Date.valueOf(fromDate);
+                java.sql.Date toSQLDate = java.sql.Date.valueOf(toDate);
+
+                // Comparamos las fechas
+                matchesDate = !productReleaseDate.before(fromSQLDate) && !productReleaseDate.after(toSQLDate);
+            }
+
+            // Devuelve true solo si el producto cumple con todos los filtros
+            return matchesSearch && matchesStock && matchesDate;
+        });
+
+        return filteredData;
     }
 
     private void configureRowStyling() {

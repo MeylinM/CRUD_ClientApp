@@ -1,6 +1,9 @@
 package eus.tartanga.crud.userInterface.controllers;
 
+import eus.tartanga.crud.exception.AddException;
+import eus.tartanga.crud.exception.DeleteException;
 import eus.tartanga.crud.exception.ReadException;
+import eus.tartanga.crud.exception.UpdateException;
 import eus.tartanga.crud.logic.CartFactory;
 import eus.tartanga.crud.logic.CartManager;
 import eus.tartanga.crud.logic.ProductFactory;
@@ -41,6 +44,8 @@ import javafx.stage.Stage;
 import javax.ws.rs.core.GenericType;
 import javafx.util.Callback;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.event.ActionEvent;
+import javafx.scene.control.Alert;
 
 /**
  *
@@ -179,7 +184,7 @@ public class CartOrdersViewController extends Application {
 
         // Precio del producto
         tbcPrice.setCellValueFactory(cellData -> {
-            Float price = cellData.getValue().getProduct().getPrice(); // Obtener el precio
+            Float price = Float.valueOf(cellData.getValue().getProduct().getPrice());  // Obtener el precio
             String formatPrice = NumberFormat.getInstance(Locale.ROOT).format(price); // Formatear el precio
             return new SimpleStringProperty(formatPrice); // Devolver el precio formateado como SimpleStringProperty
         });
@@ -205,7 +210,7 @@ public class CartOrdersViewController extends Application {
         /* -Sub total es una columna con un valor calculado con la cantidad y el precio*/
         tbcSubTotal.setCellValueFactory(cellData -> {
             Cart cart = cellData.getValue();
-            float subtotal = cart.getQuantity() * cart.getProduct().getPrice();
+            float subtotal = cart.getQuantity() * Float.valueOf(cart.getProduct().getPrice());
             return new SimpleObjectProperty<>(subtotal);
         });
         this.isCartView = isCartView;
@@ -243,13 +248,15 @@ public class CartOrdersViewController extends Application {
             titleImage.setImage(new Image(getClass().getClassLoader().getResourceAsStream("eus/tartanga/crud/app/resources/MyCart.png")));
             //"btnBuy". (Botón por defecto)
             btnBuy.setDefaultButton(true);
+            btnBuy.setOnAction(this::handleAddProduct);
+            btnClearCart.setOnAction(this::handleClearAllProducts);
             // Los filtros por artista y fecha estarán ocultos.
             cbxArtist.setVisible(false);
             dpFrom.setVisible(false);
             dpTo.setVisible(false);
             // El botón“btnPrint” estará oculto.
             btnPrint.setVisible(false);
-
+            cartList.addAll(findAllNotBoughtCartProducts());
         } else {
             // Configuración para "My Orders"
             logger.info("Initializing Orders stage");
@@ -260,11 +267,12 @@ public class CartOrdersViewController extends Application {
             btnBuy.setVisible(false);
             btnClearCart.setVisible(false);
             footer.setVisible(false);
+            cartList.addAll(findAllBoughtCartProducts());
         }
         stage.setScene(scene);
         stage.show();
-
-        cartList.addAll(findAllNotBoughtCartProducts());
+        
+        
         //Cargar la tabla Products con la información de los productos
         tbCart.setItems(cartList);
     }
@@ -291,6 +299,34 @@ public class CartOrdersViewController extends Application {
     public static void main(String[] args) {
         launch(args);
     }
+    
+    private void handleAddProduct(ActionEvent event) {
+        try {
+            //LOGICA DE CONSEGUIR EL PRODUCTO/CARRITO ESPECIFICO?
+            Cart cart = new Cart();
+            cart.setBought(true);
+            cartManager.updateCart_XML(cart, "email?", "product1");
+            /*HABRIA QUE REFRESCAR LA TABLA PARA QUE DESAPAREZCA DE LA TABLA
+            refreshCartList();*/
+        } catch (UpdateException e) {
+            showAlert("Problem with buying products");
+        }
+
+    }
+    
+    private void handleClearAllProducts(ActionEvent event) {
+        try {
+            //LOGICA DE QUE SEA DE EL CLIENTE ESPECIFICOS
+            for (Product product : productList) {
+            cartManager.removeCart("email?", product.getProductId().toString());
+            }
+            /*HABRIA QUE REFRESCAR LA TABLA PARA QUE DESAPAREZCA DE LA TABLA?
+            refreshCartList();*/
+        } catch (DeleteException e) {
+            showAlert("Problem with deleting products from the cart");
+        }
+
+    }
 
     private List<Cart> findAllNotBoughtCartProducts() {
         List<Cart> carts = null;
@@ -299,9 +335,34 @@ public class CartOrdersViewController extends Application {
             });
             return carts;
         } catch (ReadException e) {
-            System.out.println("Problemo");
+            showAlert("Problem with reading not bought products");
         }
         return carts;
-        //findAllNotBoughtProducts_XML
+    }
+    
+    private List<Cart> findAllBoughtCartProducts() {
+        List<Cart> carts = null;
+        try {
+            carts = cartManager.findAllBoughtProducts_XML(new GenericType<List<Cart>>() {});
+        } catch (ReadException e) {
+            showAlert("Problem with reading bought products");
+        }
+        return carts;
+    }
+    
+    private void showAlert(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText("Error de servidor");
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private void showAlertWarning(String message) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Warning");
+        alert.setHeaderText("Error de validación");
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

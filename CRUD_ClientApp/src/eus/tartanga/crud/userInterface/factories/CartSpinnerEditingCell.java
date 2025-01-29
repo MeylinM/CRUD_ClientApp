@@ -35,7 +35,7 @@ public class CartSpinnerEditingCell extends TableCell<Cart, Integer> {
                     // Obtener el Product desde Cart
                     Product product = cartItem.getProduct(); // Método que te da el Product relacionado
                     if (product != null) {
-                        int stock = product.getStock();  // Obtener el stock del producto
+                        int stock = Integer.parseInt(product.getStock());  // Obtener el stock del producto
 
                         // Solo actualizamos el máximo si es necesario
                         if (maxStock != stock) {

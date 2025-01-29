@@ -11,7 +11,13 @@ package eus.tartanga.crud.logic;
  */
 public class CartFactory {
     
+    private static CartManager cartManager;
+    
     public static CartManager getCartManager() {
-        return new CartClientRest();
+        
+        if (cartManager == null) {
+            cartManager = new CartClientRest();
+        }
+        return cartManager;
     }
 }
