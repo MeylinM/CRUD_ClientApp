@@ -48,10 +48,17 @@ public class HelpProductController {
      * event.
      * @param event  The window event 
      */
-    private void handleWindowShowing(WindowEvent event){
+    /*private void handleWindowShowing(WindowEvent event){
         WebEngine webEngine = webView.getEngine();
         //Load help page.eus.tartanga.crud.userInterface.html
         webEngine.load(getClass()
                 .getResource("/eus/tartanga/crud/userInterface/html/helpShopAdmin.html").toExternalForm());
+    }*/
+    
+    private void handleWindowShowing(WindowEvent event){
+        WebEngine webEngine = webView.getEngine();
+        //Load help page.eus.tartanga.crud.userInterface.html
+        webEngine.load(getClass()
+                .getResource("/eus/tartanga/crud/userInterface/html/helpArtistAdmin.html").toExternalForm());
     }
 }
