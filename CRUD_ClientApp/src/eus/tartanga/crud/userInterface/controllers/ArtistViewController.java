@@ -149,6 +149,15 @@ public class ArtistViewController {
             final Callback<TableColumn<Artist, Date>, TableCell<Artist, Date>> dateCell
                     = (TableColumn<Artist, Date> param) -> new ArtistDateEditingCell();
             debutColumn.setCellFactory(dateCell);
+            debutColumn.setOnEditCommit(event -> {
+                Artist artist = event.getRowValue();
+                artist.setDebut(event.getNewValue());
+                try {
+                    artistManager.updateArtist(artist, String.valueOf(artist.getArtistId()));
+                } catch (UpdateException ex) {
+                    Logger.getLogger(ArtistViewController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            });
 
             // Hacer la columna 'nameColumn' editable
             nameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
