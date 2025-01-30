@@ -424,8 +424,8 @@ public class ArtistViewController {
             FXMLLoader loader
                     = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/HelpArtistView.fxml"));
             Parent root = (Parent) loader.load();
-            HelpController helpController
-                    = ((HelpController) loader.getController());
+            HelpArtistController helpController
+                    = ((HelpArtistController) loader.getController());
             //Initializes and shows help stage
             helpController.initAndShowStage(root);
         } catch (Exception ex) {

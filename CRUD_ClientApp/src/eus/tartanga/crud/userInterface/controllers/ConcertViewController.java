@@ -307,6 +307,8 @@ public class ConcertViewController {
         } catch (WebApplicationException e) {
             String errorMsg = "Error" + e.getMessage();
             logger.severe(errorMsg);
+        } catch (ReadException ex) {
+           logger.severe(ex.getMessage());
         }
     }
 
