@@ -133,6 +133,8 @@ public class ArtistViewController {
             artistManager = ArtistFactory.getArtistManager();
 
             artistTable.setEditable(true);
+            debutColumn.setEditable(true);
+
             filterArtists();
 
             // Configurar columnas de tabla
@@ -147,7 +149,6 @@ public class ArtistViewController {
             final Callback<TableColumn<Artist, Date>, TableCell<Artist, Date>> dateCell
                     = (TableColumn<Artist, Date> param) -> new ArtistDateEditingCell();
             debutColumn.setCellFactory(dateCell);
-            
 
             // Hacer la columna 'nameColumn' editable
             nameColumn.setCellFactory(TextFieldTableCell.forTableColumn());

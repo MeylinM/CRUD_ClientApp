@@ -28,6 +28,7 @@ import javax.ws.rs.core.GenericType;
  *
  * @author olaia
  */
+
 public class ArtistClientRest implements ArtistManager{
 
     private WebTarget webTarget;

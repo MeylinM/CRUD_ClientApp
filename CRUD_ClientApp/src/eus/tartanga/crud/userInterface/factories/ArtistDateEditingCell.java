@@ -73,5 +73,4 @@ public class ArtistDateEditingCell extends TableCell<Artist, Date> {
         setGraphic(null);
     }
     
-    
 }
