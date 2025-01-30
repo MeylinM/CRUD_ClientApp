@@ -46,7 +46,7 @@
                   </VBox>
             </children>
          </VBox>
-            <Button layoutX="799.0" layoutY="667.0" prefHeight="54.0" prefWidth="178.0" styleClass="button-change" text="Change Password" />
+            <Button fx:id="changePasswd" layoutX="799.0" layoutY="667.0" prefHeight="54.0" prefWidth="178.0" styleClass="button-change" text="Change Password" />
         </children>
     </AnchorPane>
 </VBox>

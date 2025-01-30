@@ -10,7 +10,12 @@ package eus.tartanga.crud.logic;
  * @author 2dam
  */
 public class ConcertFactory {
+    private static ConcertManager concertManager;
+    
     public static ConcertManager getConcertManager() {
-        return new ConcertClientRest();
+        if (concertManager == null) {
+            concertManager = new ConcertClientRest();
+        }
+        return concertManager;
     }
 }

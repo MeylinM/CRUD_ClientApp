@@ -18,6 +18,7 @@ import eus.tartanga.crud.logic.CartManager;
 import eus.tartanga.crud.model.Cart;
 import eus.tartanga.crud.userInterface.controllers.ArtistViewController;
 import eus.tartanga.crud.userInterface.controllers.CartOrdersViewController;
+import eus.tartanga.crud.userInterface.controllers.ConcertViewController;
 import eus.tartanga.crud.userInterface.controllers.ProductViewController;
 import eus.tartanga.crud.userInterface.controllers.ProfileViewController;
 import eus.tartanga.crud.userInterface.controllers.SignInViewController;
@@ -43,6 +44,14 @@ public class CRUD_ClientApp extends Application {
         SignInViewController controller = ((SignInViewController) loader.getController());
         controller.setStage(stage);
         controller.initStage(root);
+        
+        /*FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ConcertView.fxml"));
+
+        Parent root = (Parent) loader.load();
+        //Scene scene = new Scene(root);
+        ConcertViewController controller = ((ConcertViewController) loader.getController());
+        controller.setStage(stage);
+        controller.initStage(root);*/
         
         /*FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ProductView.fxml"));
 

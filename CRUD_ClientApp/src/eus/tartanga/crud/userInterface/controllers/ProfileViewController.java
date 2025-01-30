@@ -5,6 +5,7 @@
  */
 package eus.tartanga.crud.userInterface.controllers;
 
+import eus.tartanga.crud.exception.DeleteException;
 import eus.tartanga.crud.exception.ReadException;
 import eus.tartanga.crud.exception.SignInException;
 import eus.tartanga.crud.logic.FanetixClientFactory;
@@ -12,12 +13,15 @@ import eus.tartanga.crud.logic.FanetixClientManager;
 import eus.tartanga.crud.model.FanetixClient;
 import eus.tartanga.crud.model.FanetixUser;
 import eus.tartanga.crud.model.Product;
+import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -61,6 +65,9 @@ public class ProfileViewController {
 
     @FXML
     private Label statusLabel;
+    
+    @FXML
+    private Button changePasswd;
 
     private Stage stage;
     private Logger logger = Logger.getLogger(ProfileViewController.class.getName());
@@ -98,9 +105,22 @@ public class ProfileViewController {
             FanetixUser user = MenuBarViewController.getLoggedUser();
             clientManager = FanetixClientFactory.getFanetixClientManager();  
             findClient(user.getEmail());
+            changePasswd.setOnAction(this::handleChangePasswd);
         } catch (Exception e) {
             String errorMsg = "Error" + e.getMessage();
             logger.severe(errorMsg);
+        }
+    }
+    
+    private void handleChangePasswd(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ChangePasswdView.fxml"));
+            Parent root = (Parent) loader.load();
+            ChangePasswdViewController controller = (ChangePasswdViewController) loader.getController();
+            controller.setStage(stage);
+            controller.initStage(root);
+        } catch (IOException ex) {
+            Logger.getLogger(ProfileViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
