@@ -59,13 +59,13 @@ public class FanetixClientRest implements FanetixClientManager{
         webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{email})).request(javax.ws.rs.core.MediaType.APPLICATION_JSON).put(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_JSON));
     }
 
-    public <T> T signIn_XML(GenericType<T> responseType, String email, String passwd) throws SignInException {
+    public <T> T signIn_XML(GenericType<T> responseType, String email, String passwd) throws ReadException {
         WebTarget resource = webTarget;
         resource = resource.path(java.text.MessageFormat.format("signIn/{0}/{1}", new Object[]{email, passwd}));
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
     }
 
-    public <T> T signIn_JSON(GenericType<T> responseType, String email, String passwd) throws SignInException {
+    public <T> T signIn_JSON(GenericType<T> responseType, String email, String passwd) throws ReadException {
         WebTarget resource = webTarget;
         resource = resource.path(java.text.MessageFormat.format("signIn/{0}/{1}", new Object[]{email, passwd}));
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);

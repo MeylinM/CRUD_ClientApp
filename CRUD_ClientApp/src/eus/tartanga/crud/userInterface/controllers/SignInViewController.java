@@ -11,6 +11,7 @@ import eus.tartanga.crud.logic.AdministratorFactory;
 import eus.tartanga.crud.logic.AdministratorManager;
 import eus.tartanga.crud.logic.FanetixClientFactory;
 import eus.tartanga.crud.logic.FanetixClientManager;
+import eus.tartanga.crud.model.Administrator;
 import eus.tartanga.crud.model.FanetixClient;
 import eus.tartanga.crud.model.FanetixUser;
 import java.io.IOException;
@@ -67,6 +68,7 @@ public class SignInViewController {
             stage.setTitle("SignIn");
             stage.setResizable(false);
             clientManager= FanetixClientFactory.getFanetixClientManager();
+            adminManager = AdministratorFactory.getAdministratorManager();
             tfPassword.setVisible(false);
             pfPassword.textProperty().addListener(this::textPropertyChange);
             tfPassword.textProperty().addListener(this::textPropertyChange);
@@ -75,7 +77,6 @@ public class SignInViewController {
             // tgbtnEyeIcon.setOnAction(this::togglePasswordVisibility);
             // hypSignUp.setOnAction(this::handlerHyperlink);
             // hypForgotPassword.setOnAction(this::handlerHyperlink);
-            //  adminManager = AdministratorFactory.getAdministratorManager();
             stage.show();
             logger.info("Showing the SignIn window.");
         } catch (Exception e) {
@@ -86,14 +87,18 @@ public class SignInViewController {
 
     @FXML
     public void handelAcceptButtonAction(ActionEvent event) {
+        FanetixClient user;
+        Administrator admin = null;
         String email = this.tfEmail.getText();
         String passwrd = this.pfPassword.getText();
         try {
             logger.info("Handeling the accept button.");
-            FanetixClient user= clientManager.signIn_XML(new GenericType<FanetixClient>() {
-            }, email, passwrd);
+            user= clientManager.signIn_XML(new GenericType<FanetixClient>() {}, email, passwrd);
+            if(user==null){
+                admin = adminManager.signIn_XML(new GenericType<Administrator>() {}, email, passwrd);
+            }
             //Sign in falseado
-            if(user!=null){              
+            if(user!=null || admin!=null){              
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ProfileView.fxml"));
                 FanetixUser userGeneral = new FanetixUser(email, passwrd);
                 MenuBarViewController.setUser(userGeneral);
@@ -102,7 +107,7 @@ public class SignInViewController {
                 controller.setStage(stage);
                 controller.initStage(root);
             }
-        }catch( SignInException e){
+        }catch( ReadException e){
             new Alert(Alert.AlertType.ERROR, "At this moment server is not available. Please try later.", ButtonType.OK).showAndWait();
         }catch (IOException ex) {
             Logger.getLogger(SignInViewController.class.getName()).log(Level.SEVERE, null, ex);
