@@ -11,6 +11,7 @@ import eus.tartanga.crud.logic.ArtistManager;
 import eus.tartanga.crud.model.Artist;
 import eus.tartanga.crud.userInterface.factories.ArtistDateEditingCell;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -103,6 +104,9 @@ public class ArtistViewController {
 
     @FXML
     private Button btnInfo;
+    
+    @FXML
+    private Button shopButton;
 
     @FXML
     private DatePicker dpFrom;
@@ -277,6 +281,7 @@ public class ArtistViewController {
             //ARREGLAR DELETE DEL SERVIDOR
             btnDeleteArtist.setOnAction(this::handleDeleteArtist);
             btnInfo.setOnAction(this::handleInfoButton);
+            shopButton.setOnAction(this::handleGoToShop);
             //Inicializar los menu contextuales
             createContextMenu();
             // Mostrará el Menú contextual con las opciones mIAddToCart, 
@@ -306,6 +311,19 @@ public class ArtistViewController {
         } catch (ReadException e) {
             logger.severe("Error al obtener artistas: " + e.getMessage());
             return FXCollections.observableArrayList();
+        }
+    }
+    
+    private void handleGoToShop(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ProductView.fxml"));
+            Parent root = (Parent) loader.load();
+            //Scene scene = new Scene(root);
+            ProductViewController controller = ((ProductViewController) loader.getController());
+            controller.setStage(stage);
+            controller.initStage(root);
+        } catch (IOException ex) {
+            Logger.getLogger(ArtistViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

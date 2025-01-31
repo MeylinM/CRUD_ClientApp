@@ -25,6 +25,7 @@ import eus.tartanga.crud.model.Artist;
 import eus.tartanga.crud.model.Cart;
 import eus.tartanga.crud.model.CartId;
 import eus.tartanga.crud.model.FanetixClient;
+import eus.tartanga.crud.model.FanetixUser;
 import eus.tartanga.crud.model.Product;
 import eus.tartanga.crud.userInterface.factories.ProductDateEditingCell;
 import java.io.ByteArrayInputStream;
@@ -155,6 +156,7 @@ public class ProductViewController {
     private ObservableList<Artist> artistList = FXCollections.observableArrayList();
     private CartManager cartManager;
     private FanetixClientManager clientManager;
+    FanetixClient client;
 
     public void setStage(Stage stage) {
         this.stage = stage;
@@ -177,16 +179,18 @@ public class ProductViewController {
             stage.getIcons().add(new Image("eus/tartanga/crud/app/resources/logo.png"));
             stage.setResizable(false);
             stage.show();
-
+            
+            //Inicializar las diferentes factorias que vamos a usar
             productManager = ProductFactory.getProductManager();
             artistManager = ArtistFactory.getArtistManager();
             cartManager = CartFactory.getCartManager();
             clientManager = FanetixClientFactory.getFanetixClientManager();
 
-            //Hacer la tabla editable
-            productTable.setEditable(true);
+            //Conseguir la informacíon del usuario loggeado
+            FanetixUser user = MenuBarViewController.getLoggedUser();
+            client = getFanetixClient(user.getEmail());
 
-            //Configurar columnas básicas
+            //Configurar las columnas básicas
             titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
             artistColumn.setCellValueFactory(new PropertyValueFactory<>("artist"));
             descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
@@ -194,112 +198,146 @@ public class ProductViewController {
             releaseDateColumn.setCellValueFactory(new PropertyValueFactory<>("releaseDate"));
             stockColumn.setCellValueFactory(new PropertyValueFactory<>("stock"));
             priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
+            
+            //Mostrar la ventana de manera diferente en caso de ser un Cliente
+            if (client != null) {
 
-            //Para obtener la lista de artistas se usará el método de lógica findAllArtist
-            artistList = FXCollections.observableArrayList(artistManager.findAllArtist(new GenericType<List<Artist>>() {
-            }));
-
-            //Crear la factoria de celda para releaseDate usando un DatePicker
-            final Callback<TableColumn<Product, Date>, TableCell<Product, Date>> dateCell
-                    = (TableColumn<Product, Date> param) -> new ProductDateEditingCell();
-            releaseDateColumn.setCellFactory(dateCell);
-
-            // Hacer las columnas editables
-            titleColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-            titleColumn.setOnEditCommit(event -> {
-                try {
-                    Product product = event.getRowValue();
-                    Product productCopy = product.clone();
-                    productCopy.setTitle(event.getNewValue());
-                    if (productCopy.getTitle() == null || productCopy.getTitle().isEmpty()) {
-                        throw new TextEmptyException("El campo de Titulo no puede estar vacío");
-                    } else if (productCopy.getTitle().length() > 50) {
-                        throw new MaxCharacterException("El título no puede tener más de 50 caracteres");
+                priceColumn.setCellFactory(column -> new TableCell<Product, String>() {
+                    @Override
+                    protected void updateItem(String price, boolean empty) {
+                        super.updateItem(price, empty);
+                        if (empty || price == null) {
+                            setText(null);
+                        } else {
+                            setText(price + " €");
+                        }
                     }
-                    updateProduct(productCopy);
-                    product.setTitle(event.getNewValue());
-                } catch (TextEmptyException | MaxCharacterException e) {
-                    Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
-                    showAlertWarning(e.getMessage());
-                    productTable.refresh();
-                } catch (Exception e) {
-                    Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
-                }
-            });
+                });
+                btnAddToCart.setOnAction(this::handleAddToCart);
+                btnAddProduct.setVisible(false);
+                btnDeleteProduct.setVisible(false);
+            } else {
+                //En caso de ser un administrador mostrar de manera diferente
+                
+                //Hacer la tabla editable
+                productTable.setEditable(true);
 
-            descriptionColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-            descriptionColumn.setOnEditCommit(event -> {
-                try {
+                //Para obtener la lista de artistas se usará el método de lógica findAllArtist
+                artistList = FXCollections.observableArrayList(artistManager.findAllArtist(new GenericType<List<Artist>>() {
+                }));
+
+                //Crear la factoria de celda para releaseDate usando un DatePicker
+                final Callback<TableColumn<Product, Date>, TableCell<Product, Date>> dateCell
+                        = (TableColumn<Product, Date> param) -> new ProductDateEditingCell();
+                releaseDateColumn.setCellFactory(dateCell);
+                releaseDateColumn.setOnEditCommit(event -> {
                     Product product = event.getRowValue();
-                    Product productCopy = product.clone();
-                    productCopy.setDescription(event.getNewValue());
-                    System.out.println(productCopy.getDescription());
-                    if (productCopy.getDescription() == null || productCopy.getDescription().isEmpty()) {
-                        throw new TextEmptyException("El campo de description no puede estar vacío");
-                    } else if (productCopy.getDescription().length() > 250) {
-                        throw new MaxCharacterException("La descripcion no puede tener más de 250 caracteres");
-                    }
-                    updateProduct(productCopy);
-                    product.setDescription(event.getNewValue());
-                } catch (TextEmptyException | MaxCharacterException e) {
-                    Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
-                    showAlertWarning(e.getMessage());
-                    productTable.refresh();
-                } catch (Exception e) {
-                    //Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
-                }
-            });
+                    product.setReleaseDate(event.getNewValue());
+                    updateProduct(product);
+                });
 
-            stockColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-            stockColumn.setOnEditCommit(event -> {
-                try {
-                    Product product = event.getRowValue();
-                    //int originalStock = product.getStock();
-                    Product productCopy = product.clone();
-                    if (Integer.parseInt(event.getNewValue()) >= 0) {
-                        productCopy.setStock(event.getNewValue());
-                    } else {
-                        throw new NumberFormatException();
+                // Hacer las columnas editables
+                titleColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+                titleColumn.setOnEditCommit(event -> {
+                    try {
+                        Product product = event.getRowValue();
+                        Product productCopy = product.clone();
+                        productCopy.setTitle(event.getNewValue());
+                        if (productCopy.getTitle() == null || productCopy.getTitle().isEmpty()) {
+                            throw new TextEmptyException("El campo de Titulo no puede estar vacío");
+                        } else if (productCopy.getTitle().length() > 50) {
+                            throw new MaxCharacterException("El título no puede tener más de 50 caracteres");
+                        }
+                        updateProduct(productCopy);
+                        product.setTitle(event.getNewValue());
+                    } catch (TextEmptyException | MaxCharacterException e) {
+                        Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
+                        showAlertWarning(e.getMessage());
+                        productTable.refresh();
+                    } catch (Exception e) {
+                        Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
                     }
-                    updateProduct(productCopy);
-                    product.setStock(event.getNewValue());
-                } catch (NumberFormatException ex) {
-                    showAlertWarning("El valor del stock debe ser un número válido y mayor o igual a 0");
-                    productTable.refresh();
-                } catch (Exception e) {
-                    Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
-                }
-            });
+                });
 
-            priceColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-            priceColumn.setOnEditCommit(event -> {
-                try {
-                    Product product = event.getRowValue();
-                    //int originalStock = product.getStock();
-                    Product productCopy = product.clone();
-                    if (Float.parseFloat(event.getNewValue()) > 0 && event.getNewValue().matches("^[1-9][0-9]*(\\.[0-9]{1,2})?$")) {
-                        productCopy.setPrice(event.getNewValue());
-                    } else {
-                        throw new NumberFormatException();
+                descriptionColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+                descriptionColumn.setOnEditCommit(event -> {
+                    try {
+                        Product product = event.getRowValue();
+                        Product productCopy = product.clone();
+                        productCopy.setDescription(event.getNewValue());
+                        System.out.println(productCopy.getDescription());
+                        if (productCopy.getDescription() == null || productCopy.getDescription().isEmpty()) {
+                            throw new TextEmptyException("El campo de description no puede estar vacío");
+                        } else if (productCopy.getDescription().length() > 250) {
+                            throw new MaxCharacterException("La descripcion no puede tener más de 250 caracteres");
+                        }
+                        updateProduct(productCopy);
+                        product.setDescription(event.getNewValue());
+                    } catch (TextEmptyException | MaxCharacterException e) {
+                        Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
+                        showAlertWarning(e.getMessage());
+                        productTable.refresh();
+                    } catch (Exception e) {
+                        //Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
                     }
-                    updateProduct(productCopy);
-                    product.setPrice(event.getNewValue());
-                } catch (NumberFormatException ex) {
-                    showAlertWarning("El valor del precio debe ser un número válido y mayor a 0");
-                    productTable.refresh();
-                } catch (Exception e) {
-                    Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
-                }
-            });
+                });
 
-            artistColumn.setCellFactory(ComboBoxTableCell.forTableColumn(artistList));
-            artistColumn.setOnEditCommit((TableColumn.CellEditEvent<Product, Artist> t) -> {
-                ((Product) t.getTableView().getItems()
-                        .get(t.getTablePosition().getRow()))
-                        .setArtist(t.getNewValue());
-                Product product = (Product) t.getTableView().getItems().get(t.getTablePosition().getRow());
-                Artist originalValueLevel = product.getArtist();
-            });
+                stockColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+                stockColumn.setOnEditCommit(event -> {
+                    try {
+                        Product product = event.getRowValue();
+                        //int originalStock = product.getStock();
+                        Product productCopy = product.clone();
+                        if (Integer.parseInt(event.getNewValue()) >= 0) {
+                            productCopy.setStock(event.getNewValue());
+                        } else {
+                            throw new NumberFormatException();
+                        }
+                        updateProduct(productCopy);
+                        product.setStock(event.getNewValue());
+                    } catch (NumberFormatException ex) {
+                        showAlertWarning("El valor del stock debe ser un número válido y mayor o igual a 0");
+                        productTable.refresh();
+                    } catch (Exception e) {
+                        Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
+                    }
+                });
+
+                priceColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+                priceColumn.setOnEditCommit(event -> {
+                    try {
+                        Product product = event.getRowValue();
+                        //int originalStock = product.getStock();
+                        Product productCopy = product.clone();
+                        if (Float.parseFloat(event.getNewValue()) > 0 && event.getNewValue().matches("^[1-9][0-9]*(\\.[0-9]{1,2})?$")) {
+                            productCopy.setPrice(event.getNewValue());
+                        } else {
+                            throw new NumberFormatException();
+                        }
+                        updateProduct(productCopy);
+                        product.setPrice(event.getNewValue());
+                    } catch (NumberFormatException ex) {
+                        showAlertWarning("El valor del precio debe ser un número válido y mayor a 0");
+                        productTable.refresh();
+                    } catch (Exception e) {
+                        Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
+                    }
+                });
+
+                artistColumn.setCellFactory(ComboBoxTableCell.forTableColumn(artistList));
+                artistColumn.setOnEditCommit((TableColumn.CellEditEvent<Product, Artist> t) -> {
+                    ((Product) t.getTableView().getItems()
+                            .get(t.getTablePosition().getRow()))
+                            .setArtist(t.getNewValue());
+                    Product product = (Product) t.getTableView().getItems().get(t.getTablePosition().getRow());
+                    Artist originalValueLevel = product.getArtist();
+                });
+
+                btnAddProduct.setOnAction(this::handleAddProduct);
+
+                btnDeleteProduct.setOnAction(this::handleDeleteProduct);
+                btnAddToCart.setVisible(false);
+            }
 
             imageColumn.setCellFactory(column -> new TableCell<Product, byte[]>() {
                 private final ImageView imageView = new ImageView();
@@ -329,20 +367,6 @@ public class ProductViewController {
                 }
             });
 
-            /*priceColumn.setCellFactory(column -> new TableCell<Product, String>() {
-                @Override
-                protected void updateItem(String price, boolean empty) {
-                    super.updateItem(price, empty);
-                    if (empty || price == null) {
-                        setText(null);
-                    } else {
-                        setText(price + " €"); 
-                    }
-                }
-            });*/
-            btnAddProduct.setOnAction(this::handleAddProduct);
-            btnAddToCart.setOnAction(this::handleAddToCart);
-            btnDeleteProduct.setOnAction(this::handleDeleteProduct);
             btnInfo.setOnAction(this::handleInfoButton);
             //Inicializar los menu contextuales
             createContextMenu();
@@ -381,51 +405,6 @@ public class ProductViewController {
         return products;
     }
 
-    private void createContextMenu() {
-        contextMenuInside = new ContextMenu();
-        MenuItem addItem = new MenuItem("Add new product");
-        addItem.setOnAction(this::handleAddProduct);
-        MenuItem deleteItem = new MenuItem("Delete");
-        deleteItem.setOnAction(this::handleDeleteProduct);
-        MenuItem printItemInside = new MenuItem("Print");
-        printItemInside.setOnAction(this::printItems);
-        contextMenuInside.getItems().addAll(addItem, deleteItem, printItemInside);
-
-        // Crear menú contextual para clics fuera de la tabla
-        contextMenuOutside = new ContextMenu();
-        MenuItem printItemOutside = new MenuItem("Print");
-        printItemOutside.setOnAction(this::printItems);
-        MenuItem addItemOutside = new MenuItem("Add new product");
-        addItemOutside.setOnAction(this::handleAddProduct);
-        contextMenuOutside.getItems().addAll(printItemOutside, addItemOutside);
-    }
-
-    private void handleRightClickTable(MouseEvent event) {
-        if (event.getButton() == MouseButton.SECONDARY) {
-            // Ocultar el otro ContextMenu si está visible
-            if (contextMenuOutside.isShowing()) {
-                contextMenuOutside.hide();
-            }
-            // Mostrar el ContextMenu dentro de la tabla
-            contextMenuInside.show(productTable, event.getScreenX(), event.getScreenY());
-        } else {
-            contextMenuInside.hide();
-        }
-    }
-
-    private void handleRightClick(MouseEvent event) {
-        if (event.getButton() == MouseButton.SECONDARY) { // Detectar clic derecho
-            // Ocultar el otro ContextMenu si está visible
-            if (contextMenuInside.isShowing()) {
-                contextMenuInside.hide();
-            }
-            // Mostrar el ContextMenu fuera de la tabla
-            contextMenuOutside.show(productAnchorPane, event.getScreenX(), event.getScreenY());
-        } else {
-            contextMenuOutside.hide();
-        }
-    }
-
     private void handleAddProduct(ActionEvent event) {
         try {
             Product product = new Product();
@@ -448,22 +427,16 @@ public class ProductViewController {
                     if (quantityToAdd > 0) {
                         Cart cart = new Cart();
                         CartId cartId = new CartId();
-                        cartId.setEmail("blackpink@fanetix.com");
+                        cartId.setEmail(client.getEmail());
                         cartId.setProductId(selectedProduct.getProductId());
                         cart.setId(cartId);
-
                         cart.setProduct(selectedProduct);
-                        FanetixClient clientF = clientManager.findClient_XML(new GenericType<FanetixClient>() {
-                        }, "blackpink@fanetix.com");
-                        if (clientF == null) {
-                            throw new IllegalStateException("Cliente no encontrado.");
-                        }
-                        cart.setClient(clientF);
+                        System.out.println(client.getEmail());
+                        cart.setClient(client);
                         cart.setOrderDate(new Date());
                         cart.setQuantity(quantityToAdd);
                         cart.setBought(false);
                         cartManager.addToCart(cart);
-
                     }
                 } else {
                     throw new NoStockException("No queda stock de ese producto, no podrá ser añadido a su carrito");
@@ -473,8 +446,6 @@ public class ProductViewController {
             }
         } catch (AddException e) {
             showAlert("An error occurred while creating the product(s)");
-        } catch (ReadException e) {
-            showAlert("No se ha encontrado al cliente");
         } catch (NoStockException e) {
             showAlertWarning(e.getMessage());
         }
@@ -534,7 +505,11 @@ public class ProductViewController {
             HelpProductController helpController
                     = ((HelpProductController) loader.getController());
             //Initializes and shows help stage
-            helpController.initAndShowStage(root);
+            if (client != null) {
+                helpController.initAndShowStageClient(root);
+            } else {
+                helpController.initAndShowStageAdmin(root);
+            }
         } catch (Exception ex) {
             //If there is an error show message and
             //log it.
@@ -616,6 +591,73 @@ public class ProductViewController {
         });
 
         return filteredData;
+    }
+
+    private void createContextMenu() {
+        contextMenuInside = new ContextMenu();
+        MenuItem printItemInside = new MenuItem("Print");
+        printItemInside.setOnAction(this::printItems);
+        if (client != null) {
+            MenuItem addItemToCart = new MenuItem("Add to cart");
+            addItemToCart.setOnAction(this::handleAddToCart);
+            contextMenuInside.getItems().addAll(addItemToCart, printItemInside);
+        } else {
+            MenuItem addItem = new MenuItem("Add new product");
+            addItem.setOnAction(this::handleAddProduct);
+            MenuItem deleteItem = new MenuItem("Delete");
+            deleteItem.setOnAction(this::handleDeleteProduct);
+            contextMenuInside.getItems().addAll(addItem, deleteItem, printItemInside);
+        }
+
+        // Crear menú contextual para clics fuera de la tabla
+        contextMenuOutside = new ContextMenu();
+        MenuItem printItemOutside = new MenuItem("Print");
+        printItemOutside.setOnAction(this::printItems);
+        if (client == null) {
+            MenuItem addItemOutside = new MenuItem("Add new product");
+            addItemOutside.setOnAction(this::handleAddProduct);
+            contextMenuOutside.getItems().addAll(printItemOutside, addItemOutside);
+        }else{
+            contextMenuOutside.getItems().addAll(printItemOutside);
+        }
+
+    }
+
+    private void handleRightClickTable(MouseEvent event) {
+        if (event.getButton() == MouseButton.SECONDARY) {
+            // Ocultar el otro ContextMenu si está visible
+            if (contextMenuOutside.isShowing()) {
+                contextMenuOutside.hide();
+            }
+            // Mostrar el ContextMenu dentro de la tabla
+            contextMenuInside.show(productTable, event.getScreenX(), event.getScreenY());
+        } else {
+            contextMenuInside.hide();
+        }
+    }
+
+    private void handleRightClick(MouseEvent event) {
+        if (event.getButton() == MouseButton.SECONDARY) { // Detectar clic derecho
+            // Ocultar el otro ContextMenu si está visible
+            if (contextMenuInside.isShowing()) {
+                contextMenuInside.hide();
+            }
+            // Mostrar el ContextMenu fuera de la tabla
+            contextMenuOutside.show(productAnchorPane, event.getScreenX(), event.getScreenY());
+        } else {
+            contextMenuOutside.hide();
+        }
+    }
+
+    private FanetixClient getFanetixClient(String email) {
+        FanetixClient client = null;
+        try {
+            client = clientManager.findClient_XML(new GenericType<FanetixClient>() {
+            }, email);
+        } catch (ReadException ex) {
+            Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return client;
     }
 
     private void configureRowStyling() {

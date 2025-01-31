@@ -35,7 +35,7 @@ public class HelpProductController {
      *
      * @param root The FXML document hierarchy root.
      */
-    public void initAndShowStage(Parent root) {
+    public void initAndShowStageAdmin(Parent root) {
         Scene scene = new Scene(root);
         Stage stage = new Stage();
         stage.initModality(Modality.APPLICATION_MODAL);
@@ -46,7 +46,22 @@ public class HelpProductController {
         stage.setResizable(false);
         stage.setMinWidth(800);
         stage.setMinHeight(600);
-        stage.setOnShowing(this::handleWindowShowing);
+        stage.setOnShowing(this::handleWindowShowingAdmin);
+        stage.show();
+    }
+    
+    public void initAndShowStageClient(Parent root) {
+        Scene scene = new Scene(root);
+        Stage stage = new Stage();
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setScene(scene);
+        stage.setTitle("Ayuda para la Gestion de Productos en la Tienda");
+        //Añadir a la ventana el ícono “FanetixLogo.png”.
+        stage.getIcons().add(new Image("eus/tartanga/crud/app/resources/logo.png"));
+        stage.setResizable(false);
+        stage.setMinWidth(800);
+        stage.setMinHeight(600);
+        stage.setOnShowing(this::handleWindowShowingClient);
         stage.show();
     }
 
@@ -56,10 +71,17 @@ public class HelpProductController {
      *
      * @param event The window event
      */
-    private void handleWindowShowing(WindowEvent event) {
+    private void handleWindowShowingAdmin(WindowEvent event) {
         WebEngine webEngine = webView.getEngine();
         //Load help page.eus.tartanga.crud.userInterface.html
         webEngine.load(getClass()
                 .getResource("/eus/tartanga/crud/userInterface/html/helpShopAdmin.html").toExternalForm());
+    }
+    
+    private void handleWindowShowingClient(WindowEvent event) {
+        WebEngine webEngine = webView.getEngine();
+        //Load help page.eus.tartanga.crud.userInterface.html
+        webEngine.load(getClass()
+                .getResource("/eus/tartanga/crud/userInterface/html/helpShopClient.html").toExternalForm());
     }
 }

@@ -99,23 +99,28 @@ public class SignInViewController {
             user = clientManager.signIn_XML(new GenericType<FanetixClient>() {
             }, email, passwrd);
             //Sign in falseado
-            if (user != null) {
-                user = clientManager.signIn_XML(new GenericType<FanetixClient>() {
+            if (user == null) {
+                admin = adminManager.signIn_XML(new GenericType<Administrator>() {
                 }, email, passwrd);
-                if (user == null) {
-                    admin = adminManager.signIn_XML(new GenericType<Administrator>() {
-                    }, email, passwrd);
-                }
-                //Sign in falseado
-                if (user != null || admin != null) {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ProfileView.fxml"));
+            }
+            //Sign in falseado
+            if (user != null || admin != null) {
+                /*FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ProfileView.fxml"));
                     FanetixUser userGeneral = new FanetixUser(email, passwrd);
                     MenuBarViewController.setUser(userGeneral);
                     Parent root = (Parent) loader.load();
                     ProfileViewController controller = (ProfileViewController) loader.getController();
                     controller.setStage(stage);
-                    controller.initStage(root);
-                }
+                    controller.initStage(root);*/
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ProductView.fxml"));
+                FanetixUser userGeneral = new FanetixUser(email, passwrd);
+                MenuBarViewController.setStageMenu(stage);
+                MenuBarViewController.setUser(userGeneral);
+                Parent root = (Parent) loader.load();
+                ProductViewController controller = (ProductViewController) loader.getController();
+                controller.setStage(stage);
+                controller.initStage(root);
+
             }
         } catch (ReadException e) {
             new Alert(Alert.AlertType.ERROR, "At this moment server is not available. Please try later.", ButtonType.OK).showAndWait();
