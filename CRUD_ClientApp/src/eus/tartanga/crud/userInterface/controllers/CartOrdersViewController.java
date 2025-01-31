@@ -6,10 +6,14 @@ import eus.tartanga.crud.exception.ReadException;
 import eus.tartanga.crud.exception.UpdateException;
 import eus.tartanga.crud.logic.CartFactory;
 import eus.tartanga.crud.logic.CartManager;
+import eus.tartanga.crud.logic.FanetixClientFactory;
+import eus.tartanga.crud.logic.FanetixClientManager;
 import eus.tartanga.crud.logic.ProductFactory;
 import eus.tartanga.crud.logic.ProductManager;
 import eus.tartanga.crud.model.Artist;
 import eus.tartanga.crud.model.Cart;
+import eus.tartanga.crud.model.FanetixClient;
+import eus.tartanga.crud.model.FanetixUser;
 import eus.tartanga.crud.model.Product;
 import eus.tartanga.crud.userInterface.factories.CartDateEditingCell;
 import eus.tartanga.crud.userInterface.factories.CartSpinnerEditingCell;
@@ -22,6 +26,8 @@ import javafx.fxml.FXML;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Level;
+import java.util.stream.Collectors;
 import javafx.application.Application;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -115,6 +121,8 @@ public class CartOrdersViewController extends Application {
     private ObservableList<Cart> cartList = FXCollections.observableArrayList();
     private ObservableList<Product> productList = FXCollections.observableArrayList();
     private ObservableList<Artist> artistList = FXCollections.observableArrayList();
+    private FanetixClient client;
+    private FanetixClientManager clientManager;
     private Stage stage;
     private Logger logger = Logger.getLogger(ArtistViewController.class.getName());
 
@@ -128,6 +136,10 @@ public class CartOrdersViewController extends Application {
         stage.getIcons().add(new Image("eus/tartanga/crud/app/resources/logo.png"));
         //Ventana no redimensionable
         stage.setResizable(false);
+
+        clientManager = FanetixClientFactory.getFanetixClientManager();
+        FanetixUser user = MenuBarViewController.getLoggedUser();
+        client = getFanetixClient(user.getEmail());
         /*La tabla mostrará las propiedades Image,ArtistName,Description,
          *Price obtenidos de cada producto
          */
@@ -236,7 +248,7 @@ public class CartOrdersViewController extends Application {
             tbcOrderDate.setCellFactory(dateCell);
 
             /*Validar que la fecha seleccionada no sea anterior a la actual.*/
-            /*○ Columna"Quantity": 
+ /*○ Columna"Quantity": 
              * Configurar como editable con un Spinner, 
              * donde el valor mínimo será 1 y el máximo será el stock 
              * disponible (Product.getStock()).
@@ -271,8 +283,7 @@ public class CartOrdersViewController extends Application {
         }
         stage.setScene(scene);
         stage.show();
-        
-        
+
         //Cargar la tabla Products con la información de los productos
         tbCart.setItems(cartList);
     }
@@ -309,12 +320,12 @@ public class CartOrdersViewController extends Application {
         }
 
     }
-    
+
     private void handleClearAllProducts(ActionEvent event) {
         try {
             //LOGICA DE QUE SEA DE EL CLIENTE ESPECIFICOS
             for (Product product : productList) {
-            cartManager.removeCart("email?", product.getProductId().toString());
+                cartManager.removeCart("email?", product.getProductId().toString());
             }
             /*HABRIA QUE REFRESCAR LA TABLA PARA QUE DESAPAREZCA DE LA TABLA?
             refreshCartList();*/
@@ -325,27 +336,38 @@ public class CartOrdersViewController extends Application {
     }
 
     private List<Cart> findAllNotBoughtCartProducts() {
+        List<Cart> allCarts = null;
         List<Cart> carts = null;
         try {
-            carts = cartManager.findAllNotBoughtProducts_XML(new GenericType<List<Cart>>() {
+            allCarts = cartManager.findAllNotBoughtProducts_XML(new GenericType<List<Cart>>() {
             });
-            return carts;
+            carts = allCarts.stream()
+                    .filter(cart -> cart.getClient() != null && cart.getClient().getEmail() != null)
+                    .filter(cart -> cart.getClient().getEmail().equals(client.getEmail()))
+                    .collect(Collectors.toList());
         } catch (ReadException e) {
             showAlert("Problem with reading not bought products");
         }
         return carts;
     }
-    
+
     private List<Cart> findAllBoughtCartProducts() {
+        List<Cart> allCarts = null;
         List<Cart> carts = null;
         try {
-            carts = cartManager.findAllBoughtProducts_XML(new GenericType<List<Cart>>() {});
+            allCarts = cartManager.findAllBoughtProducts_XML(new GenericType<List<Cart>>() {
+            });
+            carts = allCarts.stream()
+                    .filter(cart -> cart.getClient() != null && cart.getClient().getEmail() != null)
+                    .filter(cart -> cart.getClient().getEmail().equals(client.getEmail()))
+                    .collect(Collectors.toList());
+
         } catch (ReadException e) {
             showAlert("Problem with reading bought products");
         }
         return carts;
     }
-    
+
     private void showAlert(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
@@ -360,5 +382,16 @@ public class CartOrdersViewController extends Application {
         alert.setHeaderText("Error de validación");
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    private FanetixClient getFanetixClient(String email) {
+        FanetixClient client = null;
+        try {
+            client = clientManager.findClient_XML(new GenericType<FanetixClient>() {
+            }, email);
+        } catch (ReadException ex) {
+            Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return client;
     }
 }

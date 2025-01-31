@@ -22,8 +22,16 @@
                 <MenuItem fx:id="itemLogOut" text="LogOut" onAction = "#logOut" />
             </items>
         </Menu>
-        <Menu fx:id="itemArtist" text="Artist" onAction="#openArtist"/>
-        <Menu fx:id="itemMyCart" text="MyCart" onAction ="#openMyCart" />
+        <Menu fx:id="menuArtist" text="Artist">
+            <items>
+                <MenuItem fx:id="itemArtist" onAction="#openArtist"/>
+            </items>
+        </Menu>
+        <Menu fx:id="menuMyCart" text="MyCart">
+            <items>
+                <MenuItem fx:id="itemMyCart" onAction ="#openMyCart"/>
+            </items>
+        </Menu>
         <Menu fx:id="itemHelp" text="Help">
             <items>
                 <MenuItem fx:id="itemHelpArtist" text="Help Artist" onAction ="#showHelpArtist"/>
