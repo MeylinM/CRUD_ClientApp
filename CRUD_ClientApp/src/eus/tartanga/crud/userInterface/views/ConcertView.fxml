@@ -14,7 +14,6 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
 <VBox prefHeight="768.0" prefWidth="1366.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eus.tartanga.crud.userInterface.controllers.ConcertViewController">
   <fx:include fx:id="menuBar" source="MenuBarView.fxml" />
     <AnchorPane fx:id="concertAnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="742.0" prefWidth="1369.0" styleClass="background-pane" stylesheets="@../css/styles.css" VBox.vgrow="ALWAYS">
@@ -40,12 +39,12 @@
                         </ImageView>
                         <HBox alignment="CENTER_RIGHT" prefHeight="66.0" prefWidth="816.0">
                            <children>
-                              <DatePicker prefHeight="37.0" prefWidth="137.0" promptText="From..." stylesheets="@../css/styles.css">
+                              <DatePicker fx:id="dpFrom" prefHeight="37.0" prefWidth="137.0" promptText="From..." stylesheets="@../css/styles.css">
                                  <HBox.margin>
                                     <Insets right="25.0" />
                                  </HBox.margin>
                               </DatePicker>
-                              <DatePicker promptText="To..." stylesheets="@../css/styles.css" />
+                              <DatePicker fx:id="dpTo" promptText="To..." stylesheets="@../css/styles.css" />
                            </children>
                         </HBox>
                      </children>

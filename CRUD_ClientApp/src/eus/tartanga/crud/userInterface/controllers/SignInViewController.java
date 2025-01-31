@@ -129,7 +129,7 @@ public class SignInViewController {
         }
     }
 
-    // Mostrar/ocultar la contraseña
+// Mostrar/ocultar la contraseña
     private void textPropertyChange(ObservableValue observable, String oldValue, String newValue) {
         if (pfPassword.isVisible()) {
             tfPassword.setText(pfPassword.getText());
