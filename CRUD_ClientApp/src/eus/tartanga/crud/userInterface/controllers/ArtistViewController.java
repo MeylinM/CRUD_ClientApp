@@ -1,6 +1,7 @@
 package eus.tartanga.crud.userInterface.controllers;
 
 import eus.tartanga.crud.exception.AddException;
+import eus.tartanga.crud.exception.DeleteException;
 import eus.tartanga.crud.exception.MaxCharacterException;
 import eus.tartanga.crud.exception.ReadException;
 import eus.tartanga.crud.exception.TextEmptyException;
@@ -8,7 +9,12 @@ import eus.tartanga.crud.exception.UpdateException;
 import eus.tartanga.crud.exception.WrongStockFormatException;
 import eus.tartanga.crud.logic.ArtistFactory;
 import eus.tartanga.crud.logic.ArtistManager;
+import eus.tartanga.crud.logic.ConcertFactory;
+import eus.tartanga.crud.logic.ConcertManager;
+import eus.tartanga.crud.logic.ProductManager;
 import eus.tartanga.crud.model.Artist;
+import eus.tartanga.crud.model.Concert;
+import eus.tartanga.crud.model.Product;
 import eus.tartanga.crud.userInterface.factories.ArtistDateEditingCell;
 import java.io.ByteArrayInputStream;
 import java.time.LocalDate;
@@ -37,6 +43,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -113,9 +120,12 @@ public class ArtistViewController {
     private Stage stage;
     private Logger logger = Logger.getLogger(ArtistViewController.class.getName());
     private ObservableList<Artist> artistList = FXCollections.observableArrayList();
+    private ObservableList<Concert> concertList = FXCollections.observableArrayList();
     private ContextMenu contextMenuInside;
     private ContextMenu contextMenuOutside;
     private ArtistManager artistManager;
+    private ConcertManager concertManager;
+    private ProductManager productManager;
 
     public void setStage(Stage stage) {
         this.stage = stage;
@@ -131,7 +141,10 @@ public class ArtistViewController {
             stage.show();
 
             artistManager = ArtistFactory.getArtistManager();
+            concertManager = ConcertFactory.getConcertManager();
 
+            // concertList = FXCollections.observableArrayList(concertManager.findAllConcerts_XML(new GenericType<List<Concert>>(){
+            //   }));
             artistTable.setEditable(true);
             debutColumn.setEditable(true);
 
@@ -437,25 +450,96 @@ public class ArtistViewController {
     }
 
     private void handleDeleteArtist(ActionEvent event) {
-        Artist selectedProduct = artistTable.getSelectionModel().getSelectedItem();
+        // Obtener el artista seleccionado en la tabla
+        Artist selectedArtist = artistTable.getSelectionModel().getSelectedItem();
 
-        if (selectedProduct != null) {
-            try {
-                // Elimina el producto de la base de datos
-                artistManager.removeArtist(selectedProduct.getArtistId().toString());
-
-                // Elimina el producto de la lista observable
-                artistList.remove(selectedProduct);
-
-                // Muestra un mensaje de confirmación
-                logger.info("Artista eliminado con éxito: " + selectedProduct.getName());
-            } catch (Exception e) {
-                // Maneja errores, como problemas de conexión o restricciones de la base de datos
-                logger.severe("Error al eliminar el artista: " + e.getMessage());
-            }
-        } else {
-            // Maneja el caso en el que no se ha seleccionado ningún producto
+        if (selectedArtist == null) {
             logger.warning("No se ha seleccionado ningún artista para eliminar.");
+            return;
+        }
+
+        try {
+            // 1. ELIMINAR CONCIERTOS RELACIONADOS CON EL ARTISTA
+            eliminarConciertosAsociados(selectedArtist);
+
+            // 2. ELIMINAR PRODUCTOS RELACIONADOS CON EL ARTISTA
+            eliminarProductosAsociados(selectedArtist);
+
+            // 3. ELIMINAR EL ARTISTA
+            logger.info("Intentando eliminar artista: " + selectedArtist.getName() + " con ID: " + selectedArtist.getArtistId());
+            artistManager.removeArtist(selectedArtist.getArtistId().toString());
+            artistList.remove(selectedArtist);
+            logger.info("Artista eliminado con éxito: " + selectedArtist.getName());
+
+        } catch (Exception e) {
+            logger.severe("Error al eliminar el artista y sus relaciones: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    // Método para eliminar los conciertos asociados a un artista
+    private void eliminarConciertosAsociados(Artist selectedArtist) {
+        // Obtener la lista de todos los conciertos
+        List<Concert> concertList = concertManager.findAllConcerts_XML(new GenericType<List<Concert>>() {
+        });
+
+        if (concertList == null) {
+            logger.severe("No se pudo obtener la lista de conciertos.");
+            return;
+        }
+
+        // Filtrar los conciertos que contienen al artista seleccionado
+        List<Concert> concertsToDelete = concertList.stream()
+                .filter(concert -> {
+                    if (concert.getArtistList() == null) {
+                        logger.warning("El concierto " + concert.getConcertName() + " no tiene artistas asociados.");
+                        return false;
+                    }
+                    return concert.getArtistList().contains(selectedArtist);
+                })
+                .collect(Collectors.toList());
+
+        logger.info("Se encontraron " + concertsToDelete.size() + " conciertos asociados al artista " + selectedArtist.getName());
+
+        // Eliminar los conciertos relacionados con el artista
+        for (Concert concert : concertsToDelete) {
+            logger.info("Intentando eliminar concierto: " + concert.getConcertName() + " con ID: " + concert.getConcertId());
+            concertManager.removeConcert(concert.getConcertId().toString());
+            logger.info("Concierto eliminado con éxito: " + concert.getConcertName());
+        }
+    }
+
+// Método para eliminar los productos asociados a un artista
+    private void eliminarProductosAsociados(Artist selectedArtist) {
+        try {
+            // Obtener la lista de todos los productos
+            List<Product> productList = productManager.findAll_XML(new GenericType<List<Product>>() {
+            });
+            
+            if (productList == null) {
+                logger.severe("No se pudo obtener la lista de productos.");
+                return;
+            }
+            
+            // Filtrar los productos que pertenecen al artista seleccionado
+            List<Product> productsToDelete = productList.stream()
+                    .filter(product -> product.getArtist() != null && product.getArtist().equals(selectedArtist))
+                    .collect(Collectors.toList());
+            
+            logger.info("Se encontraron " + productsToDelete.size() + " productos asociados al artista " + selectedArtist.getName());
+            
+            // Eliminar los productos relacionados con el artista
+            for (Product product : productsToDelete) {
+                try {
+                    logger.info("Intentando eliminar producto: " + product.getTitle() + " con ID: " + product.getProductId());
+                    productManager.remove(product.getProductId().toString());
+                    logger.info("Producto eliminado con éxito: " + product.getTitle());
+                } catch (DeleteException ex) {
+                    Logger.getLogger(ArtistViewController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        } catch (ReadException ex) {
+            Logger.getLogger(ArtistViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
