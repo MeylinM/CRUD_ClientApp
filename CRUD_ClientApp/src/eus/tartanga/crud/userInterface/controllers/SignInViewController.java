@@ -70,7 +70,7 @@ public class SignInViewController {
             //Añadir a la ventana el ícono “FanetixLogo.png”.
             stage.getIcons().add(new Image("eus/tartanga/crud/app/resources/logo.png"));
             stage.setResizable(false);
-            clientManager= FanetixClientFactory.getFanetixClientManager();
+            clientManager = FanetixClientFactory.getFanetixClientManager();
             adminManager = AdministratorFactory.getAdministratorManager();
             tfPassword.setVisible(false);
             pfPassword.textProperty().addListener(this::textPropertyChange);
@@ -96,32 +96,35 @@ public class SignInViewController {
         String passwrd = this.pfPassword.getText();
         try {
             logger.info("Handeling the accept button.");
-            FanetixClient user = clientManager.signIn_XML(new GenericType<FanetixClient>() {
+            user = clientManager.signIn_XML(new GenericType<FanetixClient>() {
             }, email, passwrd);
             //Sign in falseado
             if (user != null) {
-            user= clientManager.signIn_XML(new GenericType<FanetixClient>() {}, email, passwrd);
-            if(user==null){
-                admin = adminManager.signIn_XML(new GenericType<Administrator>() {}, email, passwrd);
+                user = clientManager.signIn_XML(new GenericType<FanetixClient>() {
+                }, email, passwrd);
+                if (user == null) {
+                    admin = adminManager.signIn_XML(new GenericType<Administrator>() {
+                    }, email, passwrd);
+                }
+                //Sign in falseado
+                if (user != null || admin != null) {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ProfileView.fxml"));
+                    FanetixUser userGeneral = new FanetixUser(email, passwrd);
+                    MenuBarViewController.setUser(userGeneral);
+                    Parent root = (Parent) loader.load();
+                    ProfileViewController controller = (ProfileViewController) loader.getController();
+                    controller.setStage(stage);
+                    controller.initStage(root);
+                }
             }
-            //Sign in falseado
-            if(user!=null || admin!=null){              
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ProfileView.fxml"));
-                FanetixUser userGeneral = new FanetixUser(email, passwrd);
-                MenuBarViewController.setUser(userGeneral);
-                Parent root = (Parent) loader.load();
-                ProfileViewController controller = (ProfileViewController) loader.getController();
-                controller.setStage(stage);
-                controller.initStage(root);
-            }
-        }catch( ReadException e){
+        } catch (ReadException e) {
             new Alert(Alert.AlertType.ERROR, "At this moment server is not available. Please try later.", ButtonType.OK).showAndWait();
         } catch (IOException ex) {
             Logger.getLogger(SignInViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    // Mostrar/ocultar la contraseña
+// Mostrar/ocultar la contraseña
     private void textPropertyChange(ObservableValue observable, String oldValue, String newValue) {
         if (pfPassword.isVisible()) {
             tfPassword.setText(pfPassword.getText());

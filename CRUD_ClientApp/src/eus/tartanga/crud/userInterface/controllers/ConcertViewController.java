@@ -21,7 +21,9 @@ import eus.tartanga.crud.userInterface.factories.ConcertDateEditingCell;
 import eus.tartanga.crud.userInterface.factories.ConcertTimeEditingCell;
 
 import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Collection;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -41,17 +43,17 @@ import java.util.logging.Logger;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldTableCell;
@@ -59,7 +61,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javax.ws.rs.WebApplicationException;
@@ -118,9 +119,14 @@ public class ConcertViewController {
     @FXML
     private TextField tfSearch;
 
-    //me falta ponerlo en la vista
     @FXML
     private Button btnInfo;
+
+    @FXML
+    private DatePicker dpFrom;
+
+    @FXML
+    private DatePicker dpTo;
 
     private Stage stage;
     private Logger logger = Logger.getLogger(ConcertViewController.class.getName());
@@ -130,6 +136,7 @@ public class ConcertViewController {
     private ObservableList<Concert> concertList = FXCollections.observableArrayList();
     private ArtistManager artistManager;
     private ObservableList<Artist> artistList = FXCollections.observableArrayList();
+    private Alert alert;
 
     public void setStage(Stage stage) {
         this.stage = stage;
@@ -211,8 +218,6 @@ public class ConcertViewController {
                     logger.severe(e.getMessage());
                     concert.setConcertName(concertName);
                     concertTable.refresh();
-                    //HABRIA QUE DECLARAR EL ALERT ARRIBA COMO EL LOGER O QUE
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Error");
                     alert.setHeaderText("Error de validación");
                     alert.setContentText(e.getMessage());
@@ -237,8 +242,6 @@ public class ConcertViewController {
                     logger.severe(e.getMessage());
                     concert.setLocation(concertLocation);
                     concertTable.refresh();
-                    //HABRIA QUE DECLARAR EL ALERT ARRIBA COMO EL LOGER O QUE
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Error");
                     alert.setHeaderText("Error de validación");
                     alert.setContentText(e.getMessage());
@@ -263,8 +266,6 @@ public class ConcertViewController {
                     logger.severe(e.getMessage());
                     concert.setCity(concertCity);
                     concertTable.refresh();
-                    //HABRIA QUE DECLARAR EL ALERT ARRIBA COMO EL LOGER O QUE
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Error");
                     alert.setHeaderText("Error de validación");
                     alert.setContentText(e.getMessage());
@@ -276,33 +277,36 @@ public class ConcertViewController {
             final Callback<TableColumn<Concert, Date>, TableCell<Concert, Date>> dateCell
                     = (TableColumn<Concert, Date> param) -> new ConcertDateEditingCell();
             dateColumn.setCellFactory(dateCell);
+            dateColumn.setOnEditCommit(event -> {
+                Concert concert = event.getRowValue();
+                concert.setConcertDate(event.getNewValue());
+                updateConcert(concert);
+            });
 
-            //ME FALTA CAMBIAR LA FACTORY PARA QUE ME DEJE METER UN CAMPO DE TEXTO Y ME LO FORMATE A 00:00
             final Callback<TableColumn<Concert, Date>, TableCell<Concert, Date>> timeCell
                     = (TableColumn<Concert, Date> param) -> new ConcertTimeEditingCell();
             timeColumn.setCellFactory(timeCell);
+            timeColumn.setOnEditCommit(event -> {
+                Concert concert = event.getRowValue();
+                concert.setConcertTime(event.getNewValue());
+                updateConcert(concert);
+            });
 
-            //REVISAR BIEN QUE TIENE QUE HACER ESTE METODO Y QUE NECESITO
             btnAddConcert.setOnAction(this::handleAddConcert);
-            //REVISAR QUE EL METODO BORRA DE LA BASE DE DATOS, QUE LA QUERY NO IBA ( SE SUPONE)
             btnDeleteConcert.setOnAction(this::handleDeleteConcert);
-
-            //REVISAR EL DOCU DEL DISEÑO
-            //Inicializar los menus contextuales
+            btnInfo.setOnAction(this::handleInfoButton);
+            //Inicializar los menu contextuales
             createContextMenu();
             //Menu contextual de dentro de la tabla
             concertTable.setOnMousePressed(this::handleRightClickTable);
             //Menu contextual de fuera de la tabla
             concertAnchorPane.setOnMouseClicked(this::handleRightClick);
-
             //Obtener una lista de todos los concierto de la base de datos
             concertList.addAll(findAllConcerts());
             //Cargar la tabla con todos los conciertos
             concertTable.setItems(concertList);
-
             //Gestion de los filtrados
             filterConcerts();
-
             //Configurar estilos de cada fila de la tabla
             configureRowStyling();
 
@@ -310,20 +314,22 @@ public class ConcertViewController {
             String errorMsg = "Error" + e.getMessage();
             logger.severe(errorMsg);
         } catch (ReadException ex) {
-           logger.severe(ex.getMessage());
+            logger.severe(ex.getMessage());
         }
     }
 
     private void handleAddConcert(ActionEvent event) {
-        Concert concert = new Concert();
-        concert.setArtistList(artistList);
         try {
+
+            Concert concert = new Concert();
+            concert.setArtistList(artistList);
             concertManager.createConcert_XML(concert);
+            concertTable.getItems().add(concert);
+            refreshConcertList();
         } catch (AddException e) {
             logger.severe(e.getMessage());
+            showAlert("An error occurred while creating the concert");
         }
-        concertTable.getItems().add(concert);
-        refreshConcertList();
     }
 
     private void refreshConcertList() {
@@ -344,9 +350,26 @@ public class ConcertViewController {
                 logger.log(Level.INFO, "Concierto eliminado con exito{0}", selectedConcert.getConcertName());
             } catch (DeleteException e) {
                 logger.log(Level.SEVERE, "Error al eliminar el concierto{0}", e.getMessage());
+                showAlert("Error al eliminar el concierto");
             }
         } else {
             logger.warning("No se ha seleccionado ningun concieto para eliminar");
+            showAlert("No se ha seleccionado ningun concieto para eliminar");
+        }
+    }
+
+    private void handleInfoButton(ActionEvent event) {
+        try {
+            FXMLLoader loader
+                    = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ConcertHelpView.fxml"));
+            Parent root = (Parent) loader.load();
+            ConcertHelpController helpController
+                    = ((ConcertHelpController) loader.getController());
+            //Initializes and shows help stage
+            helpController.initAndShowStage(root);
+        } catch (IOException ex) {
+            logger.warning("No se ha podido cargar la ayuda");
+            showAlert("No se ha podido cargar la ayuda");
         }
     }
 
@@ -358,6 +381,7 @@ public class ConcertViewController {
             return concerts;
         } catch (ReadException ex) {
             Logger.getLogger(ConcertViewController.class.getName()).log(Level.SEVERE, null, ex);
+            showAlert("Ha ocurrido un error al cargar los conciertos");
         }
         return concerts;
     }
@@ -367,6 +391,7 @@ public class ConcertViewController {
             concertManager.updateConcert_XML(concert, concert.getConcertId().toString());
         } catch (UpdateException e) {
             logger.severe(e.getMessage());
+            showAlert("Ha ocurrido un error al actualizar los conciertos");
         }
     }
 
@@ -404,7 +429,7 @@ public class ConcertViewController {
 
         try {
             List<Artist> artists = artistList;
-            // Agregar las categorías a la lista de categorías disponibles
+            // Agregar los artistas a la lista de artistas
             artistListView.setItems(FXCollections.observableArrayList(artists));
             // Agregar manejador de clics personalizados
             artistListView.setCellFactory(lv -> {
@@ -440,12 +465,12 @@ public class ConcertViewController {
                 if (!selectedArtist.isEmpty()) {
                     try {
                         concert.setArtistList(selectedArtist);
-                        concertManager.updateConcert_XML(concert, String.valueOf(concert.getConcertId()));
+                        concertManager.updateConcert_XML(concert, concert.getConcertId().toString());
                         artistStage.close();
                         concertTable.refresh();
                         logger.log(Level.INFO, "Selected Artist: {0}", concert.getConcertName());
                     } catch (UpdateException ex) {
-                        logger.log(Level.SEVERE, "Error", ex);
+                        Logger.getLogger(ConcertViewController.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
             });
@@ -460,6 +485,7 @@ public class ConcertViewController {
             artistStage.show();
         } catch (Exception ex) {
             logger.log(Level.SEVERE, "Error", ex);
+            showAlert("Ha ocurrido un error al seleccionar los artistas");
         }
     }
 
@@ -474,6 +500,7 @@ public class ConcertViewController {
             jasperViewer.setVisible(true);
         } catch (JRException ex) {
             Logger.getLogger(ConcertViewController.class.getName()).log(Level.SEVERE, null, ex);
+            showAlert("Ha ocurrido un error al imprrimir los conciertos");
         }
 
     }
@@ -505,56 +532,86 @@ public class ConcertViewController {
     }
 
     private void filterConcerts() {
-        //PERO ESTAN MEZCLADOS EL TEMA DEL SEARCH Y EL COMING SOON, NO TENDRIAN QUE SER INDEPENDIENTES?
-
-        //Mientras el usuario está escribiendo ese valor se usará para filtrar los conciertos de la tabla.
+        // Mientras el usuario está escribiendo ese valor se usará para filtrar de la tabla
         tfSearch.textProperty().addListener((observable, oldValue, newValue) -> {
-            FilteredList<Concert> filteredConcerts = getConcertsBySearchField(newValue, cbxComingSoon.isSelected());
-
-            // Actualiza la tabla con los conciertos filtrados
-            SortedList<Concert> sortedData = new SortedList<>(filteredConcerts);
-            sortedData.comparatorProperty().bind(concertTable.comparatorProperty());
-            concertTable.setItems(sortedData);
+            applyFilter();
         });
 
-        // Filtra los conciertos de la tabla dependiendo de si ya han ocurrido o no.
+        // Filtra los elementos de la tabla en base de si hay stock o no.
         cbxComingSoon.setOnAction(event -> {
-            FilteredList<Concert> filteredConcerts = getConcertsBySearchField(tfSearch.getText(), cbxComingSoon.isSelected());
-            //Actualiza la tabla con los productos filtrados
-            SortedList<Concert> sortedData = new SortedList<>(filteredConcerts);
-            sortedData.comparatorProperty().bind(concertTable.comparatorProperty());
-            concertTable.setItems(sortedData);
+            applyFilter();
+        });
+
+        // Filtra por rango de fechas cuando cambian los DatePickers
+        dpFrom.valueProperty().addListener((observable, oldValue, newValue) -> {
+            applyFilter();
+        });
+
+        dpTo.valueProperty().addListener((observable, oldValue, newValue) -> {
+            applyFilter();
         });
     }
 
-    private FilteredList<Concert> getConcertsBySearchField(String searchText, boolean comingSoon) {
+    private void applyFilter() {
+        // Obtener el texto de búsqueda y las fechas seleccionadas
+        String searchText = tfSearch.getText();
+        boolean comingSoon = cbxComingSoon.isSelected();
+        LocalDate fromDate = dpFrom.getValue();
+        LocalDate toDate = dpTo.getValue();
+
+        // Aplicar el filtrado de productos
+        FilteredList<Concert> filteredConcert = getConcertsBySearchField(searchText, comingSoon, fromDate, toDate);
+
+        // Actualizar la tabla con los productos filtrados
+        SortedList<Concert> sortedData = new SortedList<>(filteredConcert);
+        sortedData.comparatorProperty().bind(concertTable.comparatorProperty());
+        concertTable.setItems(sortedData);
+    }
+
+    private FilteredList<Concert> getConcertsBySearchField(String searchText, boolean comingSoon, LocalDate fromDate, LocalDate toDate) {
         // Crea un FilteredList con la lista de conciertos original
         FilteredList<Concert> filteredData = new FilteredList<>(concertList, p -> true);
 
-        // Si el texto de búsqueda no es nulo o vacío, filtra los conciertos
-        if (searchText != null && !searchText.isEmpty()) {
-            // Convierte el texto de búsqueda a minúsculas para hacer la comparación insensible a mayúsculas/minúsculas
-            String lowerCaseFilter = searchText.toLowerCase();
+        // Aplica los filtros combinados (búsqueda, conmingSoon y fecha)
+        filteredData.setPredicate(concert -> {
+            // Filtra por el texto de búsqueda
+            boolean matchesSearch = true;
+            if (searchText != null && !searchText.isEmpty()) {
+                String lowerCaseFilter = searchText.toLowerCase();
 
-            // Aplica el predicado de filtrado en función de los atributos de cada concierto
-            filteredData.setPredicate(concert -> {
-                boolean matchesSearch = concert.getConcertName().toLowerCase().contains(lowerCaseFilter)
+                // Verifica si el nombre, ciudad o ubicación coinciden
+                matchesSearch = concert.getConcertName().toLowerCase().contains(lowerCaseFilter)
                         || concert.getCity().toLowerCase().contains(lowerCaseFilter)
-                        || concert.getLocation().toLowerCase().contains(lowerCaseFilter);
-                //TENGO QUE RECORRER LA LISTA DE ARTISTAS Y BUSCAR POR SUS NOMBRES
-                //  || concert.getArtistList().getName().toLowerCase().contains(lowerCaseFilter);
+                        || concert.getLocation().toLowerCase().contains(lowerCaseFilter)
+                        || concert.getArtistList().stream()
+                                .anyMatch(artist -> artist.getName().toLowerCase().contains(lowerCaseFilter));
+            }
 
-                // TENGO QUE COMPARAR CON LA FECHA ACTUAL -- Y ME IMPRIMA LOS CONCIERTOS CUYA FECHA ES MAYOR A LA ACTUAL
-                // boolean matchesComingSoon = !comingSoon || concert.getConcertDate()
-                // Solo se incluye el producto si coincide con ambos filtros (búsqueda y stock) PERO SERIA SI EL CHECK BOX ESTA SELECCIONADO O NO, HAY QUE FIJARSE EN ESO DIGO SHO
-                return matchesSearch; // && matchesComingSoon;
-            });
-        } else {
-            // Si no hay texto de búsqueda, filtra solo por la fecha EL MISMO ROYO, TENGO QUE COMPARAR CON LA FECHA ACTUAL
-            //  filteredData.setPredicate(concert -> !comingSoon || concert.concert.getConcertDate()
-        }
+            // Filtra por conciertos que aún no han ocurrido si comingSoon está marcado
+            boolean matchesComingSoon = true;
+            if (comingSoon) {
+                LocalDate today = LocalDate.now();
+                matchesComingSoon = concert.getConcertDate().toInstant()
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDate()
+                        .isAfter(today);
+            }
 
-        return filteredData; // Devuelve el filtro aplicado
+            // Filtra por fechas (si las fechas están definidas)
+            boolean matchesDate = true;
+            if (fromDate != null && toDate != null) {
+                Date concertDate = concert.getConcertDate();
+                java.sql.Date fromSQLDate = java.sql.Date.valueOf(fromDate);
+                java.sql.Date toSQLDate = java.sql.Date.valueOf(toDate);
+
+                matchesDate = !concertDate.before(fromSQLDate) && !concertDate.after(toSQLDate);
+            }
+
+            // Devuelve true solo si el concierto cumple con todos los filtros
+            return matchesSearch && matchesComingSoon && matchesDate;
+        });
+
+        return filteredData;
     }
 
     private void configureRowStyling() {
@@ -577,5 +634,13 @@ public class ConcertViewController {
 
             return row;
         });
+    }
+
+    private void showAlert(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText("Error de servidor");
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

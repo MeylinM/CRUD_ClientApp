@@ -1,38 +1,24 @@
 package eus.tartanga.crud.userInterface.factories;
 
 import eus.tartanga.crud.model.Concert;
-import java.text.DateFormat;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableCell;
-import java.time.ZoneId;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class ConcertTimeEditingCell extends TableCell<Concert, Date> {
-
-    private DatePicker dpConcertCell;
-    private DateFormat dateFormatter;
-
-    public ConcertTimeEditingCell() {
-        dpConcertCell = new DatePicker(); // Asegúrate de inicializar el DatePicker
-        dateFormatter = DateFormat.getTimeInstance(DateFormat.SHORT); // Si necesitas formatear la hora
-    }
+    private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+    private TextField textField;
 
     @Override
-    public void updateItem(Date date, boolean empty) {
-        super.updateItem(date, empty);
-        if (empty || date == null) {
+    public void updateItem(Date time, boolean empty) {
+        super.updateItem(time, empty);
+        if (empty || time == null) {
             setText(null);
         } else {
-            // Si el valor es un Date y la columna es de tipo Time
-            java.sql.Time time = new java.sql.Time(date.getTime());  // Convierte Date a Time
-
-            // Extraer hora y minutos
-            int hours = time.getHours();
-            int minutes = time.getMinutes();
-
-            // Formatear la hora (por ejemplo, "HH:mm")
-            String formattedTime = String.format("%02d:%02d", hours, minutes);
-            setText(formattedTime);
+            setText(timeFormat.format(time)); // Formatear la hora en HH:mm
         }
     }
 
@@ -40,21 +26,33 @@ public class ConcertTimeEditingCell extends TableCell<Concert, Date> {
     public void startEdit() {
         if (!isEmpty()) {
             super.startEdit();
-            Date previousTime = getItem();
-            dpConcertCell.setOnAction((e) -> {
-                Date newDate = dpConcertCell.getValue() != null
-                        ? Date.from(dpConcertCell.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant())
-                        : previousTime;
-                commitEdit(newDate);
+            textField = new TextField(getText());
+            textField.setOnKeyPressed(event -> {
+                if (event.getCode() == KeyCode.ENTER) {
+                    commitEdit(parseTime(textField.getText()));
+                } else if (event.getCode() == KeyCode.ESCAPE) {
+                    cancelEdit();
+                }
             });
             setText(null);
-            setGraphic(dpConcertCell);
+            setGraphic(textField);
+            textField.selectAll(); // Selecciona todo el texto al empezar la edición
         }
     }
 
     @Override
     public void cancelEdit() {
         super.cancelEdit();
+        setText(timeFormat.format(getItem())); // Restaurar el texto cuando se cancela la edición
         setGraphic(null);
+    }
+
+    private Date parseTime(String timeString) {
+        try {
+            Date date = timeFormat.parse(timeString);
+            return date;
+        } catch (Exception e) {
+            return null; // Si el formato es incorrecto, no modificar el valor
+        }
     }
 }
