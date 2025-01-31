@@ -185,8 +185,6 @@ public class ProfileViewController {
         lbStreet.setVisible(false);
         lbZIP.setVisible(false);
 
-        // Ocultar botón de cambio de contraseña
-        changePasswd.setVisible(false);
     }
 
     private void loadClientData(FanetixClient client) {
