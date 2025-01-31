@@ -24,6 +24,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javax.ws.rs.core.GenericType;
@@ -66,6 +67,8 @@ public class SignInViewController {
             Scene scene = new Scene(root);
             stage.setScene(scene);
             stage.setTitle("SignIn");
+            //Añadir a la ventana el ícono “FanetixLogo.png”.
+            stage.getIcons().add(new Image("eus/tartanga/crud/app/resources/logo.png"));
             stage.setResizable(false);
             clientManager= FanetixClientFactory.getFanetixClientManager();
             adminManager = AdministratorFactory.getAdministratorManager();
@@ -93,6 +96,10 @@ public class SignInViewController {
         String passwrd = this.pfPassword.getText();
         try {
             logger.info("Handeling the accept button.");
+            FanetixClient user = clientManager.signIn_XML(new GenericType<FanetixClient>() {
+            }, email, passwrd);
+            //Sign in falseado
+            if (user != null) {
             user= clientManager.signIn_XML(new GenericType<FanetixClient>() {}, email, passwrd);
             if(user==null){
                 admin = adminManager.signIn_XML(new GenericType<Administrator>() {}, email, passwrd);
@@ -109,7 +116,7 @@ public class SignInViewController {
             }
         }catch( ReadException e){
             new Alert(Alert.AlertType.ERROR, "At this moment server is not available. Please try later.", ButtonType.OK).showAndWait();
-        }catch (IOException ex) {
+        } catch (IOException ex) {
             Logger.getLogger(SignInViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

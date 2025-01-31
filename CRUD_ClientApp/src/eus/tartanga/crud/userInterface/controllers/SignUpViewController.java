@@ -251,7 +251,7 @@ public class SignUpViewController {
         stage.setScene(scene);
         // Set the title of the window to "SignUp".
         stage.setTitle("SignUp");
-        // Add an icon of a "catrina" to the window.
+        //Añadir a la ventana el ícono “FanetixLogo.png”.
         stage.getIcons().add(new Image("eus/tartanga/crud/app/resources/logo.png"));
         // Make the window non-resizable.
         stage.setResizable(false);
@@ -352,7 +352,6 @@ public class SignUpViewController {
 
         Image hiddenEyeIcon = new Image(getClass().getResourceAsStream("eus/tartanga/crud/app/resources/HidePasswdSignUp.png"));
         Image visibleEyeIcon = new Image(getClass().getResourceAsStream("eus/tartanga/crud/app/resources/ShowPasswdSignUp.png"));
-
 
         if (tgbEyePasswd.isSelected()) {
             // PasswordField “pfHiddenPassword” will become invisible.

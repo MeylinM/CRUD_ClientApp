@@ -98,7 +98,7 @@
                     </VBox.margin>
                 </HBox>
 
-                <Button fx:id="btnAccept" onAction="#handelAcceptButtonAction" prefHeight="56.0" prefWidth="142.0" style="-fx-background-color: #fff7ad;" text="Accept" textAlignment="CENTER">
+                <Button fx:id="btnAccept" defaultButton="true" onAction="#handelAcceptButtonAction" prefHeight="56.0" prefWidth="142.0" style="-fx-background-color: #fff7ad;" text="Accept" textAlignment="CENTER">
                     <font>
                         <Font name="Berlin Sans FB Demi Bold" size="24.0" />
                     </font>
