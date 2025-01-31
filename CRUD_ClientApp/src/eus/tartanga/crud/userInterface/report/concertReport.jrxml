@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="bd320b7d-8db5-4486-964d-57fc8b62a7a6">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="91"/>
+	<field name="concert" class="java.lang.String"/>
+	<field name="artist" class="eus.tartanga.crud.model.Artist"/>
+	<field name="location" class="java.lang.String"/>
+	<field name="city" class="java.lang.String"/>
+	<field name="date" class="java.lang.Date"/>
+	<field name="time" class="java.lang.Time"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<staticText>
+				<reportElement x="189" y="27" width="157" height="26" uuid="0063fb94-0297-4177-b0d6-73ac27164c70"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Concert Table Report]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="61" splitType="Stretch">
+			<staticText>
+				<reportElement x="30" y="35" width="60" height="26" uuid="eb24663e-f605-42cd-94ca-5642c20d521d"/>
+				<textElement>
+					<font size="14" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Concert]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="115" y="35" width="60" height="26" uuid="d0da2ef5-60c5-4df4-8518-960b42d14a30"/>
+				<textElement>
+					<font size="14" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Artist]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="200" y="35" width="60" height="26" uuid="c97c7e3c-aad7-43e8-90b5-32d7ebed279a"/>
+				<textElement>
+					<font size="14" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Location]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="285" y="35" width="60" height="26" uuid="d4d3e997-7f78-4d2a-a88a-4b99a85331bd"/>
+				<textElement>
+					<font size="14" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[City]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="370" y="35" width="60" height="26" uuid="cfe6a95b-9b3d-406e-88f6-68c93d503eea"/>
+				<textElement>
+					<font size="14" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="455" y="35" width="60" height="26" uuid="98088830-9ec3-44c0-ac79-2ed52f5d090b"/>
+				<textElement>
+					<font size="14" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Time]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="125" splitType="Stretch">
+			<textField>
+				<reportElement x="30" y="13" width="60" height="20" uuid="9fb98f75-69b3-437c-b927-8906446ab66b"/>
+				<textFieldExpression><![CDATA[$F{concertName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="115" y="13" width="60" height="20" uuid="1d86df5c-4831-4457-9e70-f895a9da1174"/>
+				<textFieldExpression><![CDATA[$F{artistList}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="200" y="13" width="60" height="20" uuid="ed4f5adb-e702-422d-9cf5-1d14a90f3e63"/>
+				<textFieldExpression><![CDATA[$F{location}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="285" y="13" width="60" height="20" uuid="485cdcc8-1851-4281-8d3f-5d52d0f63ae7"/>
+				<textFieldExpression><![CDATA[$F{city}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="370" y="13" width="60" height="20" uuid="71e4899c-d349-4c3a-83ae-27a313598bcd"/>
+				<textFieldExpression><![CDATA[$F{concertDate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="455" y="13" width="60" height="20" uuid="51a30f91-64c5-43f3-8374-863c669da095"/>
+				<textFieldExpression><![CDATA[$F{concertTime}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

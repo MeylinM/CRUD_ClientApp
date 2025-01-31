@@ -4,9 +4,6 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.DatePicker?>
-<?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
@@ -17,84 +14,70 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefHeight="768.0" prefWidth="1366.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eus.tartanga.crud.userInterface.ConcertController">
-  <children>
-    <MenuBar stylesheets="@styles.css" VBox.vgrow="NEVER">
-      <menus>
-        <Menu mnemonicParsing="false" text="Profile">
-        </Menu>
-        <Menu mnemonicParsing="false" text="Artist">
-        </Menu>
-        <Menu mnemonicParsing="false" text="Help">
-        </Menu>
-        <Menu mnemonicParsing="false" text="---">
-               <items>
-                  <MenuItem mnemonicParsing="false" text="LogOut" />
-                  <MenuItem mnemonicParsing="false" text="Exit" />
-               </items></Menu>
-      </menus>
-    </MenuBar>
-    <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="742.0" prefWidth="1369.0" styleClass="background-pane" stylesheets="@styles.css" VBox.vgrow="ALWAYS">
+
+<VBox prefHeight="768.0" prefWidth="1366.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eus.tartanga.crud.userInterface.controllers.ConcertViewController">
+  <fx:include fx:id="menuBar" source="MenuBarView.fxml" />
+    <AnchorPane fx:id="concertAnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="742.0" prefWidth="1369.0" styleClass="background-pane" stylesheets="@../css/styles.css" VBox.vgrow="ALWAYS">
          <children>
-            <ImageView fitHeight="524.0" fitWidth="709.0" layoutX="330.0" layoutY="-118.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fitHeight="111.0" fitWidth="685.0" layoutX="414.0" layoutY="29.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../resources/concert.png" />
+                  <Image url="@../../app/resources/concert.png" />
                </image>
             </ImageView>
-            <VBox alignment="CENTER" fillWidth="false" layoutX="45.0" layoutY="148.0" prefHeight="557.0" prefWidth="1278.0" spacing="10.0" stylesheets="@styles.css">
+            <VBox alignment="CENTER" fillWidth="false" layoutX="45.0" layoutY="148.0" prefHeight="557.0" prefWidth="1278.0" spacing="10.0" stylesheets="styles.css">
                <children>
                   <HBox alignment="CENTER_LEFT" prefHeight="66.0" prefWidth="1278.0">
                      <children>
-                        <TextField fx:id="searchField" prefHeight="42.0" prefWidth="429.0" promptText="Search concert...">
+                        <TextField fx:id="tfSearch" prefHeight="42.0" prefWidth="429.0" promptText="Search concert..." stylesheets="@../css/styles.css">
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>
                         </TextField>
-                        <ImageView fitHeight="62.0" fitWidth="53.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitHeight="51.0" fitWidth="53.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@lupa.png" />
+                              <Image url="@../../app/resources/lupa.png" />
                            </image>
                         </ImageView>
                         <HBox alignment="CENTER_RIGHT" prefHeight="66.0" prefWidth="816.0">
                            <children>
-                              <DatePicker prefHeight="37.0" prefWidth="137.0" promptText="From...">
+                              <DatePicker prefHeight="37.0" prefWidth="137.0" promptText="From..." stylesheets="@../css/styles.css">
                                  <HBox.margin>
                                     <Insets right="25.0" />
                                  </HBox.margin>
                               </DatePicker>
-                              <DatePicker promptText="To..." />
+                              <DatePicker promptText="To..." stylesheets="@../css/styles.css" />
                            </children>
                         </HBox>
                      </children>
                   </HBox>
-                  <TableView fx:id="concertTable" prefHeight="400.0" prefWidth="1279.0">
+                  <TableView fx:id="concertTable" prefHeight="400.0" prefWidth="1279.0" stylesheets="@../css/styles.css">
                         <columns>
-                            <TableColumn fx:id="billboardColumn" prefWidth="129.5999755859375" style="-fx-alignment: center;" text="Billboard" />
-                            <TableColumn fx:id="concertColumn" prefWidth="192.80001831054688" style="-fx-alignment: center-left;" text="Concert" />
-                            <TableColumn fx:id="artistColumn" prefWidth="222.4000244140625" style="-fx-alignment: center-left;" text="Artist" />
-                            <TableColumn fx:id="locationColumn" prefWidth="174.4000244140625" style="-fx-alignment: center-left;" text="Location" />
-                            <TableColumn fx:id="cityColumn" prefWidth="196.79998779296875" style="-fx-alignment: center-left;" text="City" />
-                            <TableColumn fx:id="dateColumn" prefWidth="164.7999267578125" style="-fx-alignment: center;" text="Date" />
-                            <TableColumn fx:id="timeColumn" prefWidth="208.7999267578125" style="-fx-alignment: center-right;" text="Time" />
+                            <TableColumn fx:id="billboardColumn" prefWidth="129" style="-fx-alignment: center;" text="Billboard" />
+                            <TableColumn fx:id="concertColumn" prefWidth="217" style="-fx-alignment: center;" text="Concert" />
+                            <TableColumn fx:id="artistColumn" prefWidth="228" style="-fx-alignment: center;" text="Artist" />
+                            <TableColumn fx:id="locationColumn" prefWidth="205" style="-fx-alignment: center;" text="Location" />
+                            <TableColumn fx:id="cityColumn" prefWidth="186" style="-fx-alignment: center;" text="City" />
+                            <TableColumn fx:id="dateColumn" prefWidth="177" style="-fx-alignment: center;" text="Date" />
+                            <TableColumn fx:id="timeColumn" prefWidth="148" style="-fx-alignment: center;" text="Time" />
                         </columns>
                     </TableView>
                   <HBox prefHeight="30.0" prefWidth="1255.0" spacing="373.0">
                      <children>
                         <HBox prefHeight="30.0" prefWidth="697.0" spacing="30.0">
                            <children>
-                              <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="125.0" styleClass="yellow-button" text="Add Concert">
+                              <Button fx:id="btnAddConcert" mnemonicParsing="false" prefHeight="26.0" prefWidth="125.0" styleClass="yellow-button" stylesheets="@../css/styles.css" text="Add Concert">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
                               </Button>
-                              <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="125.0" styleClass="yellow-button" text="Delete Concert">
+                              <Button fx:id="btnDeleteConcert" mnemonicParsing="false" prefHeight="26.0" prefWidth="125.0" styleClass="yellow-button" stylesheets="@../css/styles.css" text="Delete Concert">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
                               </Button>
                            </children>
                         </HBox>
-                        <CheckBox alignment="CENTER" mnemonicParsing="false" prefHeight="30.0" prefWidth="185.0" text="Coming soon">
+                        <CheckBox fx:id="cbxComingSoon" alignment="CENTER" mnemonicParsing="false" prefHeight="30.0" prefWidth="185.0" stylesheets="@../css/styles.css" text="Coming soon">
                            <font>
                               <Font size="14.0" />
                            </font>
@@ -106,7 +89,15 @@
                   </HBox>
                </children>
             </VBox>
+            <Button fx:id="btnInfo" layoutX="1225.0" layoutY="55.0" mnemonicParsing="false" prefHeight="66.0" prefWidth="70.0" styleClass="info-button">
+                <graphic>
+                    <ImageView fitHeight="66.0" fitWidth="70.0">
+                        <image>
+                            <Image url="@../../app/resources/btnInfo.png" />
+                        </image>
+                    </ImageView>
+                </graphic>
+            </Button>
          </children>
     </AnchorPane>
-  </children>
 </VBox>

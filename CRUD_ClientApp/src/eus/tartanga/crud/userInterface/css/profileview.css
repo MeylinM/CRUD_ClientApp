@@ -68,7 +68,7 @@
     -fx-text-fill: #5a5a5a;
 }
 /* Estilos específicos */
-#fullNameField, #phoneField, #postalCodeField, #oldPasswd {
+#fullNameField, #phoneField, #postalCodeField, #oldPasswd, #dateField{
     -fx-background-color: #fddde6;
     -fx-border-color: #f5a8b8;
     -fx-border-width: 2;

@@ -15,7 +15,7 @@
 
 <VBox prefHeight="768.0" prefWidth="1366.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eus.tartanga.crud.userInterface.controllers.ArtistViewController">
     <fx:include fx:id="menuBar" source="MenuBarView.fxml" />
-    <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="742.0" prefWidth="1369.0" styleClass="background-pane" stylesheets="@../css/styles.css" VBox.vgrow="ALWAYS">
+    <AnchorPane fx:id="artistAnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="742.0" prefWidth="1369.0" styleClass="background-pane" stylesheets="@../css/styles.css" VBox.vgrow="ALWAYS">
          <children>
             <VBox alignment="CENTER" fillWidth="false" layoutX="45.0" layoutY="148.0" prefHeight="557.0" prefWidth="1278.0" spacing="10.0" stylesheets="@styles.css">
                <children>
@@ -33,35 +33,35 @@
                         </ImageView>
                         <HBox alignment="CENTER_RIGHT" prefHeight="66.0" prefWidth="816.0">
                            <children>
-                              <DatePicker prefHeight="37.0" prefWidth="137.0" promptText="From...">
+                              <DatePicker fx:id="dpFrom" prefHeight="37.0" prefWidth="137.0" promptText="From...">
                                  <HBox.margin>
                                     <Insets right="25.0" />
                                  </HBox.margin>
                               </DatePicker>
-                              <DatePicker promptText="To..." />
+                              <DatePicker fx:id="dpTo" promptText="To..." />
                            </children>
                         </HBox>
                      </children>
                   </HBox>
                   <TableView fx:id="artistTable" prefHeight="400.0" prefWidth="1279.0">
                         <columns>
-                            <TableColumn fx:id="artistColumn" prefWidth="210.0" style="-fx-alignment: center;" text="Artist" />
-                            <TableColumn fx:id="nameColumn" prefWidth="210.0" style="-fx-alignment: center-left;" text="Name" />
-                            <TableColumn fx:id="companyColumn" prefWidth="230.0" style="-fx-alignment: center-left;" text="Company" />
-                            <TableColumn fx:id="lastAlbumColumn" prefWidth="370.0" style="-fx-alignment: center-left;" text="Last Album" />
-                            <TableColumn fx:id="debutColumn" prefWidth="210.0" style="-fx-alignment: center-left;" text="Debut" />
+                            <TableColumn fx:id="artistColumn" prefWidth="223.20000839233398" style="-fx-alignment: center;" text="Artist" />
+                            <TableColumn fx:id="nameColumn" prefWidth="225.06668090820312" style="-fx-alignment: center-left;" text="Name" />
+                            <TableColumn fx:id="companyColumn" prefWidth="225.33334350585938" style="-fx-alignment: center-left;" text="Company" />
+                            <TableColumn fx:id="lastAlbumColumn" prefWidth="365.5999755859375" style="-fx-alignment: center-left;" text="Last Album" />
+                            <TableColumn fx:id="debutColumn" prefWidth="214.9334716796875" style="-fx-alignment: center-left;" text="Debut" />
                         </columns>
                     </TableView>
                   <HBox prefHeight="30.0" prefWidth="1255.0" spacing="373.0">
                      <children>
                         <HBox prefHeight="30.0" prefWidth="1258.0" spacing="30.0">
                            <children>
-                              <Button fx:id="addButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="125.0" styleClass="yellow-button" text="Add Artist">
+                              <Button fx:id="btnAddArtist" mnemonicParsing="false" prefHeight="26.0" prefWidth="125.0" styleClass="yellow-button" text="Add Artist">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="deleteButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="125.0" styleClass="yellow-button" text="Delete Artist">
+                              <Button fx:id="btnDeleteArtist" mnemonicParsing="false" prefHeight="26.0" prefWidth="125.0" styleClass="yellow-button" text="Delete Artist">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
@@ -93,6 +93,15 @@
                   <Image url="@../../app/resources/ArtistTittle.png" />
                </image>
             </ImageView>
+         <Button fx:id="btnInfo" layoutX="1205.0" layoutY="40.0" mnemonicParsing="false" prefHeight="88.0" prefWidth="91.0" styleClass="info-button">
+            <graphic>
+               <ImageView fitHeight="88.0" fitWidth="91.0" pickOnBounds="true" preserveRatio="true">
+                  <image>
+                     <Image url="@../../app/resources/btnInfo.png" />
+                  </image>
+               </ImageView>
+            </graphic>
+         </Button>
          </children>
     </AnchorPane>
 </VBox>

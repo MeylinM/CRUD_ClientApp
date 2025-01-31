@@ -15,34 +15,30 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author Olaia
  */
-
 @XmlRootElement
 public class Artist implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-   
     private Integer artistId;
-
     private byte[] image;
-   
-   
     private Date debut;
-
     private String company;
-
-   
     private String name;
-
     private String lastAlbum;
 
-   
     private List<Concert> concertList;
 
-   
     private Set<Product> getProducts;
 
-   
+    public Artist() {
+        this.name = "Name of the artist";
+        this.company = "Company of the artist";
+        this.lastAlbum = "Last album of the artist";
+        this.debut = new Date();
+
+    }
+
     public Set<Product> getGetProducts() {
         return getProducts;
     }
@@ -99,7 +95,6 @@ public class Artist implements Serializable {
         this.lastAlbum = lastAlbum;
     }
 
-   
     public List<Concert> getConcertList() {
         return concertList;
     }
