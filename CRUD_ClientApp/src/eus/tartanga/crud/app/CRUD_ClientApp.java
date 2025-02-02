@@ -21,6 +21,7 @@ import javafx.scene.Parent;
  */
 public class CRUD_ClientApp extends Application {
 
+    
     @Override
     public void start(Stage stage) throws IOException {
 

@@ -112,14 +112,22 @@ public class SignInViewController {
                     ProfileViewController controller = (ProfileViewController) loader.getController();
                     controller.setStage(stage);
                     controller.initStage(root);*/
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ProductView.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ArtistView.fxml"));
+                FanetixUser userGeneral = new FanetixUser(email, passwrd);
+                MenuBarViewController.setStageMenu(stage);
+                MenuBarViewController.setUser(userGeneral);
+                Parent root = (Parent) loader.load();
+                ArtistViewController controller = (ArtistViewController) loader.getController();
+                controller.setStage(stage);
+                controller.initStage(root);
+                /*FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ProductView.fxml"));
                 FanetixUser userGeneral = new FanetixUser(email, passwrd);
                 MenuBarViewController.setStageMenu(stage);
                 MenuBarViewController.setUser(userGeneral);
                 Parent root = (Parent) loader.load();
                 ProductViewController controller = (ProductViewController) loader.getController();
                 controller.setStage(stage);
-                controller.initStage(root);
+                controller.initStage(root);*/
 
             }
         } catch (ReadException e) {

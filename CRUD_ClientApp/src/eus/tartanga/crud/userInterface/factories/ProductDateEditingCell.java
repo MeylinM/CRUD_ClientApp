@@ -80,7 +80,6 @@ public class ProductDateEditingCell extends TableCell<Product, Date> {
                     alert.setHeaderText("Error de validación");
                     alert.setContentText(ex.getMessage());
                     alert.showAndWait();
-
                     // Restaurar el valor previo
                     dpProductCell.setValue(previousDate != null
                             ? previousDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
@@ -110,6 +109,7 @@ public class ProductDateEditingCell extends TableCell<Product, Date> {
         }
 
         int year = date.getYear();
+        // Validar primero el valor de la celda que controlara que la fecha introducida está entre los años 1980 y 2030
         if (year < 1980 || year > 2030) {
             throw new WrongDateException("La fecha debe estar entre los años 1980 y 2030.");
         }
