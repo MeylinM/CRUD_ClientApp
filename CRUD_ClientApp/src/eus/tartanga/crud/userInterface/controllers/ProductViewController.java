@@ -491,9 +491,15 @@ public class ProductViewController {
             JasperViewer jasperViewer = new JasperViewer(jasperPrint, false);
             jasperViewer.setVisible(true);
         } catch (JRException ex) {
-            //EXCEPCIONES DE ESAS
+            showAlertPrint("Error al imprimir:\n"+
+                            ex.getMessage());
+            logger.severe("UI GestionUsuariosController: Error printing report: {0}"+
+                            ex.getMessage());
+
         }
     }
+    
+
 
     private void handleInfoButton(ActionEvent event) {
         try {
@@ -686,6 +692,14 @@ public class ProductViewController {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
         alert.setHeaderText("Error de servidor");
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+    
+    private void showAlertPrint(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText("Error de imprenta");
         alert.setContentText(message);
         alert.showAndWait();
     }
