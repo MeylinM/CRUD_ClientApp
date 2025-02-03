@@ -124,4 +124,12 @@ public class Concert implements Serializable {
         return "eus.tartanga.crud.entities.Concert[ id=" + concertId + " ]";
     }
 
+    public String getArtistNames() {
+        return artistList != null && !artistList.isEmpty()
+                ? artistList.stream()
+                        .map(Artist::getName) // Asumiendo que Artist tiene un método getName()
+                        .reduce((a, b) -> a + ", " + b)
+                        .orElse("No artists")
+                : "No artists";
+    }
 }
