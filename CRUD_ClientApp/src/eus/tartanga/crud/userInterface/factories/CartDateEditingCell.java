@@ -5,26 +5,27 @@ import java.text.DateFormat;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.Locale;
+import javafx.scene.control.Alert;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableCell;
+import javafx.scene.input.KeyCode;
 
 /**
- *
- * @author 2dam
+ * Celda editable para la columna de fecha en la tabla de carrito.
  */
 public class CartDateEditingCell extends TableCell<Cart, Date> {
 
-    private DatePicker dpProductCell;
+    private DatePicker dpCartCell;
     private DateFormat dateFormatter;
+    private Date previousDate;
 
     public CartDateEditingCell() {
-        dpProductCell = new DatePicker();
+        dpCartCell = new DatePicker();
     }
 
     @Override
     protected void updateItem(Date date, boolean empty) {
         super.updateItem(date, empty);
-
         dateFormatter = new java.text.SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
         if (empty) {
@@ -32,14 +33,13 @@ public class CartDateEditingCell extends TableCell<Cart, Date> {
             setGraphic(null);
         } else {
             if (isEditing()) {
-                dpProductCell.setValue(date != null
+                dpCartCell.setValue(date != null
                         ? date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
                         : null);
                 setText(null);
-                setGraphic(dpProductCell);
+                setGraphic(dpCartCell);
             } else if (date != null) {
-                String dateText = dateFormatter.format(date);
-                setText(dateText);
+                setText(dateFormatter.format(date));
                 setGraphic(null);
             }
         }
@@ -49,21 +49,56 @@ public class CartDateEditingCell extends TableCell<Cart, Date> {
     public void startEdit() {
         if (!isEmpty()) {
             super.startEdit();
-            Date previousDate = getItem();
-            dpProductCell.setOnAction((e) -> {
-                Date newDate = dpProductCell.getValue() != null
-                        ? Date.from(dpProductCell.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant())
-                        : previousDate; // Si no hay valor nuevo, conserva la fecha anterior
-                commitEdit(newDate);
+            previousDate = getItem(); // Guardamos la fecha anterior
+            Date today = new Date(); // Fecha actual
+
+            dpCartCell.setValue(previousDate != null
+                    ? previousDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+                    : today.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+
+            // Manejar cuando el usuario elige una fecha
+            dpCartCell.setOnAction(event -> validateAndCommitDate());
+
+            // Manejar cuando el usuario presiona Enter
+            dpCartCell.setOnKeyPressed(event -> {
+                if (event.getCode() == KeyCode.ENTER) {
+                    validateAndCommitDate();
+                } else if (event.getCode() == KeyCode.ESCAPE) {
+                    cancelEdit();
+                }
             });
+
             setText(null);
-            setGraphic(dpProductCell);
+            setGraphic(dpCartCell);
         }
+    }
+
+    private void validateAndCommitDate() {
+        Date today = new Date();
+        Date selectedDate = Date.from(dpCartCell.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        if (selectedDate.before(today)) {
+            showAlert("Fecha inválida", "No puedes seleccionar una fecha anterior a la actual.");
+            dpCartCell.setValue(previousDate != null
+                    ? previousDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+                    : today.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+        } else {
+            commitEdit(selectedDate);
+        }
+    }
+
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     @Override
     public void cancelEdit() {
         super.cancelEdit();
+        setText(previousDate != null ? dateFormatter.format(previousDate) : null);
         setGraphic(null);
     }
 }
