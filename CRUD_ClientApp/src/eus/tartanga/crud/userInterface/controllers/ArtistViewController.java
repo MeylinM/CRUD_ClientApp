@@ -20,6 +20,7 @@ import java.io.ByteArrayInputStream;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -40,7 +41,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -56,6 +59,13 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.Callback;
 import javax.ws.rs.core.GenericType;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
@@ -158,7 +168,6 @@ public class ArtistViewController {
             artistColumn.setCellValueFactory(new PropertyValueFactory<>("image"));
 
             // Hacer la columna 'debutColumn' editable
-            //NO HACE UPDATE
             final Callback<TableColumn<Artist, Date>, TableCell<Artist, Date>> dateCell
                     = (TableColumn<Artist, Date> param) -> new ArtistDateEditingCell();
             debutColumn.setCellFactory(dateCell);
@@ -463,7 +472,7 @@ public class ArtistViewController {
             eliminarConciertosAsociados(selectedArtist);
 
             // 2. ELIMINAR PRODUCTOS RELACIONADOS CON EL ARTISTA
-            eliminarProductosAsociados(selectedArtist);
+           // eliminarProductosAsociados(selectedArtist);
 
             // 3. ELIMINAR EL ARTISTA
             logger.info("Intentando eliminar artista: " + selectedArtist.getName() + " con ID: " + selectedArtist.getArtistId());
@@ -471,7 +480,7 @@ public class ArtistViewController {
             artistList.remove(selectedArtist);
             logger.info("Artista eliminado con éxito: " + selectedArtist.getName());
 
-        } catch (Exception e) {
+        } catch (DeleteException e) {
             logger.severe("Error al eliminar el artista y sus relaciones: " + e.getMessage());
             e.printStackTrace();
         }
@@ -510,7 +519,7 @@ public class ArtistViewController {
     }
 
 // Método para eliminar los productos asociados a un artista
-    private void eliminarProductosAsociados(Artist selectedArtist) {
+  /*  private void eliminarProductosAsociados(Artist selectedArtist) {
         try {
             // Obtener la lista de todos los productos
             List<Product> productList = productManager.findAll_XML(new GenericType<List<Product>>() {
@@ -541,19 +550,19 @@ public class ArtistViewController {
         } catch (ReadException ex) {
             Logger.getLogger(ArtistViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
+    }*/
 
     private void printItems(ActionEvent event) {
-        /*  try {
-            JasperReport report = JasperCompileManager.compileReport(getClass().getResourceAsStream("/eus/tartanga/crud/userInterface/report/productReport.jrxml"));
-            JRBeanCollectionDataSource dataItems = new JRBeanCollectionDataSource((Collection<Product>) this.productTable.getItems());
+          try {
+            JasperReport report = JasperCompileManager.compileReport(getClass().getResourceAsStream("/eus/tartanga/crud/userInterface/report/artistReport.jrxml"));
+            JRBeanCollectionDataSource dataItems = new JRBeanCollectionDataSource((Collection<Artist>) this.artistTable.getItems());
             Map<String, Object> parameters = new HashMap<>();
             JasperPrint jasperPrint = JasperFillManager.fillReport(report, parameters, dataItems);
             JasperViewer jasperViewer = new JasperViewer(jasperPrint, false);
             jasperViewer.setVisible(true);
         } catch (JRException ex) {
-            //EXCEPCIONES DE ESAS
-        }*/
+            logger.severe("Error printing report: {0}" + ex.getMessage());
+        }
     }
 
     // Filtro de búsqueda
