@@ -633,7 +633,7 @@ public class CartOrdersViewController {
         try {
             LOGGER.info("Loading help view...");
             //Load node graph from fxml file
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/HelpCartOrdersView.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/HelpMyCartOrdersView.fxml"));
             Parent root = (Parent) loader.load();
             HelpMyCartOrdersViewController helpController = ((HelpMyCartOrdersViewController) loader.getController());
             if (cart) {

@@ -1,98 +1,113 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="OrdersReport" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d5244d52-14d6-4762-904f-d735d7e48ddd">
-
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports 
+              http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="report name" pageWidth="595" pageHeight="842" columnWidth="535"
+              leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20"
+              uuid="56fee01d-8277-437e-835b-ec47302e7d28">
+    
     <property name="ireport.zoom" value="1.0"/>
     <property name="ireport.x" value="0"/>
     <property name="ireport.y" value="0"/>
-
-    <field name="quantity" class="java.lang.Integer"/>
-    <field name="orderDate" class="java.util.Date"/>
-    <field name="productTitle" class="java.lang.String">
-        <fieldDescription><![CDATA[product.title]]></fieldDescription>
-    </field>
-    <field name="price" class="java.math.BigDecimal"/>
-
-    <variable name="subTotal" class="java.math.BigDecimal">
-        <variableExpression><![CDATA[new java.math.BigDecimal($F{quantity}).multiply($F{price})]]></variableExpression>
-    </variable>
     
-    <variable name="total" class="java.math.BigDecimal" calculation="Sum">
-        <variableExpression><![CDATA[$V{subTotal}]]></variableExpression>
-    </variable>
-
+    <field name="title" class="java.lang.String"/>
+    <field name="product" class="eus.tartanga.crud.model.Product"/>
+    <field name="quantity" class="java.lang.Integer"/>
+    <field name="bought" class="java.lang.Boolean"/>
+    <field name="orderDate" class="java.util.Date"/>
+    
+    <background>
+        <band splitType="Stretch"/>
+    </background>
+    
     <title>
-        <band height="80">
+        <band height="79" splitType="Stretch">
             <staticText>
-                <reportElement x="174" y="0" width="200" height="30" uuid="3df6b69d-2230-4a69-9dbe-d316fd994d1a"/>
-                <textElement textAlignment="Center">
-                    <font size="18" isBold="true"/>
+                <reportElement x="222" y="31" width="150" height="20"/>
+                <textElement>
+                    <font size="14" isBold="true"/>
                 </textElement>
-                <text><![CDATA[Order Details]]></text>
+                <!-- Cambié el contenido estático por la referencia al producto -->
+                <text><![CDATA[$F{product} == null ? "Unknown Product" : $F{product}.getName()]]></text>
             </staticText>
         </band>
     </title>
-
+    
+    <pageHeader>
+        <band height="35" splitType="Stretch"/>
+    </pageHeader>
+    
+    <!-- Column Headers -->
     <columnHeader>
-        <band height="30">
+        <band height="20" splitType="Stretch">
             <staticText>
-                <reportElement x="10" y="0" width="120" height="20" uuid="4c0e5401-37be-40bb-a1b2-6cfefab744be"/>
-                <text><![CDATA[Product Title]]></text>
+                <reportElement x="0" y="0" width="100" height="20"/>
+                <textElement>
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Product]]></text>
             </staticText>
+            
             <staticText>
-                <reportElement x="130" y="0" width="120" height="20" uuid="3f88d4fa-b26b-46bd-8109-522b6102565b"/>
-                <text><![CDATA[Order Date]]></text>
-            </staticText>
-            <staticText>
-                <reportElement x="250" y="0" width="80" height="20" uuid="2789601c-87d2-444e-82e9-7319b740665b"/>
+                <reportElement x="110" y="0" width="100" height="20"/>
+                <textElement>
+                    <font isBold="true"/>
+                </textElement>
                 <text><![CDATA[Quantity]]></text>
             </staticText>
+            
             <staticText>
-                <reportElement x="330" y="0" width="80" height="20" uuid="aae47c54-692a-4e4a-a884-da300e4d4b74"/>
-                <text><![CDATA[Price]]></text>
+                <reportElement x="180" y="0" width="150" height="20"/>
+                <textElement>
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Bought]]></text>
             </staticText>
+            
             <staticText>
-                <reportElement x="410" y="0" width="80" height="20" uuid="1cafdcb0-29a4-4f35-a28d-cff4bcd29716"/>
-                <text><![CDATA[Subtotal]]></text>
+                <reportElement x="380" y="0" width="100" height="20"/>
+                <textElement>
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Order Date]]></text>
             </staticText>
+            
         </band>
     </columnHeader>
 
     <detail>
-        <band height="25">
+        <band height="20">
             <textField>
-                <reportElement x="10" y="0" width="120" height="20" uuid="e1e42ef7-bc07-44a4-817b-bc0802db4ccf"/>
-                <textFieldExpression><![CDATA[$F{productTitle}]]></textFieldExpression>
+                <reportElement x="0" y="0" width="100" height="20"/>
+                <textFieldExpression><![CDATA[$F{product} == null ? "Unknown" : $F{product}.getTitle()]]></textFieldExpression>
             </textField>
+            
             <textField>
-                <reportElement x="130" y="0" width="120" height="20" uuid="19e6b6bb-44c4-48e2-b7d7-22324c3816ef"/>
-                <textFieldExpression><![CDATA[new java.text.SimpleDateFormat("dd/MM/yyyy").format($F{orderDate})]]></textFieldExpression>
-            </textField>
-            <textField>
-                <reportElement x="250" y="0" width="80" height="20" uuid="2acea0df-e96d-4af7-a151-9a32c367d2a5"/>
+                <reportElement x="110" y="0" width="100" height="20"/>
                 <textFieldExpression><![CDATA[$F{quantity}]]></textFieldExpression>
             </textField>
+            
             <textField>
-                <reportElement x="330" y="0" width="80" height="20" uuid="215f90bd-f39f-4158-9223-ac971c4a307c"/>
-                <textFieldExpression><![CDATA[$F{price}]]></textFieldExpression>
+                <reportElement x="180" y="0" width="150" height="20"/>
+                <textFieldExpression><![CDATA[$F{bought} == null ? "Not Bought" : $F{bought} ? "Bought" : "Not Bought"]]></textFieldExpression>
             </textField>
+            
             <textField>
-                <reportElement x="410" y="0" width="80" height="20" uuid="a73108f0-8233-4902-b398-e87d7607eb4f"/>
-                <textFieldExpression><![CDATA[$V{subTotal}]]></textFieldExpression>
+                <reportElement x="380" y="0" width="100" height="20"/>
+                <textFieldExpression><![CDATA[new SimpleDateFormat("dd/MM/yyyy").format($F{orderDate})]]></textFieldExpression>
             </textField>
         </band>
     </detail>
 
-    <summary>
-        <band height="30">
-            <staticText>
-                <reportElement x="330" y="0" width="80" height="20" uuid="c13b4b94-afa8-46ea-8f51-7d1a9f269440"/>
-                <text><![CDATA[Total:]]></text>
-            </staticText>
-            <textField>
-                <reportElement x="410" y="0" width="80" height="20" uuid="08feb18d-3e91-444f-86d8-b8b667afd3ff"/>
-                <textFieldExpression><![CDATA[$V{total}]]></textFieldExpression>
-            </textField>
-        </band>
-    </summary>
+    <columnFooter>
+        <band height="45" splitType="Stretch"/>
+    </columnFooter>
 
+    <pageFooter>
+        <band height="54" splitType="Stretch"/>
+    </pageFooter>
+
+    <summary>
+        <band height="42" splitType="Stretch"/>
+    </summary>
 </jasperReport>
