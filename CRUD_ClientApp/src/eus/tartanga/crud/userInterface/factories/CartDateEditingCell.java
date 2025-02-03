@@ -1,32 +1,53 @@
 package eus.tartanga.crud.userInterface.factories;
 
+import eus.tartanga.crud.exception.WrongDateException;
 import eus.tartanga.crud.model.Cart;
 import java.text.DateFormat;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.Locale;
 import javafx.scene.control.Alert;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableCell;
-import javafx.scene.input.KeyCode;
 
 /**
- * Celda editable para la columna de fecha en la tabla de carrito.
+ * Editable cell for the date column in the shopping cart table.
+ * <p>
+ * This class represents a custom table cell that allows users to edit a date
+ * value using a {@link DatePicker}. It validates that the selected date is not
+ * earlier than the current date, and handles the conversion between Date and
+ * LocalDate.
+ * </p>
+ *
+ * @author Elbire And Meylin
  */
 public class CartDateEditingCell extends TableCell<Cart, Date> {
 
+    // The DatePicker used for editing the date.
     private DatePicker dpCartCell;
+    // Formatter for displaying the date in a readable format.
     private DateFormat dateFormatter;
-    private Date previousDate;
 
+    /**
+     * Constructor for the CartDateEditingCell. Initializes the DatePicker and
+     * sets the default date format.
+     */
     public CartDateEditingCell() {
         dpCartCell = new DatePicker();
+        dateFormatter = DateFormat.getDateInstance(DateFormat.SHORT, Locale.getDefault());
     }
 
+    /**
+     * Updates the item displayed in the table cell based on whether the cell is
+     * in edit mode or not.
+     *
+     * @param date The current date value of the cell.
+     * @param empty True if the cell is empty, false otherwise.
+     */
     @Override
     protected void updateItem(Date date, boolean empty) {
         super.updateItem(date, empty);
-        dateFormatter = new java.text.SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
         if (empty) {
             setText(null);
@@ -38,32 +59,51 @@ public class CartDateEditingCell extends TableCell<Cart, Date> {
                         : null);
                 setText(null);
                 setGraphic(dpCartCell);
-            } else if (date != null) {
-                setText(dateFormatter.format(date));
+            } else {
+                // When not editing, display the date in text form.
+                setText(date != null ? dateFormatter.format(date) : null);
                 setGraphic(null);
             }
         }
     }
 
+    /**
+     * Starts editing the cell by displaying the DatePicker and handling the
+     * date selection.
+     */
     @Override
     public void startEdit() {
         if (!isEmpty()) {
             super.startEdit();
-            previousDate = getItem(); // Guardamos la fecha anterior
-            Date today = new Date(); // Fecha actual
 
+            // Save the previous date value before editing.
+            Date previousDate = getItem();
             dpCartCell.setValue(previousDate != null
                     ? previousDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
-                    : today.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+                    : null);
 
-            // Manejar cuando el usuario elige una fecha
-            dpCartCell.setOnAction(event -> validateAndCommitDate());
+            dpCartCell.setOnAction((e) -> {
+                try {
+                    LocalDate selectedDate = dpCartCell.getValue();
 
-            // Manejar cuando el usuario presiona Enter
-            dpCartCell.setOnKeyPressed(event -> {
-                if (event.getCode() == KeyCode.ENTER) {
-                    validateAndCommitDate();
-                } else if (event.getCode() == KeyCode.ESCAPE) {
+                    // Validate if the selected date is not earlier than today or null.
+                    validateDate(selectedDate);
+                    // Convert the LocalDate to Date and commit the change.
+                    Date newDate = selectedDate != null
+                            ? Date.from(selectedDate.atStartOfDay(ZoneId.systemDefault()).toInstant())
+                            : previousDate;
+                    commitEdit(newDate);
+                } catch (WrongDateException ex) {
+                    // Show error alert if the validation fails.
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setHeaderText("Validation Error");
+                    alert.setContentText(ex.getMessage());
+                    alert.showAndWait();
+                    // Restore the previous date value if validation fails.
+                    dpCartCell.setValue(previousDate != null
+                            ? previousDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+                            : null);
                     cancelEdit();
                 }
             });
@@ -73,32 +113,35 @@ public class CartDateEditingCell extends TableCell<Cart, Date> {
         }
     }
 
-    private void validateAndCommitDate() {
-        Date today = new Date();
-        Date selectedDate = Date.from(dpCartCell.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
-
-        if (selectedDate.before(today)) {
-            showAlert("Fecha inválida", "No puedes seleccionar una fecha anterior a la actual.");
-            dpCartCell.setValue(previousDate != null
-                    ? previousDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
-                    : today.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-        } else {
-            commitEdit(selectedDate);
-        }
-    }
-
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
+    /**
+     * Cancels editing and restores the original value to the cell if the user
+     * cancels the edit.
+     */
     @Override
     public void cancelEdit() {
         super.cancelEdit();
-        setText(previousDate != null ? dateFormatter.format(previousDate) : null);
+
+        // Restore the text when editing is canceled.
+        Date date = getItem();
+        setText(date != null ? dateFormatter.format(date) : null);
         setGraphic(null);
+    }
+
+    /**
+     * Validates if the selected date is earlier than today's date.
+     *
+     * @param date The date to validate.
+     * @throws WrongDateException If the date is earlier than today's date.
+     */
+    private void validateDate(LocalDate date) throws WrongDateException {
+        if (date == null) {
+            throw new WrongDateException("La fecha no puede ser nula.");
+        }
+        LocalDate today = LocalDate.now();
+
+        // Validate that the date is not earlier than today
+        if (date.isBefore(today)) {
+            throw new WrongDateException("The date cannot be earlier than today's date.");
+        }
     }
 }
