@@ -13,6 +13,7 @@ import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
+import javax.xml.ws.WebServiceException;
 
 /**
  * Jersey REST client generated for REST resource:CartFacadeREST
@@ -68,7 +69,7 @@ public class CartClientRest implements CartManager{
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
     }
 
-    public <T> T findCart_JSON(Class<T> responseType, String email, String productId) throws ReadException {
+    public <T> T findCart_JSON(GenericType<T> responseType, String email, String productId) throws ReadException {
         WebTarget resource = webTarget;
         resource = resource.path(java.text.MessageFormat.format("{0}/{1}", new Object[]{email, productId}));
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
@@ -114,12 +115,12 @@ public class CartClientRest implements CartManager{
         webTarget.path(java.text.MessageFormat.format("{0}/{1}", new Object[]{email, productId})).request(javax.ws.rs.core.MediaType.APPLICATION_JSON).put(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_JSON));
     }
 
-    public <T> T findAllCartProducts_XML(Class<T> responseType) throws ReadException {
+    public <T> T findAllCartProducts_XML(GenericType<T> responseType) throws WebServiceException {
         WebTarget resource = webTarget;
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
     }
 
-    public <T> T findAllCartProducts_JSON(Class<T> responseType) throws ReadException {
+    public <T> T findAllCartProducts_JSON(GenericType<T> responseType) throws WebServiceException {
         WebTarget resource = webTarget;
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
     }

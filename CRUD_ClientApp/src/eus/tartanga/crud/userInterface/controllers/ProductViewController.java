@@ -478,7 +478,7 @@ public class ProductViewController {
 
     private void handleDeleteProduct(ActionEvent event) {
         ObservableList<Product> selectedProducts = productTable.getSelectionModel().getSelectedItems();
-
+        List<Cart> carts = null;
         if (selectedProducts.isEmpty()) {
             showAlertWarning("Error de seleccion","Please select at least one product to delete");
             return;
@@ -492,7 +492,20 @@ public class ProductViewController {
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
                 // Elimina cada producto seleccionado
-                for (Product product : new ArrayList<>(selectedProducts)) {
+                for (Product product : new ArrayList<>(selectedProducts)){
+                    System.out.println("Producto: "+product.getTitle());
+                    carts = cartManager.findAllCartProducts_XML(new GenericType<List<Cart>>() {});
+                    for(Cart cartsList : carts){
+                        System.out.println("Carrito: "+cartsList.getId().getEmail()+cartsList.getId().getProductId());
+                        try {
+                            if(product.getProductId()==cartsList.getId().getProductId()){
+                                System.out.println("EL PRODUCTO TIENE ESTE CARRITO: "+product.getProductId()+cartsList.getId().getProductId());
+                                cartManager.removeCart(cartsList.getId().getEmail(), cartsList.getId().getProductId().toString());
+                            }
+                        } catch (DeleteException ex) {
+                            Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
                     productManager.remove(product.getProductId().toString());
                     productList.remove(product); // Actualizar la tabla
                 }
