@@ -81,6 +81,7 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.converter.FloatStringConverter;
 import javafx.util.converter.IntegerStringConverter;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.GenericType;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
@@ -416,7 +417,7 @@ public class ProductViewController {
             products = productManager.findAll_XML(new GenericType<List<Product>>() {
             });
             return products;
-        } catch (ReadException e) {
+        } catch (WebApplicationException e) {
             showAlert("Error del servidor","An error occurred while getting the product list");
         }
         return products;
@@ -436,7 +437,7 @@ public class ProductViewController {
             //Si la operación se lleva a cabo sin errores, la fila recién creada se mostrará en la tabla.
             productTable.getItems().add(product);
             refreshProductList();
-        } catch (AddException e) {
+        } catch (WebApplicationException e) {
             showAlert("Error del servidor","An error occurred while creating the product(s)");
         }
     }
@@ -455,8 +456,8 @@ public class ProductViewController {
                         cartId.setProductId(selectedProduct.getProductId());
                         cart.setId(cartId);
                         cart.setProduct(selectedProduct);
-                        System.out.println(client.getEmail());
-                        cart.setClient(client);
+                        //System.out.println(client.getEmail());
+                        //cart.setClient(client);
                         cart.setOrderDate(new Date());
                         cart.setQuantity(quantityToAdd);
                         cart.setBought(false);
@@ -497,7 +498,7 @@ public class ProductViewController {
                 }
                 productTable.getSelectionModel().clearSelection();
 
-            } catch (DeleteException e) {
+            } catch (WebApplicationException e) {
                 showAlert("Error de servidor","An error occurred while deleting the product(s)");
             }
         }
@@ -506,7 +507,7 @@ public class ProductViewController {
     private void updateProduct(Product product) {
         try {
             productManager.edit_XML(product, product.getProductId().toString());
-        } catch (UpdateException e) {
+        } catch (WebApplicationException e) {
             showAlert("Error de servidor","An error occurred while updating the product");
         }
     }
@@ -693,7 +694,7 @@ public class ProductViewController {
         try {
             client = clientManager.findClient_XML(new GenericType<FanetixClient>() {
             }, email);
-        } catch (ReadException ex) {
+        } catch (WebApplicationException ex) {
             Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
         return client;

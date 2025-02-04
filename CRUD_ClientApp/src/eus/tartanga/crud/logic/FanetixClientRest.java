@@ -11,6 +11,7 @@ import eus.tartanga.crud.exception.ReadException;
 import eus.tartanga.crud.exception.SignInException;
 import eus.tartanga.crud.exception.UpdateException;
 import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
@@ -39,56 +40,56 @@ public class FanetixClientRest implements FanetixClientManager{
         webTarget = client.target(BASE_URI).path("eus.tartanga.crud.entities.fanetixclient");
     }
 
-    public void createClient_XML(Object requestEntity) throws AddException {
+    public void createClient_XML(Object requestEntity) throws WebApplicationException {
         webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
     }
 
-    public void createClient_JSON(Object requestEntity) throws AddException {
+    public void createClient_JSON(Object requestEntity) throws WebApplicationException {
         webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_JSON));
     }
 
-    public void removeClient(String email) throws DeleteException {
+    public void removeClient(String email) throws WebApplicationException {
         webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{email})).request().delete();
     }
 
-    public void updateClient_XML(Object requestEntity, String email) throws UpdateException {
+    public void updateClient_XML(Object requestEntity, String email) throws WebApplicationException {
         webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{email})).request(javax.ws.rs.core.MediaType.APPLICATION_XML).put(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
     }
 
-    public void updateClient_JSON(Object requestEntity, String email) throws UpdateException {
+    public void updateClient_JSON(Object requestEntity, String email) throws WebApplicationException {
         webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{email})).request(javax.ws.rs.core.MediaType.APPLICATION_JSON).put(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_JSON));
     }
 
-    public <T> T signIn_XML(GenericType<T> responseType, String email, String passwd) throws ReadException {
+    public <T> T signIn_XML(GenericType<T> responseType, String email, String passwd) throws WebApplicationException {
         WebTarget resource = webTarget;
         resource = resource.path(java.text.MessageFormat.format("signIn/{0}/{1}", new Object[]{email, passwd}));
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
     }
 
-    public <T> T signIn_JSON(GenericType<T> responseType, String email, String passwd) throws ReadException {
+    public <T> T signIn_JSON(GenericType<T> responseType, String email, String passwd) throws WebApplicationException {
         WebTarget resource = webTarget;
         resource = resource.path(java.text.MessageFormat.format("signIn/{0}/{1}", new Object[]{email, passwd}));
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
     }
 
-    public <T> T findClient_XML(GenericType<T> responseType, String email) throws ReadException {
+    public <T> T findClient_XML(GenericType<T> responseType, String email) throws WebApplicationException {
         WebTarget resource = webTarget;
         resource = resource.path(java.text.MessageFormat.format("{0}", new Object[]{email}));
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
     }
 
-    public <T> T findClient_JSON(Class<T> responseType, String email) throws ReadException {
+    public <T> T findClient_JSON(Class<T> responseType, String email) throws WebApplicationException {
         WebTarget resource = webTarget;
         resource = resource.path(java.text.MessageFormat.format("{0}", new Object[]{email}));
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
     }
 
-    public <T> T findAllClients_XML(Class<T> responseType) throws ReadException {
+    public <T> T findAllClients_XML(Class<T> responseType) throws WebApplicationException {
         WebTarget resource = webTarget;
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
     }
 
-    public <T> T findAllClients_JSON(Class<T> responseType) throws ReadException {
+    public <T> T findAllClients_JSON(Class<T> responseType) throws WebApplicationException {
         WebTarget resource = webTarget;
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
     }

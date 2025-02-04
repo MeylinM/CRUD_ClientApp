@@ -52,6 +52,7 @@ import javafx.util.Callback;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
+import javax.ws.rs.WebApplicationException;
 
 /**
  *
@@ -389,7 +390,7 @@ public class CartOrdersViewController extends Application {
         try {
             client = clientManager.findClient_XML(new GenericType<FanetixClient>() {
             }, email);
-        } catch (ReadException ex) {
+        } catch (WebApplicationException ex) {
             Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
         return client;

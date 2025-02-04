@@ -10,6 +10,7 @@ import eus.tartanga.crud.exception.DeleteException;
 import eus.tartanga.crud.exception.ReadException;
 import eus.tartanga.crud.exception.UpdateException;
 import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
@@ -39,95 +40,95 @@ public class ProductClientRest implements ProductManager{
     }
 
     @Override
-    public <T> T findStock_XML(GenericType<T> responseType) throws ReadException {
+    public <T> T findStock_XML(GenericType<T> responseType) throws WebApplicationException {
         WebTarget resource = webTarget;
         resource = resource.path("stock");
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
     }
 
     @Override
-    public <T> T findStock_JSON(GenericType<T> responseType) throws ReadException {
+    public <T> T findStock_JSON(GenericType<T> responseType) throws WebApplicationException {
         WebTarget resource = webTarget;
         resource = resource.path("stock");
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
     }
 
     @Override
-    public void edit_XML(Object requestEntity, String id) throws UpdateException {
+    public void edit_XML(Object requestEntity, String id) throws WebApplicationException {
         webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{id})).request(javax.ws.rs.core.MediaType.APPLICATION_XML).put(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
     }
 
     @Override
-    public void edit_JSON(Object requestEntity, String id) throws UpdateException {
+    public void edit_JSON(Object requestEntity, String id) throws WebApplicationException {
         webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{id})).request(javax.ws.rs.core.MediaType.APPLICATION_JSON).put(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_JSON));
     }
 
     @Override
-    public <T> T findBetweenDates_XML(GenericType<T> responseType, String startDate, String endDate) throws ReadException {
+    public <T> T findBetweenDates_XML(GenericType<T> responseType, String startDate, String endDate) throws WebApplicationException {
         WebTarget resource = webTarget;
         resource = resource.path(java.text.MessageFormat.format("betweenDates/{0}/{1}", new Object[]{startDate, endDate}));
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
     }
 
     @Override
-    public <T> T findBetweenDates_JSON(GenericType<T> responseType, String startDate, String endDate) throws ReadException {
+    public <T> T findBetweenDates_JSON(GenericType<T> responseType, String startDate, String endDate) throws WebApplicationException {
         WebTarget resource = webTarget;
         resource = resource.path(java.text.MessageFormat.format("betweenDates/{0}/{1}", new Object[]{startDate, endDate}));
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
     }
 
     @Override
-    public <T> T find_XML(GenericType<T> responseType, String id) throws ReadException {
+    public <T> T find_XML(GenericType<T> responseType, String id) throws WebApplicationException {
         WebTarget resource = webTarget;
         resource = resource.path(java.text.MessageFormat.format("{0}", new Object[]{id}));
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
     }
 
     @Override
-    public <T> T find_JSON(GenericType<T> responseType, String id) throws ReadException {
+    public <T> T find_JSON(GenericType<T> responseType, String id) throws WebApplicationException {
         WebTarget resource = webTarget;
         resource = resource.path(java.text.MessageFormat.format("{0}", new Object[]{id}));
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
     }
 
     @Override
-    public void create_XML(Object requestEntity) throws AddException {
+    public void create_XML(Object requestEntity) throws WebApplicationException {
         webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
     }
 
     @Override
-    public void create_JSON(Object requestEntity) throws AddException {
+    public void create_JSON(Object requestEntity) throws WebApplicationException {
         webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_JSON));
     }
 
     @Override
-    public <T> T searchByTerm_XML(GenericType<T> responseType, String searchTerm) throws ReadException {
+    public <T> T searchByTerm_XML(GenericType<T> responseType, String searchTerm) throws WebApplicationException {
         WebTarget resource = webTarget;
         resource = resource.path(java.text.MessageFormat.format("search/{0}", new Object[]{searchTerm}));
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
     }
 
     @Override
-    public <T> T searchByTerm_JSON(GenericType<T> responseType, String searchTerm) throws ReadException {
+    public <T> T searchByTerm_JSON(GenericType<T> responseType, String searchTerm) throws WebApplicationException {
         WebTarget resource = webTarget;
         resource = resource.path(java.text.MessageFormat.format("search/{0}", new Object[]{searchTerm}));
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
     }
 
     @Override
-    public <T> T findAll_XML(GenericType<T> responseType) throws ReadException {
+    public <T> T findAll_XML(GenericType<T> responseType) throws WebApplicationException {
         WebTarget resource = webTarget;
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
     }
 
     @Override
-    public <T> T findAll_JSON(GenericType<T> responseType) throws ReadException {
+    public <T> T findAll_JSON(GenericType<T> responseType) throws WebApplicationException {
         WebTarget resource = webTarget;
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
     }
 
     @Override
-    public void remove(String id) throws DeleteException {
+    public void remove(String id) throws WebApplicationException {
         webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{id})).request().delete();
     }
 

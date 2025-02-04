@@ -10,6 +10,7 @@ import eus.tartanga.crud.exception.DeleteException;
 import eus.tartanga.crud.exception.ReadException;
 import eus.tartanga.crud.exception.UpdateException;
 import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
@@ -36,38 +37,38 @@ public class AdministratorRest implements AdministratorManager {
         webTarget = client.target(BASE_URI).path("eus.tartanga.crud.entities.administrator");
     }
     @Override
-    public <T> T find(GenericType<T> responseType, String email) throws ReadException {
+    public <T> T find(GenericType<T> responseType, String email) throws WebApplicationException {
         WebTarget resource = webTarget;
         resource = resource.path(java.text.MessageFormat.format("{0}", new Object[]{email}));
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
     }
     @Override
-    public <T> T signIn_XML(GenericType<T> responseType, String email, String passwd) throws ReadException {
+    public <T> T signIn_XML(GenericType<T> responseType, String email, String passwd) throws WebApplicationException {
         WebTarget resource = webTarget;
         resource = resource.path(java.text.MessageFormat.format("signIn/{0}/{1}", new Object[]{email, passwd}));
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
     }
     @Override
-    public <T> T signIn_JSON(GenericType<T> responseType, String email, String passwd) throws ReadException {
+    public <T> T signIn_JSON(GenericType<T> responseType, String email, String passwd) throws WebApplicationException {
         WebTarget resource = webTarget;
         resource = resource.path(java.text.MessageFormat.format("signIn/{0}/{1}", new Object[]{email, passwd}));
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
     }
     @Override
-    public Response create(Object requestEntity) throws AddException {
+    public Response create(Object requestEntity) throws WebApplicationException {
         return webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML), Response.class);
     }
     @Override
-    public Response update(Object requestEntity) throws UpdateException {
+    public Response update(Object requestEntity) throws WebApplicationException {
         return webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML).put(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML), Response.class);
     }
     @Override
-    public <T> T findAll(GenericType<T> responseType) throws ReadException {
+    public <T> T findAll(GenericType<T> responseType) throws WebApplicationException {
         WebTarget resource = webTarget;
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
     }
     @Override
-    public Response remove(String email) throws DeleteException {
+    public Response remove(String email) throws WebApplicationException {
         return webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{email})).request().delete(Response.class);
     }
     @Override

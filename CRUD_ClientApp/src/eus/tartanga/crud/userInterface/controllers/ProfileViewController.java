@@ -37,6 +37,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.GenericType;
 
 /**
@@ -163,7 +164,7 @@ public class ProfileViewController {
                 }, email);
                 loadAdminData(admin);
             }
-        } catch (ReadException ex) {
+        } catch (WebApplicationException ex) {
             Logger.getLogger(ProfileViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

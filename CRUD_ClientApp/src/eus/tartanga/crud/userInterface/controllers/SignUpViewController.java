@@ -49,6 +49,7 @@ import eus.tartanga.crud.logic.FanetixClientFactory;
 import eus.tartanga.crud.logic.FanetixClientManager;
 import eus.tartanga.crud.model.FanetixClient;
 import java.util.regex.Pattern;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.GenericType;
 
 /**
@@ -536,7 +537,7 @@ public class SignUpViewController {
                 }
 
             }
-        } catch (ReadException | AddException e) {
+        } catch (WebApplicationException e) {
             // Handle server-related errors with an alert message.
             new Alert(Alert.AlertType.ERROR, e.getLocalizedMessage(), ButtonType.OK).showAndWait();
 

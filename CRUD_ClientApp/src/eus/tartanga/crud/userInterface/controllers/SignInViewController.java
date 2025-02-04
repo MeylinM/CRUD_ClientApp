@@ -27,6 +27,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.GenericType;
 
 /**
@@ -105,13 +106,6 @@ public class SignInViewController {
             }
             //Sign in falseado
             if (user != null || admin != null) {
-                /*FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ProfileView.fxml"));
-                    FanetixUser userGeneral = new FanetixUser(email, passwrd);
-                    MenuBarViewController.setUser(userGeneral);
-                    Parent root = (Parent) loader.load();
-                    ProfileViewController controller = (ProfileViewController) loader.getController();
-                    controller.setStage(stage);
-                    controller.initStage(root);*/
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ArtistView.fxml"));
                 FanetixUser userGeneral = new FanetixUser(email, passwrd);
                 MenuBarViewController.setStageMenu(stage);
@@ -120,17 +114,9 @@ public class SignInViewController {
                 ArtistViewController controller = (ArtistViewController) loader.getController();
                 controller.setStage(stage);
                 controller.initStage(root);
-                /*FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ProductView.fxml"));
-                FanetixUser userGeneral = new FanetixUser(email, passwrd);
-                MenuBarViewController.setStageMenu(stage);
-                MenuBarViewController.setUser(userGeneral);
-                Parent root = (Parent) loader.load();
-                ProductViewController controller = (ProductViewController) loader.getController();
-                controller.setStage(stage);
-                controller.initStage(root);*/
 
             }
-        } catch (ReadException e) {
+        } catch (WebApplicationException e) {
             new Alert(Alert.AlertType.ERROR, "At this moment server is not available. Please try later.", ButtonType.OK).showAndWait();
         } catch (IOException ex) {
             Logger.getLogger(SignInViewController.class.getName()).log(Level.SEVERE, null, ex);
