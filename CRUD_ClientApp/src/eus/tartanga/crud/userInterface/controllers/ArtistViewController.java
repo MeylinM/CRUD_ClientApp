@@ -293,7 +293,6 @@ public class ArtistViewController {
 
             artistTable.setItems(artistList);
             btnAddArtist.setOnAction(this::handleAddArtist);
-            //ARREGLAR DELETE DEL SERVIDOR
             btnDeleteArtist.setOnAction(this::handleDeleteArtist);
             btnInfo.setOnAction(this::handleInfoButton);
             //Inicializar los menu contextuales
@@ -468,18 +467,22 @@ public class ArtistViewController {
         }
 
         try {
-            // 1. ELIMINAR CONCIERTOS RELACIONADOS CON EL ARTISTA
-            eliminarConciertosAsociados(selectedArtist);
+            // 1. Verificar si el artista tiene conciertos asociados
+            boolean hasConcerts = eliminarConciertosAsociados(selectedArtist);
 
-            // 2. Si el artista tiene un ID, eliminarlo usando el ID; si no tiene ID, eliminarlo de la lista directamente
-            if (selectedArtist.getArtistId() != null) {
-                logger.info("Intentando eliminar artista con ID: " + selectedArtist.getArtistId());
-                artistManager.removeArtist(selectedArtist.getArtistId().toString());
-            } else {
-                // Si no tiene ID, eliminamos directamente del listado
-                logger.info("El artista no tiene ID, eliminando de la lista directamente: " + selectedArtist.getName());
+            // Si el artista tiene conciertos asociados, mostrar el alert y no proceder con la eliminación
+            if (hasConcerts) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("No se puede eliminar el artista");
+                alert.setHeaderText("El artista " + selectedArtist.getName() + " tiene conciertos asociados.");
+                alert.setContentText("Elimine los conciertos asociados antes de borrar el artista.");
+                alert.showAndWait();
+                return; // No eliminar el artista si tiene conciertos asociados
             }
 
+            // 2. Si no tiene conciertos asociados, proceder a eliminarlo
+            logger.info("Intentando eliminar artista con ID: " + selectedArtist.getArtistId());
+            artistManager.removeArtist(selectedArtist.getArtistId().toString());
             artistList.remove(selectedArtist);
             logger.info("Artista eliminado con éxito: " + selectedArtist.getName());
 
@@ -489,15 +492,15 @@ public class ArtistViewController {
         }
     }
 
-    // Método para eliminar los conciertos asociados a un artista
-    private void eliminarConciertosAsociados(Artist selectedArtist) {
+// Método para eliminar los conciertos asociados a un artista
+    private boolean eliminarConciertosAsociados(Artist selectedArtist) {
         // Obtener la lista de todos los conciertos
         List<Concert> concertList = concertManager.findAllConcerts_XML(new GenericType<List<Concert>>() {
         });
 
         if (concertList == null) {
             logger.severe("No se pudo obtener la lista de conciertos.");
-            return;
+            return false;
         }
 
         // Filtrar los conciertos que contienen al artista seleccionado
@@ -506,16 +509,13 @@ public class ArtistViewController {
                 .collect(Collectors.toList());
 
         if (!concertsToDelete.isEmpty()) {
-            // Si se encontraron conciertos, mostrar el Alert y evitar la eliminación
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("No se puede eliminar el artista");
-            alert.setHeaderText("El artista " + selectedArtist.getName() + " tiene conciertos asociados.");
-            alert.setContentText("Elimine los conciertos asociados antes de borrar el artista.");
-            alert.showAndWait();
-            return; // No eliminar el artista si tiene conciertos asociados
+            // Si se encontraron conciertos asociados, regresamos 'true' para indicar que no se debe eliminar el artista
+            return true;
         }
 
+        // Si no se encontraron conciertos, regresamos 'false'
         logger.info("No se encontraron conciertos asociados al artista " + selectedArtist.getName());
+        return false;
     }
 
     private void printItems(ActionEvent event) {
@@ -588,7 +588,6 @@ public class ArtistViewController {
 
     private void updateArtist(Artist artist) {
         try {
-            System.out.println("Intento de update");
             artistManager.updateArtist(artist, artist.getArtistId().toString());
         } catch (UpdateException e) {
             System.out.println(e);
