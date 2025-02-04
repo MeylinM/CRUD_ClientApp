@@ -390,7 +390,7 @@ public class CartOrdersViewController extends Application {
         try {
             client = clientManager.findClient_XML(new GenericType<FanetixClient>() {
             }, email);
-        } catch (WebApplicationException ex) {
+        } catch (ReadException ex) {
             Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
         return client;

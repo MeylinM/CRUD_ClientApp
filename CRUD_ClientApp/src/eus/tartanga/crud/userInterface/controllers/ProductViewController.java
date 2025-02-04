@@ -189,8 +189,7 @@ public class ProductViewController {
             cartManager = CartFactory.getCartManager();
             clientManager = FanetixClientFactory.getFanetixClientManager();
 
-            //Selección múltiple en tabla.
-            productTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+            
 
             //Conseguir la informacíon del usuario loggeado
             FanetixUser user = MenuBarViewController.getLoggedUser();
@@ -224,13 +223,13 @@ public class ProductViewController {
                 btnDeleteProduct.setVisible(false);
             } else {
                 //En caso de ser un administrador mostrar de manera diferente
-
+                //Selección múltiple en tabla para el uso del botón delete.
+                productTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
                 //Hacer la tabla editable
                 productTable.setEditable(true);
 
                 //Para obtener la lista de artistas se usará el método de lógica findAllArtist
-                artistList = FXCollections.observableArrayList(artistManager.findAllArtist(new GenericType<List<Artist>>() {
-                }));
+                artistList.addAll(findAllArtist());
 
                 //Crear la factoria de celda para releaseDate usando un DatePicker
                 final Callback<TableColumn<Product, Date>, TableCell<Product, Date>> dateCell
@@ -264,7 +263,7 @@ public class ProductViewController {
                         product.setTitle(event.getNewValue());
                     } catch (TextEmptyException | MaxCharacterException e) {
                         Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
-                        showAlertWarning("Error de  validacíon de titulo",e.getMessage());
+                        showAlertWarning("Error de  validacíon de titulo", e.getMessage());
                         productTable.refresh();
                     } catch (Exception e) {
                         Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
@@ -291,7 +290,7 @@ public class ProductViewController {
                         product.setDescription(event.getNewValue());
                     } catch (TextEmptyException | MaxCharacterException e) {
                         Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
-                        showAlertWarning("Error de validacion de descripcion",e.getMessage());
+                        showAlertWarning("Error de validacion de descripcion", e.getMessage());
                         productTable.refresh();
                     } catch (Exception e) {
                         //Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
@@ -312,7 +311,7 @@ public class ProductViewController {
                         updateProduct(productCopy);
                         product.setStock(event.getNewValue());
                     } catch (NumberFormatException ex) {
-                        showAlertWarning("Error de validacíon de stock","El valor del stock debe ser un número válido y mayor o igual a 0");
+                        showAlertWarning("Error de validacíon de stock", "El valor del stock debe ser un número válido y mayor o igual a 0");
                         productTable.refresh();
                     } catch (Exception e) {
                         Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
@@ -335,7 +334,7 @@ public class ProductViewController {
                         //Establecer la propiedad price del objeto Product correspondiente a la la editada.
                         product.setPrice(event.getNewValue());
                     } catch (NumberFormatException ex) {
-                        showAlertWarning("Error de validacíon de precio","El valor del precio debe ser un número válido y mayor a 0");
+                        showAlertWarning("Error de validacíon de precio", "El valor del precio debe ser un número válido y mayor a 0");
                         productTable.refresh();
                     } catch (Exception e) {
                         Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
@@ -343,12 +342,18 @@ public class ProductViewController {
                 });
 
                 artistColumn.setCellFactory(ComboBoxTableCell.forTableColumn(artistList));
-                artistColumn.setOnEditCommit((TableColumn.CellEditEvent<Product, Artist> t) -> {
-                    ((Product) t.getTableView().getItems()
-                            .get(t.getTablePosition().getRow()))
-                            .setArtist(t.getNewValue());
-                    Product product = (Product) t.getTableView().getItems().get(t.getTablePosition().getRow());
-                    Artist originalValueLevel = product.getArtist();
+                artistColumn.setOnEditCommit(event -> {
+                    try {
+                        Product product = event.getRowValue();
+                        Product productCopy = product.clone(); 
+                        productCopy.setArtist(event.getNewValue()); 
+                        updateProduct(productCopy);
+                        product.setArtist(event.getNewValue());
+                    } catch (Exception e) {
+                        Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
+                        showAlertWarning("Error al actualizar artista", "No se pudo actualizar el artista en la base de datos.");
+                        productTable.refresh();
+                    }
                 });
 
                 btnAddProduct.setOnAction(this::handleAddProduct);
@@ -417,10 +422,21 @@ public class ProductViewController {
             products = productManager.findAll_XML(new GenericType<List<Product>>() {
             });
             return products;
-        } catch (WebApplicationException e) {
-            showAlert("Error del servidor","An error occurred while getting the product list");
+        } catch (ReadException e) {
+            showAlert("Error del servidor", "An error occurred while getting the product list");
         }
         return products;
+    }
+
+    private List<Artist> findAllArtist() {
+        List<Artist> artists = null;
+        try {
+            artists = artistManager.findAllArtist(new GenericType<List<Artist>>() {
+            });
+        } catch (ReadException e) {
+            showAlert("Error del servidor", "An error occurred while getting the product list");
+        }
+        return artists;
     }
 
     private void handleAddProduct(ActionEvent event) {
@@ -437,8 +453,8 @@ public class ProductViewController {
             //Si la operación se lleva a cabo sin errores, la fila recién creada se mostrará en la tabla.
             productTable.getItems().add(product);
             refreshProductList();
-        } catch (WebApplicationException e) {
-            showAlert("Error del servidor","An error occurred while creating the product(s)");
+        } catch (AddException e) {
+            showAlert("Error del servidor", "An error occurred while creating the product(s)");
         }
     }
 
@@ -467,12 +483,12 @@ public class ProductViewController {
                     throw new NoStockException("No queda stock de ese producto, no podrá ser añadido a su carrito");
                 }
             } else {
-                showAlertWarning("Error de seleccion","No se ha seleccionado ningún producto para eliminar.");
+                showAlertWarning("Error de seleccion", "No se ha seleccionado ningún producto para eliminar.");
             }
         } catch (AddException e) {
-            showAlert("Error de servidor","An error occurred while creating the product(s)");
+            showAlert("Error de servidor", "An error occurred while creating the product(s)");
         } catch (NoStockException e) {
-            showAlertWarning("Stock no disponible",e.getMessage());
+            showAlertWarning("Stock no disponible", e.getMessage());
         }
     }
 
@@ -480,7 +496,7 @@ public class ProductViewController {
         ObservableList<Product> selectedProducts = productTable.getSelectionModel().getSelectedItems();
         List<Cart> carts = null;
         if (selectedProducts.isEmpty()) {
-            showAlertWarning("Error de seleccion","Please select at least one product to delete");
+            showAlertWarning("Error de seleccion", "Please select at least one product to delete");
             return;
         }
         Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -491,15 +507,16 @@ public class ProductViewController {
         Optional<ButtonType> result = confirmationAlert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
+                carts = cartManager.findAllCartProducts_XML(new GenericType<List<Cart>>() {
+                });
                 // Elimina cada producto seleccionado
-                for (Product product : new ArrayList<>(selectedProducts)){
-                    System.out.println("Producto: "+product.getTitle());
-                    carts = cartManager.findAllCartProducts_XML(new GenericType<List<Cart>>() {});
-                    for(Cart cartsList : carts){
-                        System.out.println("Carrito: "+cartsList.getId().getEmail()+cartsList.getId().getProductId());
+                for (Product product : new ArrayList<>(selectedProducts)) {
+                    System.out.println("Producto: " + product.getTitle());
+                    for (Cart cartsList : carts) {
+                        System.out.println("Carrito: " + cartsList.getId().getEmail() + cartsList.getId().getProductId());
                         try {
-                            if(product.getProductId()==cartsList.getId().getProductId()){
-                                System.out.println("EL PRODUCTO TIENE ESTE CARRITO: "+product.getProductId()+cartsList.getId().getProductId());
+                            if (product.getProductId() == cartsList.getId().getProductId()) {
+                                System.out.println("EL PRODUCTO TIENE ESTE CARRITO: " + product.getProductId() + cartsList.getId().getProductId());
                                 cartManager.removeCart(cartsList.getId().getEmail(), cartsList.getId().getProductId().toString());
                             }
                         } catch (DeleteException ex) {
@@ -511,8 +528,8 @@ public class ProductViewController {
                 }
                 productTable.getSelectionModel().clearSelection();
 
-            } catch (WebApplicationException e) {
-                showAlert("Error de servidor","An error occurred while deleting the product(s)");
+            } catch (DeleteException e) {
+                showAlert("Error de servidor", "An error occurred while deleting the product(s)");
             }
         }
     }
@@ -520,8 +537,8 @@ public class ProductViewController {
     private void updateProduct(Product product) {
         try {
             productManager.edit_XML(product, product.getProductId().toString());
-        } catch (WebApplicationException e) {
-            showAlert("Error de servidor","An error occurred while updating the product");
+        } catch (UpdateException e) {
+            showAlert("Error de servidor", "An error occurred while updating the product");
         }
     }
 
@@ -707,7 +724,7 @@ public class ProductViewController {
         try {
             client = clientManager.findClient_XML(new GenericType<FanetixClient>() {
             }, email);
-        } catch (WebApplicationException ex) {
+        } catch (ReadException ex) {
             Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
         return client;
@@ -742,6 +759,7 @@ public class ProductViewController {
         alert.setContentText(message);
         alert.showAndWait();
     }
+
     private void showAlertWarning(String header, String message) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle("Warning");

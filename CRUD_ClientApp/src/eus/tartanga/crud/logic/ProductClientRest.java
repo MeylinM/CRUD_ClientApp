@@ -28,7 +28,7 @@ import javax.ws.rs.core.GenericType;
  *
  * @author 2dam
  */
-public class ProductClientRest implements ProductManager{
+public class ProductClientRest implements ProductManager {
 
     private WebTarget webTarget;
     private Client client;
@@ -54,13 +54,21 @@ public class ProductClientRest implements ProductManager{
     }
 
     @Override
-    public void edit_XML(Object requestEntity, String id) throws WebApplicationException {
-        webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{id})).request(javax.ws.rs.core.MediaType.APPLICATION_XML).put(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
+    public void edit_XML(Object requestEntity, String id) throws UpdateException {
+        try {
+            webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{id})).request(javax.ws.rs.core.MediaType.APPLICATION_XML).put(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
+        } catch (WebApplicationException e) {
+            throw new UpdateException(e.getMessage());
+        }
     }
 
     @Override
-    public void edit_JSON(Object requestEntity, String id) throws WebApplicationException {
-        webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{id})).request(javax.ws.rs.core.MediaType.APPLICATION_JSON).put(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_JSON));
+    public void edit_JSON(Object requestEntity, String id) throws UpdateException {
+        try {
+            webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{id})).request(javax.ws.rs.core.MediaType.APPLICATION_JSON).put(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_JSON));
+        } catch (WebApplicationException e) {
+            throw new UpdateException(e.getMessage());
+        }
     }
 
     @Override
@@ -78,27 +86,44 @@ public class ProductClientRest implements ProductManager{
     }
 
     @Override
-    public <T> T find_XML(GenericType<T> responseType, String id) throws WebApplicationException {
-        WebTarget resource = webTarget;
-        resource = resource.path(java.text.MessageFormat.format("{0}", new Object[]{id}));
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+    public <T> T find_XML(GenericType<T> responseType, String id) throws ReadException {
+        try {
+            WebTarget resource = webTarget;
+            resource = resource.path(java.text.MessageFormat.format("{0}", new Object[]{id}));
+            return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+        } catch (WebApplicationException e) {
+            throw new ReadException(e.getMessage());
+        }
+
     }
 
     @Override
-    public <T> T find_JSON(GenericType<T> responseType, String id) throws WebApplicationException {
-        WebTarget resource = webTarget;
-        resource = resource.path(java.text.MessageFormat.format("{0}", new Object[]{id}));
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
+    public <T> T find_JSON(GenericType<T> responseType, String id) throws ReadException {
+        try {
+            WebTarget resource = webTarget;
+            resource = resource.path(java.text.MessageFormat.format("{0}", new Object[]{id}));
+            return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
+        } catch (WebApplicationException e) {
+            throw new ReadException(e.getMessage());
+        }
     }
 
     @Override
-    public void create_XML(Object requestEntity) throws WebApplicationException {
-        webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
+    public void create_XML(Object requestEntity) throws AddException {
+        try {
+            webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
+        } catch (WebApplicationException e) {
+            throw new AddException(e.getMessage());
+        }
     }
 
     @Override
-    public void create_JSON(Object requestEntity) throws WebApplicationException {
-        webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_JSON));
+    public void create_JSON(Object requestEntity) throws AddException {
+        try {
+            webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_JSON));
+        } catch (WebApplicationException e) {
+            throw new AddException(e.getMessage());
+        }
     }
 
     @Override
@@ -116,24 +141,36 @@ public class ProductClientRest implements ProductManager{
     }
 
     @Override
-    public <T> T findAll_XML(GenericType<T> responseType) throws WebApplicationException {
-        WebTarget resource = webTarget;
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+    public <T> T findAll_XML(GenericType<T> responseType) throws ReadException {
+        try {
+            WebTarget resource = webTarget;
+            return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+        } catch (WebApplicationException e) {
+            throw new ReadException(e.getMessage());
+        }
     }
 
     @Override
-    public <T> T findAll_JSON(GenericType<T> responseType) throws WebApplicationException {
-        WebTarget resource = webTarget;
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
+    public <T> T findAll_JSON(GenericType<T> responseType) throws ReadException {
+        try {
+            WebTarget resource = webTarget;
+            return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
+        } catch (WebApplicationException e) {
+            throw new ReadException(e.getMessage());
+        }
     }
 
     @Override
-    public void remove(String id) throws WebApplicationException {
-        webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{id})).request().delete();
+    public void remove(String id) throws DeleteException {
+        try {
+            webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{id})).request().delete();
+        } catch (WebApplicationException e) {
+            throw new DeleteException(e.getMessage());
+        }
     }
 
     public void close() {
         client.close();
     }
-    
+
 }

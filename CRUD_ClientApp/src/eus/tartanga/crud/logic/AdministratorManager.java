@@ -21,19 +21,19 @@ import javax.ws.rs.core.Response;
  */
 public interface AdministratorManager {
 
-    public <T> T find(GenericType<T> responseType, String email) throws WebApplicationException;
+    public <T> T find(GenericType<T> responseType, String email) throws ReadException;
 
-    public <T> T signIn_XML(GenericType<T> responseType, String email, String passwd) throws WebApplicationException;
+    public <T> T signIn_XML(GenericType<T> responseType, String email, String passwd) throws SignInException;
 
-    public <T> T signIn_JSON(GenericType<T> responseType, String email, String passwd) throws WebApplicationException;
+    public <T> T signIn_JSON(GenericType<T> responseType, String email, String passwd) throws SignInException;
 
-    public Response create(Object requestEntity) throws WebApplicationException;
+    public Response create(Object requestEntity) throws AddException;
 
-    public Response update(Object requestEntity) throws WebApplicationException;
+    public Response update(Object requestEntity) throws UpdateException;
 
-    public <T> T findAll(GenericType<T> responseType) throws WebApplicationException;
+    public <T> T findAll(GenericType<T> responseType) throws ReadException;
 
-    public Response remove(String email) throws WebApplicationException;
+    public Response remove(String email) throws DeleteException;
 
     public void close();
 }

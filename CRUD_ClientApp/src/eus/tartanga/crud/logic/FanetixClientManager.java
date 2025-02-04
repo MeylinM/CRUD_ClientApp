@@ -19,27 +19,27 @@ import javax.ws.rs.core.GenericType;
  */
 public interface FanetixClientManager {
 
-    public void createClient_XML(Object requestEntity) throws WebApplicationException;
+    public void createClient_XML(Object requestEntity) throws AddException;
 
-    public void createClient_JSON(Object requestEntity) throws WebApplicationException; //SignUp
+    public void createClient_JSON(Object requestEntity) throws AddException; //SignUp
 
-    public void removeClient(String email) throws WebApplicationException;
+    public void removeClient(String email) throws DeleteException;
 
-    public void updateClient_XML(Object requestEntity, String email) throws WebApplicationException;
+    public void updateClient_XML(Object requestEntity, String email) throws UpdateException;
 
-    public void updateClient_JSON(Object requestEntity, String email) throws WebApplicationException;
+    public void updateClient_JSON(Object requestEntity, String email) throws UpdateException;
 
-    public <T> T signIn_XML(GenericType<T> responseType, String email, String passwd) throws WebApplicationException;
+    public <T> T signIn_XML(GenericType<T> responseType, String email, String passwd) throws SignInException;
 
-    public <T> T signIn_JSON(GenericType<T> responseType, String email, String passwd) throws WebApplicationException;
+    public <T> T signIn_JSON(GenericType<T> responseType, String email, String passwd) throws SignInException;
 
-    public <T> T findClient_XML(GenericType<T> responseType, String email) throws WebApplicationException;
+    public <T> T findClient_XML(GenericType<T> responseType, String email) throws ReadException;
 
-    public <T> T findClient_JSON(Class<T> responseType, String email) throws WebApplicationException;
+    public <T> T findClient_JSON(Class<T> responseType, String email) throws ReadException;
 
-    public <T> T findAllClients_XML(Class<T> responseType) throws WebApplicationException;
+    public <T> T findAllClients_XML(Class<T> responseType) throws ReadException;
 
-    public <T> T findAllClients_JSON(Class<T> responseType) throws WebApplicationException;
+    public <T> T findAllClients_JSON(Class<T> responseType) throws ReadException;
 
     public void close();
 }

@@ -116,7 +116,7 @@ public class SignInViewController {
                 controller.initStage(root);
 
             }
-        } catch (WebApplicationException e) {
+        } catch (SignInException e) {
             new Alert(Alert.AlertType.ERROR, "At this moment server is not available. Please try later.", ButtonType.OK).showAndWait();
         } catch (IOException ex) {
             Logger.getLogger(SignInViewController.class.getName()).log(Level.SEVERE, null, ex);

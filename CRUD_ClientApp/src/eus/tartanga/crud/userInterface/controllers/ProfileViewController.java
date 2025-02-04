@@ -164,7 +164,7 @@ public class ProfileViewController {
                 }, email);
                 loadAdminData(admin);
             }
-        } catch (WebApplicationException ex) {
+        } catch (ReadException ex) {
             Logger.getLogger(ProfileViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
