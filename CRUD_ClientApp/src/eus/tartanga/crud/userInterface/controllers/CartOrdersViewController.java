@@ -250,7 +250,7 @@ public class CartOrdersViewController {
                 }
             }
         });
-        //Cantidad del prodcuto
+         //Cantidad del prodcuto
         tbcQuantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         /* -Sub total es una columna con un valor calculado con la cantidad y el precio*/
         tbcSubTotal.setCellValueFactory(cellData -> {
@@ -303,7 +303,7 @@ public class CartOrdersViewController {
                 updateCart(cart);
             });
 
-            //Columna Quantity: Configurar como editable con un Spinner
+             //Columna Quantity: Configurar como editable con un Spinner
             /*
             *donde el valor mínimo será 1 y el máximo será el stock 
             * disponible (Product.getStock()). 
@@ -319,6 +319,7 @@ public class CartOrdersViewController {
                 cart.setQuantity(event.getNewValue()); // Actualiza la cantidad en el modelo de datos
                 updateCart(cart); // Actualiza el carrito, puedes personalizar esta lógica
             });
+
             //"btnBuy". (Botón por defecto)
             btnBuy.setDefaultButton(
                     true);
