@@ -471,12 +471,15 @@ public class ArtistViewController {
             // 1. ELIMINAR CONCIERTOS RELACIONADOS CON EL ARTISTA
             eliminarConciertosAsociados(selectedArtist);
 
-            // 2. ELIMINAR PRODUCTOS RELACIONADOS CON EL ARTISTA
-           // eliminarProductosAsociados(selectedArtist);
+            // 2. Si el artista tiene un ID, eliminarlo usando el ID; si no tiene ID, eliminarlo de la lista directamente
+            if (selectedArtist.getArtistId() != null) {
+                logger.info("Intentando eliminar artista con ID: " + selectedArtist.getArtistId());
+                artistManager.removeArtist(selectedArtist.getArtistId().toString());
+            } else {
+                // Si no tiene ID, eliminamos directamente del listado
+                logger.info("El artista no tiene ID, eliminando de la lista directamente: " + selectedArtist.getName());
+            }
 
-            // 3. ELIMINAR EL ARTISTA
-            logger.info("Intentando eliminar artista: " + selectedArtist.getName() + " con ID: " + selectedArtist.getArtistId());
-            artistManager.removeArtist(selectedArtist.getArtistId().toString());
             artistList.remove(selectedArtist);
             logger.info("Artista eliminado con éxito: " + selectedArtist.getName());
 
@@ -499,61 +502,24 @@ public class ArtistViewController {
 
         // Filtrar los conciertos que contienen al artista seleccionado
         List<Concert> concertsToDelete = concertList.stream()
-                .filter(concert -> {
-                    if (concert.getArtistList() == null) {
-                        logger.warning("El concierto " + concert.getConcertName() + " no tiene artistas asociados.");
-                        return false;
-                    }
-                    return concert.getArtistList().contains(selectedArtist);
-                })
+                .filter(concert -> concert.getArtistList() != null && concert.getArtistList().contains(selectedArtist))
                 .collect(Collectors.toList());
 
-        logger.info("Se encontraron " + concertsToDelete.size() + " conciertos asociados al artista " + selectedArtist.getName());
-
-        // Eliminar los conciertos relacionados con el artista
-        for (Concert concert : concertsToDelete) {
-            logger.info("Intentando eliminar concierto: " + concert.getConcertName() + " con ID: " + concert.getConcertId());
-            concertManager.removeConcert(concert.getConcertId().toString());
-            logger.info("Concierto eliminado con éxito: " + concert.getConcertName());
+        if (!concertsToDelete.isEmpty()) {
+            // Si se encontraron conciertos, mostrar el Alert y evitar la eliminación
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No se puede eliminar el artista");
+            alert.setHeaderText("El artista " + selectedArtist.getName() + " tiene conciertos asociados.");
+            alert.setContentText("Elimine los conciertos asociados antes de borrar el artista.");
+            alert.showAndWait();
+            return; // No eliminar el artista si tiene conciertos asociados
         }
+
+        logger.info("No se encontraron conciertos asociados al artista " + selectedArtist.getName());
     }
 
-// Método para eliminar los productos asociados a un artista
-  /*  private void eliminarProductosAsociados(Artist selectedArtist) {
-        try {
-            // Obtener la lista de todos los productos
-            List<Product> productList = productManager.findAll_XML(new GenericType<List<Product>>() {
-            });
-            
-            if (productList == null) {
-                logger.severe("No se pudo obtener la lista de productos.");
-                return;
-            }
-            
-            // Filtrar los productos que pertenecen al artista seleccionado
-            List<Product> productsToDelete = productList.stream()
-                    .filter(product -> product.getArtist() != null && product.getArtist().equals(selectedArtist))
-                    .collect(Collectors.toList());
-            
-            logger.info("Se encontraron " + productsToDelete.size() + " productos asociados al artista " + selectedArtist.getName());
-            
-            // Eliminar los productos relacionados con el artista
-            for (Product product : productsToDelete) {
-                try {
-                    logger.info("Intentando eliminar producto: " + product.getTitle() + " con ID: " + product.getProductId());
-                    productManager.remove(product.getProductId().toString());
-                    logger.info("Producto eliminado con éxito: " + product.getTitle());
-                } catch (DeleteException ex) {
-                    Logger.getLogger(ArtistViewController.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        } catch (ReadException ex) {
-            Logger.getLogger(ArtistViewController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }*/
-
     private void printItems(ActionEvent event) {
-          try {
+        try {
             JasperReport report = JasperCompileManager.compileReport(getClass().getResourceAsStream("/eus/tartanga/crud/userInterface/report/artistReport.jrxml"));
             JRBeanCollectionDataSource dataItems = new JRBeanCollectionDataSource((Collection<Artist>) this.artistTable.getItems());
             Map<String, Object> parameters = new HashMap<>();
