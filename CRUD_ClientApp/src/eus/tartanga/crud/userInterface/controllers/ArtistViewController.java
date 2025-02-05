@@ -11,13 +11,18 @@ import eus.tartanga.crud.logic.ArtistFactory;
 import eus.tartanga.crud.logic.ArtistManager;
 import eus.tartanga.crud.logic.ConcertFactory;
 import eus.tartanga.crud.logic.ConcertManager;
+import eus.tartanga.crud.logic.FanetixClientFactory;
+import eus.tartanga.crud.logic.FanetixClientManager;
 import eus.tartanga.crud.logic.ProductManager;
 import eus.tartanga.crud.model.Artist;
 import eus.tartanga.crud.model.Concert;
+import eus.tartanga.crud.model.FanetixClient;
+import eus.tartanga.crud.model.FanetixUser;
 import eus.tartanga.crud.model.Product;
 import eus.tartanga.crud.userInterface.factories.ArtistDateEditingCell;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -55,6 +60,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -121,9 +127,12 @@ public class ArtistViewController {
 
     @FXML
     private Button btnInfo;
-    
+
     @FXML
     private Button shopButton;
+
+    @FXML
+    private Button concertsButton;
 
     @FXML
     private DatePicker dpFrom;
@@ -140,6 +149,8 @@ public class ArtistViewController {
     private ArtistManager artistManager;
     private ConcertManager concertManager;
     private ProductManager productManager;
+    private FanetixClientManager clientManager;
+    FanetixClient client;
 
     public void setStage(Stage stage) {
         this.stage = stage;
@@ -153,20 +164,18 @@ public class ArtistViewController {
             stage.setTitle("Artist");
             //Añadir a la ventana el ícono “FanetixLogo.png”.
             stage.getIcons().add(new Image("eus/tartanga/crud/app/resources/logo.png"));
-
             stage.setResizable(false);
             stage.show();
 
             artistManager = ArtistFactory.getArtistManager();
             concertManager = ConcertFactory.getConcertManager();
+            clientManager = FanetixClientFactory.getFanetixClientManager();
 
-            // concertList = FXCollections.observableArrayList(concertManager.findAllConcerts_XML(new GenericType<List<Concert>>(){
-            //   }));
-            artistTable.setEditable(true);
-            debutColumn.setEditable(true);
+            //Conseguir la informacíon del usuario loggeado
+            FanetixUser user = MenuBarViewController.getLoggedUser();
+            client = getFanetixClient(user.getEmail());
 
-            filterArtists();
-
+            //filterArtists();
             // Configurar columnas de tabla
             nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
             companyColumn.setCellValueFactory(new PropertyValueFactory<>("company"));
@@ -174,100 +183,126 @@ public class ArtistViewController {
             debutColumn.setCellValueFactory(new PropertyValueFactory<>("debut"));
             artistColumn.setCellValueFactory(new PropertyValueFactory<>("image"));
 
-            // Hacer la columna 'debutColumn' editable
-            final Callback<TableColumn<Artist, Date>, TableCell<Artist, Date>> dateCell
-                    = (TableColumn<Artist, Date> param) -> new ArtistDateEditingCell();
-            debutColumn.setCellFactory(dateCell);
-            debutColumn.setOnEditCommit(event -> {
-                Artist artist = event.getRowValue();
-                artist.setDebut(event.getNewValue());
-                try {
-                    artistManager.updateArtist(artist, String.valueOf(artist.getArtistId()));
-                } catch (UpdateException ex) {
-                    Logger.getLogger(ArtistViewController.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            });
-
-            // Hacer la columna 'nameColumn' editable
-            nameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-            nameColumn.setOnEditCommit(event -> {
-                Artist artist = event.getRowValue();
-                String originalName = artist.getName();
-
-                try {
-                    artist.setName(event.getNewValue());
-
-                    if (artist.getName().isEmpty()) {
-                        throw new TextEmptyException("El campo de nombre no puede estar vacío.");
-                    } else if (artist.getName().length() > 20) {
-                        throw new MaxCharacterException("El nombre no puede tener más de 20 caracteres.");
+            //Mostrar la ventana de manera diferente en caso de ser un Cliente
+            if (client != null) {
+                btnAddArtist.setVisible(false);
+                btnDeleteArtist.setVisible(false);
+                // Aplicar el formateo de la fecha para clientes
+                final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                debutColumn.setCellFactory(column -> new TableCell<Artist, Date>() {
+                    @Override
+                    protected void updateItem(Date date, boolean empty) {
+                        super.updateItem(date, empty);
+                        if (empty || date == null) {
+                            setText(null);
+                        } else {
+                            setText(dateFormat.format(date)); // Formatear la fecha correctamente
+                        }
                     }
+                });
+            } else {
+                artistTable.setEditable(true);
+                debutColumn.setEditable(true);
 
-                    updateArtist(artist);
-                } catch (TextEmptyException | MaxCharacterException e) {
-                    logger.log(Level.SEVERE, null, e);
-                    artist.setName(originalName);
-                    artistTable.refresh();
+                //En caso de ser un administrador mostrar de manera diferente
+                // Hacer la columna 'debutColumn' editable
+                final Callback<TableColumn<Artist, Date>, TableCell<Artist, Date>> dateCell
+                        = (TableColumn<Artist, Date> param) -> new ArtistDateEditingCell();
+                debutColumn.setCellFactory(dateCell);
+                debutColumn.setOnEditCommit(event -> {
 
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Error");
-                    alert.setHeaderText("Error de validación");
-                    alert.setContentText(e.getMessage());
-                    alert.showAndWait();
-                }
-            });
+                    Artist artist = event.getRowValue();
+                    artist.setDebut(event.getNewValue());
 
-            // Hacer la columna 'companyColumn' editable
-            companyColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-            companyColumn.setOnEditCommit(event -> {
-                Artist artist = event.getRowValue();
-                String originalCompany = artist.getCompany();
-                try {
+                    try {
+                        artistManager.updateArtist(artist, String.valueOf(artist.getArtistId()));
+                    } catch (UpdateException ex) {
+                        Logger.getLogger(ArtistViewController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                });
+
+                // Hacer la columna 'nameColumn' editable
+                nameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+                nameColumn.setOnEditCommit(event -> {
+                    Artist artist = event.getRowValue();
+                    String originalName = artist.getName();
+
+                    try {
+                        artist.setName(event.getNewValue());
+
+                        if (artist.getName().isEmpty()) {
+                            throw new TextEmptyException("El campo de nombre no puede estar vacío.");
+                        } else if (artist.getName().length() > 20) {
+                            throw new MaxCharacterException("El nombre no puede tener más de 20 caracteres.");
+                        }
+
+                        updateArtist(artist);
+                    } catch (TextEmptyException | MaxCharacterException e) {
+                        logger.log(Level.SEVERE, null, e);
+                        artist.setName(originalName);
+                        artistTable.refresh();
+
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Error");
+                        alert.setHeaderText("Error de validación");
+                        alert.setContentText(e.getMessage());
+                        alert.showAndWait();
+                    }
+                });
+
+                // Hacer la columna 'companyColumn' editable
+                companyColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+                companyColumn.setOnEditCommit(event -> {
+                    Artist artist = event.getRowValue();
+                    String originalCompany = artist.getCompany();
+                    try {
+                        artist.setCompany(event.getNewValue());
+                        if (artist.getCompany() == null || artist.getCompany().isEmpty()) {
+                            throw new TextEmptyException("El campo de compañia no puede estar vacío");
+                        } else if (artist.getCompany().length() > 20) {
+                            throw new MaxCharacterException("La compañia no puede tener más de 20 caracteres");
+                        }
+                        updateArtist(artist);
+                    } catch (TextEmptyException | MaxCharacterException e) {
+                        Logger.getLogger(ArtistViewController.class.getName()).log(Level.SEVERE, null, e);
+                        artist.setCompany(originalCompany);
+                        artistTable.refresh();
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Error");
+                        alert.setHeaderText("Error de validación");
+                        alert.setContentText(e.getMessage());
+                        alert.showAndWait();
+                    }
                     artist.setCompany(event.getNewValue());
-                    if (artist.getCompany() == null || artist.getCompany().isEmpty()) {
-                        throw new TextEmptyException("El campo de compañia no puede estar vacío");
-                    } else if (artist.getCompany().length() > 20) {
-                        throw new MaxCharacterException("La compañia no puede tener más de 20 caracteres");
-                    }
-                    updateArtist(artist);
-                } catch (TextEmptyException | MaxCharacterException e) {
-                    Logger.getLogger(ArtistViewController.class.getName()).log(Level.SEVERE, null, e);
-                    artist.setCompany(originalCompany);
-                    artistTable.refresh();
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Error");
-                    alert.setHeaderText("Error de validación");
-                    alert.setContentText(e.getMessage());
-                    alert.showAndWait();
-                }
-                artist.setCompany(event.getNewValue());
-            });
+                });
 
-            // Hacer la columna 'companyColumn' editable
-            lastAlbumColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-            lastAlbumColumn.setOnEditCommit(event -> {
-                Artist artist = event.getRowValue();
-                String originalAlbum = artist.getLastAlbum();
-                try {
-                    artist.setLastAlbum(event.getNewValue());
-                    if (artist.getLastAlbum() == null || artist.getLastAlbum().isEmpty()) {
-                        throw new TextEmptyException("El campo de Last Album no puede estar vacío");
-                    } else if (artist.getLastAlbum().length() > 50) {
-                        throw new MaxCharacterException("La Last Album no puede tener más de 50 caracteres");
+                // Hacer la columna 'companyColumn' editable
+                lastAlbumColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+                lastAlbumColumn.setOnEditCommit(event -> {
+                    Artist artist = event.getRowValue();
+                    String originalAlbum = artist.getLastAlbum();
+                    try {
+                        artist.setLastAlbum(event.getNewValue());
+                        if (artist.getLastAlbum() == null || artist.getLastAlbum().isEmpty()) {
+                            throw new TextEmptyException("El campo de Last Album no puede estar vacío");
+                        } else if (artist.getLastAlbum().length() > 50) {
+                            throw new MaxCharacterException("La Last Album no puede tener más de 50 caracteres");
+                        }
+                        updateArtist(artist);
+                    } catch (TextEmptyException | MaxCharacterException e) {
+                        Logger.getLogger(ArtistViewController.class.getName()).log(Level.SEVERE, null, e);
+                        artist.setLastAlbum(originalAlbum);
+                        artistTable.refresh();
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Error");
+                        alert.setHeaderText("Error de validación");
+                        alert.setContentText(e.getMessage());
+                        alert.showAndWait();
                     }
-                    updateArtist(artist);
-                } catch (TextEmptyException | MaxCharacterException e) {
-                    Logger.getLogger(ArtistViewController.class.getName()).log(Level.SEVERE, null, e);
-                    artist.setLastAlbum(originalAlbum);
-                    artistTable.refresh();
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Error");
-                    alert.setHeaderText("Error de validación");
-                    alert.setContentText(e.getMessage());
-                    alert.showAndWait();
-                }
-            });
-
+                });
+                btnAddArtist.setOnAction(this::handleAddArtist);
+                btnDeleteArtist.setOnAction(this::handleDeleteArtist);
+            }
             // Configuración para la columna de imagen
             artistColumn.setCellFactory(column -> new TableCell<Artist, byte[]>() {
                 private final ImageView imageView = new ImageView();
@@ -299,10 +334,10 @@ public class ArtistViewController {
             });
 
             artistTable.setItems(artistList);
-            btnAddArtist.setOnAction(this::handleAddArtist);
-            btnDeleteArtist.setOnAction(this::handleDeleteArtist);
             btnInfo.setOnAction(this::handleInfoButton);
             shopButton.setOnAction(this::handleGoToShop);
+            concertsButton.setOnAction(this::handleGoToConcert);
+
             //Inicializar los menu contextuales
             createContextMenu();
             // Mostrará el Menú contextual con las opciones mIAddToCart, 
@@ -334,13 +369,26 @@ public class ArtistViewController {
             return FXCollections.observableArrayList();
         }
     }
-    
+
     private void handleGoToShop(ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ProductView.fxml"));
             Parent root = (Parent) loader.load();
             //Scene scene = new Scene(root);
             ProductViewController controller = ((ProductViewController) loader.getController());
+            controller.setStage(stage);
+            controller.initStage(root);
+        } catch (IOException ex) {
+            Logger.getLogger(ArtistViewController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void handleGoToConcert(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ConcertView.fxml"));
+            Parent root = (Parent) loader.load();
+            //Scene scene = new Scene(root);
+            ConcertViewController controller = ((ConcertViewController) loader.getController());
             controller.setStage(stage);
             controller.initStage(root);
         } catch (IOException ex) {
@@ -516,26 +564,31 @@ public class ArtistViewController {
 // Método para eliminar los conciertos asociados a un artista
     private boolean eliminarConciertosAsociados(Artist selectedArtist) {
         // Obtener la lista de todos los conciertos
-        List<Concert> concertList = concertManager.findAllConcerts_XML(new GenericType<List<Concert>>() {
-        });
+        List<Concert> concertList;
+        try {
+            concertList = concertManager.findAllConcerts_XML(new GenericType<List<Concert>>() {
+            });
 
-        if (concertList == null) {
-            logger.severe("No se pudo obtener la lista de conciertos.");
-            return false;
+            if (concertList == null) {
+                logger.severe("No se pudo obtener la lista de conciertos.");
+                return false;
+            }
+
+            // Filtrar los conciertos que contienen al artista seleccionado
+            List<Concert> concertsToDelete = concertList.stream()
+                    .filter(concert -> concert.getArtistList() != null && concert.getArtistList().contains(selectedArtist))
+                    .collect(Collectors.toList());
+
+            if (!concertsToDelete.isEmpty()) {
+                // Si se encontraron conciertos asociados, regresamos 'true' para indicar que no se debe eliminar el artista
+                return true;
+            }
+
+            // Si no se encontraron conciertos, regresamos 'false'
+            logger.info("No se encontraron conciertos asociados al artista " + selectedArtist.getName());
+        } catch (ReadException ex) {
+            Logger.getLogger(ArtistViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        // Filtrar los conciertos que contienen al artista seleccionado
-        List<Concert> concertsToDelete = concertList.stream()
-                .filter(concert -> concert.getArtistList() != null && concert.getArtistList().contains(selectedArtist))
-                .collect(Collectors.toList());
-
-        if (!concertsToDelete.isEmpty()) {
-            // Si se encontraron conciertos asociados, regresamos 'true' para indicar que no se debe eliminar el artista
-            return true;
-        }
-
-        // Si no se encontraron conciertos, regresamos 'false'
-        logger.info("No se encontraron conciertos asociados al artista " + selectedArtist.getName());
         return false;
     }
 
@@ -583,6 +636,17 @@ public class ArtistViewController {
         SortedList<Artist> sortedData = new SortedList<>(filteredArtist);
         sortedData.comparatorProperty().bind(artistTable.comparatorProperty());
         artistTable.setItems(sortedData);
+    }
+
+    private FanetixClient getFanetixClient(String email) {
+        FanetixClient client = null;
+        try {
+            client = clientManager.findClient_XML(new GenericType<FanetixClient>() {
+            }, email);
+        } catch (ReadException ex) {
+            Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return client;
     }
 
     private void configureRowStyling() {
