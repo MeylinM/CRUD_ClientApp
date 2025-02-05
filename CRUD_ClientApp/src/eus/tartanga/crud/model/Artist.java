@@ -126,7 +126,7 @@ public class Artist implements Serializable {
 
     @Override
     public String toString() {
-        return "eus.tartanga.crud.entities.Artist[ id=" + artistId + " ]";
+        return name;
     }
 
 }

@@ -17,7 +17,7 @@ import java.util.Date;
 
 
 @XmlRootElement
-public class Product implements Serializable {
+public class Product implements Serializable, Cloneable {
 
     private static final long serialVersionUID = 1L;
    
@@ -30,16 +30,16 @@ public class Product implements Serializable {
     private String description;
     private Artist artist;
     private Date releaseDate;
-    private float price;
-    private int stock;
+    private String price;
+    private String stock;
     private byte[] image;
     
     public Product() {
         this.title = "Tittle of the product";
         this.description = "Description of the product";
         this.releaseDate = new Date();
-        this.price = 0;
-        this.stock = 1;
+        this.price = "0";
+        this.stock = "1";
     }
     
     public Integer getProductId() {
@@ -84,19 +84,19 @@ public class Product implements Serializable {
         this.releaseDate = releaseDate;
     }
 
-    public float getPrice() {
+    public String getPrice() {
         return price;
     }
 
-    public void setPrice(float price) {
+    public void setPrice(String price) {
         this.price = price;
     }
 
-    public int getStock() {
+    public String getStock() {
         return stock;
     }
 
-    public void setStock(int stock) {
+    public void setStock(String stock) {
         this.stock = stock;
     }
 
@@ -126,6 +126,10 @@ public class Product implements Serializable {
             return false;
         }
         return true;
+    }
+    
+    public Product clone() throws CloneNotSupportedException{
+        return (Product) super.clone();
     }
 
     @Override

@@ -17,6 +17,7 @@ import eus.tartanga.crud.model.Concert;
 import eus.tartanga.crud.model.Product;
 import eus.tartanga.crud.userInterface.factories.ArtistDateEditingCell;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -120,6 +121,9 @@ public class ArtistViewController {
 
     @FXML
     private Button btnInfo;
+    
+    @FXML
+    private Button shopButton;
 
     @FXML
     private DatePicker dpFrom;
@@ -147,6 +151,9 @@ public class ArtistViewController {
             Scene scene = new Scene(root);
             stage.setScene(scene);
             stage.setTitle("Artist");
+            //Añadir a la ventana el ícono “FanetixLogo.png”.
+            stage.getIcons().add(new Image("eus/tartanga/crud/app/resources/logo.png"));
+
             stage.setResizable(false);
             stage.show();
 
@@ -295,6 +302,7 @@ public class ArtistViewController {
             btnAddArtist.setOnAction(this::handleAddArtist);
             btnDeleteArtist.setOnAction(this::handleDeleteArtist);
             btnInfo.setOnAction(this::handleInfoButton);
+            shopButton.setOnAction(this::handleGoToShop);
             //Inicializar los menu contextuales
             createContextMenu();
             // Mostrará el Menú contextual con las opciones mIAddToCart, 
@@ -324,6 +332,19 @@ public class ArtistViewController {
         } catch (ReadException e) {
             logger.severe("Error al obtener artistas: " + e.getMessage());
             return FXCollections.observableArrayList();
+        }
+    }
+    
+    private void handleGoToShop(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ProductView.fxml"));
+            Parent root = (Parent) loader.load();
+            //Scene scene = new Scene(root);
+            ProductViewController controller = ((ProductViewController) loader.getController());
+            controller.setStage(stage);
+            controller.initStage(root);
+        } catch (IOException ex) {
+            Logger.getLogger(ArtistViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -445,8 +466,8 @@ public class ArtistViewController {
             FXMLLoader loader
                     = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/HelpArtistView.fxml"));
             Parent root = (Parent) loader.load();
-            HelpController helpController
-                    = ((HelpController) loader.getController());
+            HelpArtistController helpController
+                    = ((HelpArtistController) loader.getController());
             //Initializes and shows help stage
             helpController.initAndShowStage(root);
         } catch (Exception ex) {

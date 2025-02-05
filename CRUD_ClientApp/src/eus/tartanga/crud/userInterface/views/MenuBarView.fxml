@@ -22,15 +22,19 @@
                 <MenuItem fx:id="itemLogOut" text="LogOut" onAction = "#logOut" />
             </items>
         </Menu>
-        <Menu fx:id="itemArtist" text="Artist" onAction ="#openArtist" />
-        <Menu fx:id="itemMyCart" text="MyCart" onAction ="#openMyCart" />
-        <Menu fx:id="itemHelp" text="Help">
+        <Menu fx:id="menuArtist" text="Artist">
             <items>
-                <MenuItem fx:id="itemHelpArtist" text="Help Artist" onAction ="#showHelpArtist"/>
-                <MenuItem fx:id="itemHelpConcert" text="Help Concert" onAction ="#showHelpConcert" />
-                <MenuItem fx:id="itemHelpProduct" text="Help Product" onAction ="#showHelpProduct" />
-                <MenuItem fx:id="itemHelpCart" text="Help Cart" onAction ="#showHelpCart"/>
-                <MenuItem fx:id="itemHelpOrder" text="Help Order" onAction ="#showHelpOrder"/>
+                <MenuItem fx:id="itemArtist" onAction="#openArtist"/>
+            </items>
+        </Menu>
+        <Menu fx:id="menuMyCart" text="MyCart">
+            <items>
+                <MenuItem fx:id="itemMyCart" onAction ="#openMyCart"/>
+            </items>
+        </Menu>
+        <Menu fx:id="menuHelp" text="Help">
+            <items>
+                <MenuItem onAction ="#showHelp"/>
             </items>
         </Menu>
     </menus>

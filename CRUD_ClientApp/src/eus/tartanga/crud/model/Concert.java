@@ -6,43 +6,34 @@
 package eus.tartanga.crud.model;
 
 import java.io.Serializable;
-import java.sql.Time;
 import java.util.Date;
 import java.util.List;
-import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
  * @author Irati
  */
-
-
 @XmlRootElement
 public class Concert implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
-   
     private Integer concertId;
-
     private byte[] billboard;
-
-    @NotNull(message = "concertName.required")
     private String concertName;
-
-   
     private List<Artist> artistList;
-
     private String location;
-
     private String city;
-
-   
     private Date concertDate;
-
-
     private Date concertTime;
+
+    public Concert() {
+        this.concertName = "Name of the concert or tour";
+        this.location = "Concert location";
+        this.city = "Concert location city";
+        this.concertDate = new Date();
+        this.concertTime = new Date();
+    }
 
     public Integer getConcertId() {
         return concertId;
@@ -132,4 +123,5 @@ public class Concert implements Serializable {
     public String toString() {
         return "eus.tartanga.crud.entities.Concert[ id=" + concertId + " ]";
     }
+
 }

@@ -12,6 +12,7 @@ import eus.tartanga.crud.exception.ReadException;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
+import javax.xml.ws.WebServiceException;
 
 /**
  *
@@ -27,9 +28,9 @@ import javax.ws.rs.core.GenericType;
 
     public <T> T findAllNotBoughtProducts_JSON(GenericType<T> responseType) throws ReadException;
 
-    public <T> T findCart_XML(Class<T> responseType, String email, String productId) throws ReadException;
+    public <T> T findCart_XML(GenericType<T> responseType, String email, String productId) throws ReadException;
 
-    public <T> T findCart_JSON(Class<T> responseType, String email, String productId) throws ReadException;
+    public <T> T findCart_JSON(GenericType<T> responseType, String email, String productId) throws ReadException;
 
     public <T> T findAllBoughtProducts_XML(GenericType<T> responseType) throws ReadException;
 
@@ -43,9 +44,9 @@ import javax.ws.rs.core.GenericType;
 
     public void updateCart_JSON(Object requestEntity, String email, String productId) throws UpdateException;
 
-    public <T> T findAllCartProducts_XML(Class<T> responseType) throws ReadException;
+    public <T> T findAllCartProducts_XML(GenericType<T> responseType) throws WebServiceException;
 
-    public <T> T findAllCartProducts_JSON(Class<T> responseType) throws ReadException;
+    public <T> T findAllCartProducts_JSON(GenericType<T> responseType) throws WebServiceException;
 
     public <T> T findBetweenDate_XML(Class<T> responseType, String startDate, String endDate) throws ReadException;
 

@@ -15,14 +15,11 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 /**
- * Controller class for help window . 
- * It shows a help page that explains how to use the user's data management window.
- * The view is defined in Help.fmxl file and the help page is help.html.
  *
- * @author javi
+ * @author 2dam
  */
-public class HelpController {
-    /**
+public class HelpGeneralController {
+      /**
      * The control that shows the help page.
      */
     @FXML
@@ -48,17 +45,11 @@ public class HelpController {
      * event.
      * @param event  The window event 
      */
-    /*private void handleWindowShowing(WindowEvent event){
-        WebEngine webEngine = webView.getEngine();
-        //Load help page.eus.tartanga.crud.userInterface.html
-        webEngine.load(getClass()
-                .getResource("/eus/tartanga/crud/userInterface/html/helpShopAdmin.html").toExternalForm());
-    }*/
     
     private void handleWindowShowing(WindowEvent event){
         WebEngine webEngine = webView.getEngine();
         //Load help page.eus.tartanga.crud.userInterface.html
         webEngine.load(getClass()
-                .getResource("/eus/tartanga/crud/userInterface/html/helpArtistAdmin.html").toExternalForm());
+                .getResource("/eus/tartanga/crud/userInterface/html/helpGeneral.html").toExternalForm());
     }
 }

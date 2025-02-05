@@ -1,0 +1,58 @@
+/* ------------------ Estilos Generales ------------------ */
+* {
+    -fx-light-blue: #d9edf4;
+    -fx-pink: #fdd3e1;
+    -fx-pink-darker:#ffb6c1;
+    -fx-yellow: #f9eccf;
+    -fx-yellow-darker: #ffde59;
+
+}
+
+/* ------------------ Estilos de Fondo ------------------ */
+.background-pane {
+    -fx-background-image: url("../../app/resources/fondo.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: cover;
+    -fx-background-position: center; 
+}
+
+/* ------------------ Estilos para Botones ------------------ */
+.yellow-button {
+    -fx-background-color: -fx-yellow;
+    -fx-padding: 5px;
+    -fx-border-radius: 3px;
+}
+
+.yellow-button:hover {
+    -fx-background-color: -fx-pink;
+}
+/*-------------------- Estilo Text Field Default -------------------*/
+.text-field{
+    -fx-border-color: -fx-pink;
+}
+
+/*-------------------- Estilo Toggle Buttom ------------------------*/
+.toggle-button {
+    -fx-background-color: -fx-light-blue;
+    -fx-border-color: -fx-pink;
+}
+/*--------------------- Estilo Hyperlink ----------------------------*/
+/* Estilo para el Hyperlink en estado normal */
+.hyperlink {
+    -fx-text-fill: -fx-yellow-darker;
+}
+
+/* Estilo cuando el Hyperlink es hover (cuando el ratón pasa por encima) */
+.hyperlink:hover {
+    -fx-text-fill: -fx-pink;
+}
+
+/* Estilo cuando el Hyperlink ha sido visitado */
+.hyperlink:visited {
+    -fx-text-fill: -fx-pink-darker; 
+}
+
+/* Estilo cuando el Hyperlink tiene el foco */
+.hyperlink:focused {
+    -fx-text-fill: -fx-pink;
+}

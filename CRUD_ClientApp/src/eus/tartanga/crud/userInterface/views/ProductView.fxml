@@ -16,7 +16,7 @@
 
 <VBox prefHeight="768.0" prefWidth="1366.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eus.tartanga.crud.userInterface.controllers.ProductViewController">
     <fx:include fx:id="menuBar" source="MenuBarView.fxml" />
-    <AnchorPane fx:id="productAnchorPane" prefHeight="728.0" prefWidth="1366.0" styleClass="background-pane" stylesheets="@../css/styles.css">
+    <AnchorPane fx:id="productAnchorPane" prefHeight="742.0" prefWidth="1366.0" styleClass="background-pane" stylesheets="@../css/styles.css">
         <children>
             <VBox alignment="CENTER" fillWidth="false" layoutX="45.0" layoutY="148.0" prefHeight="557.0" prefWidth="1278.0" spacing="10.0">
                 <children>
@@ -49,10 +49,10 @@
                             <TableColumn fx:id="imageColumn" prefWidth="138" style="-fx-alignment: center;" text="Image" />
                             <TableColumn fx:id="titleColumn" prefWidth="200.0" style="-fx-alignment: center-left;" text="Title" />
                             <TableColumn fx:id="artistColumn" prefWidth="200.0" style="-fx-alignment: center-left;" text="Artist" />
-                            <TableColumn fx:id="descriptionColumn" prefWidth="390.0" style="-fx-alignment: center-left;" text="Description" />
-                            <TableColumn fx:id="releaseDateColumn" prefWidth="153" style="-fx-alignment: center;" text="Release Date" />
+                            <TableColumn fx:id="descriptionColumn" prefWidth="385.0" style="-fx-alignment: center-left;" text="Description" />
+                            <TableColumn fx:id="releaseDateColumn" prefWidth="145.0" style="-fx-alignment: center;" text="Release Date" />
                             <TableColumn fx:id="stockColumn" prefWidth="83" style="-fx-alignment: center;" text="Stock" />
-                            <TableColumn fx:id="priceColumn" prefWidth="108.7999267578125" style="-fx-alignment: center-right;" text="Price (€)" />
+                            <TableColumn fx:id="priceColumn" prefWidth="105.0" style="-fx-alignment: center-right;" text="Price (€)" />
                         </columns>
                     </TableView>
                     <HBox prefHeight="30.0" prefWidth="1255.0" spacing="373.0">

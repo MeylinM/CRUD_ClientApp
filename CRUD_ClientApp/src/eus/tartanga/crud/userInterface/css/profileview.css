@@ -24,7 +24,7 @@
     -fx-border-color: #d8bfe3;
     -fx-border-width: 2;
     -fx-padding: 15;
-    -fx-spacing: 10;
+    -fx-spacing: 3;
     -fx-alignment: center;
 }
 
@@ -45,16 +45,17 @@
 /* Botón de cambio de contraseña */
 .button-change {
     -fx-font-size: 16px;
-    -fx-background-color: #f5c48d;
+    -fx-background-color: #fff9e5;
     -fx-background-radius: 20px;
     -fx-border-color: #f4b56c;
     -fx-border-width: 2;
     -fx-border-radius: 20px;
     -fx-text-fill: #444;
     -fx-padding: 5 15;
+    -fx-font-weight: bold; 
 }
 .button-change:hover {
-    -fx-background-color: #f4b56c;
+    -fx-background-color: #fef3c7;
     -fx-cursor: hand;
 }
 
@@ -66,3 +67,32 @@
     -fx-font-size: 16px;
     -fx-text-fill: #5a5a5a;
 }
+/* Estilos específicos */
+#fullNameField, #phoneField, #postalCodeField, #oldPasswd, #dateField{
+    -fx-background-color: #fddde6;
+    -fx-border-color: #f5a8b8;
+    -fx-border-width: 2;
+    -fx-border-radius: 5px;
+    -fx-padding: 5;
+    -fx-text-fill: #333;
+}
+
+#emailField, #cityField,#newPasswd {
+    -fx-background-color: #e8f0fb;
+    -fx-border-color: #b3cde7;
+    -fx-border-width: 2;
+    -fx-border-radius: 5px;
+    -fx-padding: 5;
+    -fx-text-fill: #333;
+}
+
+#passwordField, #streetField, #repeatPasswd {
+    -fx-background-color: #fff9e5;
+    -fx-border-color: #f2e2aa;
+    -fx-border-width: 2;
+    -fx-border-radius: 5px;
+    -fx-padding: 5;
+    -fx-text-fill: #333;
+}
+
+
