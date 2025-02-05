@@ -76,7 +76,6 @@ public class CartClientRest implements CartManager {
     }
 
     public <T> T findCart_JSON(GenericType<T> responseType, String email, String productId) throws ReadException {
-        ProductFinalFixes
         WebTarget resource = webTarget;
         resource = resource.path(java.text.MessageFormat.format("{0}/{1}", new Object[]{email, productId}));
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
@@ -118,14 +117,12 @@ public class CartClientRest implements CartManager {
 
     @Override
     public <T> T findAllCartProducts_XML(GenericType<T> responseType) throws WebServiceException {
-        ProductFinalFixes
         WebTarget resource = webTarget;
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
     }
 
     @Override
     public <T> T findAllCartProducts_JSON(GenericType<T> responseType) throws WebServiceException {
-        ProductFinalFixes
         WebTarget resource = webTarget;
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
     }
