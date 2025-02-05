@@ -29,6 +29,7 @@ import eus.tartanga.crud.model.FanetixUser;
 import eus.tartanga.crud.model.Product;
 import eus.tartanga.crud.userInterface.factories.ProductDateEditingCell;
 import java.io.ByteArrayInputStream;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -46,6 +47,7 @@ import javafx.scene.image.ImageView;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -189,8 +191,6 @@ public class ProductViewController {
             cartManager = CartFactory.getCartManager();
             clientManager = FanetixClientFactory.getFanetixClientManager();
 
-            
-
             //Conseguir la informacíon del usuario loggeado
             FanetixUser user = MenuBarViewController.getLoggedUser();
             client = getFanetixClient(user.getEmail());
@@ -215,6 +215,19 @@ public class ProductViewController {
                             setText(null);
                         } else {
                             setText(price + " €");
+                        }
+                    }
+                });
+                releaseDateColumn.setCellFactory(column -> new TableCell<Product, Date>() {
+                    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+
+                    @Override
+                    protected void updateItem(Date item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty || item == null) {
+                            setText(null);
+                        } else {
+                            setText(dateFormat.format(item));
                         }
                     }
                 });
@@ -345,8 +358,8 @@ public class ProductViewController {
                 artistColumn.setOnEditCommit(event -> {
                     try {
                         Product product = event.getRowValue();
-                        Product productCopy = product.clone(); 
-                        productCopy.setArtist(event.getNewValue()); 
+                        Product productCopy = product.clone();
+                        productCopy.setArtist(event.getNewValue());
                         updateProduct(productCopy);
                         product.setArtist(event.getNewValue());
                     } catch (Exception e) {

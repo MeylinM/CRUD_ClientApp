@@ -563,6 +563,7 @@ public class ArtistViewController {
 
 // Método para eliminar los conciertos asociados a un artista
     private boolean eliminarConciertosAsociados(Artist selectedArtist) {
+
         // Obtener la lista de todos los conciertos
         List<Concert> concertList;
         try {
@@ -586,6 +587,7 @@ public class ArtistViewController {
 
             // Si no se encontraron conciertos, regresamos 'false'
             logger.info("No se encontraron conciertos asociados al artista " + selectedArtist.getName());
+
         } catch (ReadException ex) {
             Logger.getLogger(ArtistViewController.class.getName()).log(Level.SEVERE, null, ex);
         }

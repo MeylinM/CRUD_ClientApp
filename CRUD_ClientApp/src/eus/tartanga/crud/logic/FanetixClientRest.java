@@ -149,6 +149,10 @@ public class FanetixClientRest implements FanetixClientManager {
         }
     }
 
+    /**
+     *
+     */
+    @Override
     public void close() {
         client.close();
     }

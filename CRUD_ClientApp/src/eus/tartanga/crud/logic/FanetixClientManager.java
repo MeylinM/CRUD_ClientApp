@@ -5,10 +5,10 @@
  */
 package eus.tartanga.crud.logic;
 
-import eus.tartanga.crud.exception.SignInException;
 import eus.tartanga.crud.exception.AddException;
 import eus.tartanga.crud.exception.DeleteException;
 import eus.tartanga.crud.exception.ReadException;
+import eus.tartanga.crud.exception.SignInException;
 import eus.tartanga.crud.exception.UpdateException;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.WebApplicationException;
@@ -40,6 +40,8 @@ public interface FanetixClientManager {
     public <T> T findAllClients_XML(Class<T> responseType) throws ReadException;
 
     public <T> T findAllClients_JSON(Class<T> responseType) throws ReadException;
+    
+    //public void resetPasswd(String email); HAY QUE HACER LA QUERY EN EL SERVIDOR Y TODO EL ROLLO
 
     public void close();
 }

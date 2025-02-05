@@ -85,7 +85,7 @@
                                 <Insets bottom="10.0" />
                             </padding>
                             <graphic>
-                                <ImageView fitHeight="51.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                                <ImageView fx:id="ivEyeIcon" fitHeight="51.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
                                     <image>
                                         <Image url="@../../app/resources/ShowPasswd.png" />
                                     </image>

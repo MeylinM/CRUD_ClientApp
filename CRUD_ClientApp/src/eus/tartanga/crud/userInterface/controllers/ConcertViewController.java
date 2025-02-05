@@ -491,16 +491,16 @@ public class ConcertViewController {
 
     private void printItems(ActionEvent event) {
         try {
+            //Se abrirá una ventana donde se puedan imprimir los datos del informe de la tabla.
             JasperReport report = JasperCompileManager.compileReport(getClass().getResourceAsStream("/eus/tartanga/crud/userInterface/report/concertReport.jrxml"));
-            JRBeanCollectionDataSource dataItems
-                    = new JRBeanCollectionDataSource((Collection<Concert>) this.concertTable.getItems());
+            JRBeanCollectionDataSource dataItems = new JRBeanCollectionDataSource((Collection<Concert>) this.concertTable.getItems());
             Map<String, Object> parameters = new HashMap<>();
             JasperPrint jasperPrint = JasperFillManager.fillReport(report, parameters, dataItems);
-            JasperViewer jasperViewer = new JasperViewer(jasperPrint);
+            JasperViewer jasperViewer = new JasperViewer(jasperPrint, false);
             jasperViewer.setVisible(true);
         } catch (JRException ex) {
-            Logger.getLogger(ConcertViewController.class.getName()).log(Level.SEVERE, null, ex);
-            showAlert("Ha ocurrido un error al imprrimir los conciertos");
+            logger.severe("Error printing report: {0}" + ex.getMessage());
+
         }
 
     }
