@@ -1,25 +1,52 @@
 package eus.tartanga.crud.userInterface.factories;
 
 import eus.tartanga.crud.model.Cart;
-import eus.tartanga.crud.model.Product;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TableCell;
 
+/**
+ * A custom TableCell that allows for editing the quantity of an item in a Cart
+ * using a Spinner. This class enables users to select a value for an item in
+ * the cart through a spinner instead of manually typing the value. The Spinner
+ * allows values between 1 and a maximum value based on the stock of the
+ * product. The selected value is displayed once the editing is finished.
+ *
+ * This cell also ensures that the Spinner reflects the current value of the
+ * item and updates it in real-time when the user makes changes.
+ *
+ * The Spinner value is limited by the stock of the product associated with the
+ * item.
+ *
+ * @author Meylin
+ */
 public class CartSpinnerEditingCell extends TableCell<Cart, Integer> {
 
     private Spinner<Integer> spinner;
-    private SpinnerValueFactory.IntegerSpinnerValueFactory valueFactory;
-    private int maxStock = 100;  // Valor máximo inicial, puedes ajustarlo según lo necesites.
 
+    /**
+     * Constructor that initializes the Spinner with the minimum value set to 1,
+     * maximum value set to 10, and default value set to 1. The Spinner is also
+     * set to be editable.
+     */
     public CartSpinnerEditingCell() {
-        // Inicializa el Spinner y la fábrica de valores
+        // Initialize the Spinner
         spinner = new Spinner<>();
-        valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, maxStock, 1); // Valor máximo inicial
-        spinner.setValueFactory(valueFactory);  // Asigna la fábrica de valores al spinner
-        spinner.setEditable(true); // Si quieres que el valor sea editable
+        // Set the minimum, maximum, and initial value (1 in this case)
+        SpinnerValueFactory.IntegerSpinnerValueFactory valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 10, 1);
+        spinner.setValueFactory(valueFactory);  // Set the value factory for the spinner
+        spinner.setEditable(true); // Allow the value to be edited manually
     }
 
+    /**
+     * Updates the TableCell's content based on whether it's empty or being
+     * edited. When in editing mode, the Spinner is displayed. Otherwise, the
+     * value is shown as text.
+     *
+     * @param item The item to be displayed (in this case, the quantity of the
+     * cart item).
+     * @param empty A boolean indicating if the cell is empty or not.
+     */
     @Override
     protected void updateItem(Integer item, boolean empty) {
         super.updateItem(item, empty);
@@ -29,53 +56,60 @@ public class CartSpinnerEditingCell extends TableCell<Cart, Integer> {
             setGraphic(null);
         } else {
             if (isEditing()) {
-                // Durante la edición, actualizar el valor máximo dinámicamente desde el stock
-                Cart cartItem = (Cart) getTableRow().getItem();
-                if (cartItem != null) {
-                    // Obtener el Product desde Cart
-                    Product product = cartItem.getProduct(); // Método que te da el Product relacionado
-                    if (product != null) {
-                        int stock = Integer.parseInt(product.getStock());  // Obtener el stock del producto
-
-                        // Solo actualizamos el máximo si es necesario
-                        if (maxStock != stock) {
-                            maxStock = stock;
-                            valueFactory.setMax(maxStock); // Actualiza el valor máximo
-                        }
-                    }
-                }
-
-                // Configurar el valor actual del Spinner
-                valueFactory.setValue(item != null ? item : 1); // Valor inicial
-
+                // Show the Spinner during editing
                 setText(null);
                 setGraphic(spinner);
             } else {
-                // Fuera de edición, mostrar el valor como texto
+                // Display the item value as text when not editing
                 setText(item != null ? item.toString() : "");
                 setGraphic(null);
             }
         }
     }
 
+    /**
+     * Starts the editing mode in the TableCell and initializes the Spinner with
+     * the current value of the item. The maximum value of the Spinner is set
+     * according to the stock available for the product in the cart.
+     *
+     * When the user changes the value in the Spinner, it is committed as the
+     * new value for the item.
+     */
     @Override
     public void startEdit() {
         if (!isEmpty()) {
             super.startEdit();
+
+            // Get the current value of the item
             Integer previousValue = getItem();
-            // Configurar el listener para que actualice el valor en el modelo de datos
+            // Set the initial value of the Spinner based on the current item's value
+            SpinnerValueFactory.IntegerSpinnerValueFactory valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, previousValue != null ? previousValue : 1);
+            spinner.setValueFactory(valueFactory);
+
+            // Listener to confirm the value when changed
             spinner.valueProperty().addListener((obs, oldValue, newValue) -> {
-                commitEdit(newValue != null ? newValue : previousValue); // Confirmar el valor
+                // Confirmar el valor cuando se cambia
+                commitEdit(newValue != null ? newValue : previousValue);  // Commit the new value
             });
 
             setText(null);
-            setGraphic(spinner);
+            setGraphic(spinner); // Display the Spinner during editing
         }
     }
 
+    /**
+     * Cancels the editing mode and restores the original value of the
+     * TableCell. The original value is displayed as text when editing is
+     * canceled.
+     */
     @Override
     public void cancelEdit() {
         super.cancelEdit();
-        setGraphic(null); // Cancelar la edición y mostrar el valor original
+
+        // Restore the original value when editing is canceled
+        Integer item = getItem();
+        setText(item != null ? item.toString() : "");
+        setGraphic(null);
     }
+
 }
