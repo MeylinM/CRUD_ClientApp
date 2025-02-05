@@ -5,7 +5,9 @@
  */
 package eus.tartanga.crud.userInterface.controllers;
 
+import eus.tartanga.crud.encrypt.AsymmetricalClient;
 import eus.tartanga.crud.exception.AddException;
+import eus.tartanga.crud.exception.EncryptException;
 import java.util.logging.Logger;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -48,10 +50,12 @@ import eus.tartanga.crud.exception.UserExistErrorException;
 import eus.tartanga.crud.logic.FanetixClientFactory;
 import eus.tartanga.crud.logic.FanetixClientManager;
 import eus.tartanga.crud.model.FanetixClient;
+import java.util.Base64;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.GenericType;
+import static jxl.biff.BaseCellFeatures.logger;
 
 /**
  * @author Meylin, Elbire
@@ -269,7 +273,7 @@ public class SignUpViewController {
         // Make the "tfShowConfirmPassword" field hidden.
         tfShowConfirmPassword.setVisible(false);
         // Set the CheckBox to be selected 
-        cbxStatus.setSelected(true);
+//        cbxStatus.setSelected(true);
         // Hide all error labels.
         clearErrorLabels();
         setTooltips();
@@ -521,7 +525,8 @@ public class SignUpViewController {
                 mobile = Integer.parseInt(tfMobile.getText());
                 clearErrorStyle(tfMobile, labelErrorMobile);
             }
-
+            /*
+            //LO QUE TENIAIS ANTES
             if (!(email == null || password == null || name == null || street == null || mobile == 0 || city == null || zip == 0)) {
                 newUser = new FanetixClient(email, password, name, street, mobile, city, zip);
 
@@ -537,13 +542,43 @@ public class SignUpViewController {
                     // After accepting the message, close the SignUp window and return control to the SignIn window.
                     stage.close();
                 }
-                } catch (ReadException ex) {
-                    Logger.getLogger(SignUpViewController.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                
+            }*/
 
+            //Encriptacion
+            if (!(email == null || password == null || name == null || street == null || mobile == 0 || city == null || zip == 0)) {
+                // Encriptar la contraseña antes de enviarla al servidor
+                AsymmetricalClient asymmetricalClient = new AsymmetricalClient();
+                byte[] encryptedPassword;
+
+                try {
+                    encryptedPassword = asymmetricalClient.encyptedData(password);
+                } catch (EncryptException ex) {
+                    LOGGER.severe("Encryption error");
+                    new Alert(Alert.AlertType.ERROR, "Error encrypting the password. Please try again.", ButtonType.OK).showAndWait();
+                    return; // Detiene el proceso si la encriptación falla
+                }
+
+                // Convertimos la contraseña encriptada a Base64
+                String encryptedPasswordBase64 = Base64.getEncoder().encodeToString(encryptedPassword);
+
+                // Crear usuario con la contraseña encriptada
+                newUser = new FanetixClient(email, encryptedPasswordBase64, name, street, mobile, city, zip);
+
+                FanetixClientManager clientManager = FanetixClientFactory.getFanetixClientManager();
+                clientManager.createClient_XML(newUser);
+
+                // Validar si se creó correctamente en el servidor
+                newUserValidate = clientManager.findClient_XML(new GenericType<FanetixClient>() {
+                }, email);
+                if (newUserValidate != null) {
+                    new Alert(Alert.AlertType.CONFIRMATION, "You have successfully registered.", ButtonType.OK).showAndWait();
+                    stage.close(); // Cierra la ventana de SignUp
+                }
             }
-        } catch (AddException e) {
+
+
+        } catch (ReadException | AddException e) {
+
             // Handle server-related errors with an alert message.
             new Alert(Alert.AlertType.ERROR, e.getLocalizedMessage(), ButtonType.OK).showAndWait();
 
@@ -779,7 +814,7 @@ public class SignUpViewController {
         tfZip.clear();
         tfCity.clear();
         tfMobile.clear();
-        cbxStatus.setSelected(true);
+       // cbxStatus.setSelected(true);
     }
 
     /**
