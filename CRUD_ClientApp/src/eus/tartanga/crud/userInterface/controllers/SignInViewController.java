@@ -35,6 +35,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.GenericType;
 
 /**
@@ -157,14 +158,15 @@ public class SignInViewController {
                 FanetixUser userGeneral = new FanetixUser(email, passwrd);
                 MenuBarViewController.setStageMenu(stage);
                 MenuBarViewController.setUser(userGeneral);
-                Parent root = loader.load();
-                ArtistViewController controller = loader.getController();
+                Parent root = (Parent) loader.load();
+                ArtistViewController controller = (ArtistViewController) loader.getController();
                 controller.setStage(stage);
                 controller.initStage(root);
             }
-        } catch (ReadException e) {
-            new Alert(Alert.AlertType.ERROR, "At this moment the server is not available. Please try later.", ButtonType.OK).showAndWait();
-        } catch (IOException | PatternEmailIncorrectException | TextEmptyException ex) {
+
+        } catch (SignInException e) {
+            new Alert(Alert.AlertType.ERROR, "At this moment server is not available. Please try later.", ButtonType.OK).showAndWait();
+        } catch (IOException ex) {
             Logger.getLogger(SignInViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

@@ -29,9 +29,11 @@ import eus.tartanga.crud.model.FanetixUser;
 import eus.tartanga.crud.model.Product;
 import eus.tartanga.crud.userInterface.factories.ProductDateEditingCell;
 import java.io.ByteArrayInputStream;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collection;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -45,6 +47,7 @@ import javafx.scene.image.ImageView;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -66,6 +69,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TextField;
@@ -79,6 +83,7 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.converter.FloatStringConverter;
 import javafx.util.converter.IntegerStringConverter;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.GenericType;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
@@ -179,7 +184,7 @@ public class ProductViewController {
             stage.getIcons().add(new Image("eus/tartanga/crud/app/resources/logo.png"));
             stage.setResizable(false);
             stage.show();
-            
+
             //Inicializar las diferentes factorias que vamos a usar
             productManager = ProductFactory.getProductManager();
             artistManager = ArtistFactory.getArtistManager();
@@ -198,7 +203,7 @@ public class ProductViewController {
             releaseDateColumn.setCellValueFactory(new PropertyValueFactory<>("releaseDate"));
             stockColumn.setCellValueFactory(new PropertyValueFactory<>("stock"));
             priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
-            
+
             //Mostrar la ventana de manera diferente en caso de ser un Cliente
             if (client != null) {
 
@@ -213,18 +218,31 @@ public class ProductViewController {
                         }
                     }
                 });
+                releaseDateColumn.setCellFactory(column -> new TableCell<Product, Date>() {
+                    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+
+                    @Override
+                    protected void updateItem(Date item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty || item == null) {
+                            setText(null);
+                        } else {
+                            setText(dateFormat.format(item));
+                        }
+                    }
+                });
                 btnAddToCart.setOnAction(this::handleAddToCart);
                 btnAddProduct.setVisible(false);
                 btnDeleteProduct.setVisible(false);
             } else {
                 //En caso de ser un administrador mostrar de manera diferente
-                
+                //Selección múltiple en tabla para el uso del botón delete.
+                productTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
                 //Hacer la tabla editable
                 productTable.setEditable(true);
 
                 //Para obtener la lista de artistas se usará el método de lógica findAllArtist
-                artistList = FXCollections.observableArrayList(artistManager.findAllArtist(new GenericType<List<Artist>>() {
-                }));
+                artistList.addAll(findAllArtist());
 
                 //Crear la factoria de celda para releaseDate usando un DatePicker
                 final Callback<TableColumn<Product, Date>, TableCell<Product, Date>> dateCell
@@ -232,7 +250,9 @@ public class ProductViewController {
                 releaseDateColumn.setCellFactory(dateCell);
                 releaseDateColumn.setOnEditCommit(event -> {
                     Product product = event.getRowValue();
+                    //Establecer la propiedad releaseDate del objeto Product correspondiente a la la editada.
                     product.setReleaseDate(event.getNewValue());
+                    //Llamar al método de lógica updateProduct pasándole el objeto Product.
                     updateProduct(product);
                 });
 
@@ -243,16 +263,20 @@ public class ProductViewController {
                         Product product = event.getRowValue();
                         Product productCopy = product.clone();
                         productCopy.setTitle(event.getNewValue());
+                        //Validar primero que no esté vacío el valor
                         if (productCopy.getTitle() == null || productCopy.getTitle().isEmpty()) {
                             throw new TextEmptyException("El campo de Titulo no puede estar vacío");
-                        } else if (productCopy.getTitle().length() > 50) {
+                        }//Validar que no supere los 50 caracteres 
+                        else if (productCopy.getTitle().length() > 50) {
                             throw new MaxCharacterException("El título no puede tener más de 50 caracteres");
                         }
+                        //Llamar al método de lógica updateProduct pasándole el objeto Product.
                         updateProduct(productCopy);
+                        //Establecer la propiedad tittle del objeto Product correspondiente a la la editada.
                         product.setTitle(event.getNewValue());
                     } catch (TextEmptyException | MaxCharacterException e) {
                         Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
-                        showAlertWarning(e.getMessage());
+                        showAlertWarning("Error de  validacíon de titulo", e.getMessage());
                         productTable.refresh();
                     } catch (Exception e) {
                         Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
@@ -266,16 +290,20 @@ public class ProductViewController {
                         Product productCopy = product.clone();
                         productCopy.setDescription(event.getNewValue());
                         System.out.println(productCopy.getDescription());
+                        //Validar primero que no esté vacío el valor
                         if (productCopy.getDescription() == null || productCopy.getDescription().isEmpty()) {
                             throw new TextEmptyException("El campo de description no puede estar vacío");
-                        } else if (productCopy.getDescription().length() > 250) {
+                        }//Validar que el valor escrito no supere los 250 caracteres 
+                        else if (productCopy.getDescription().length() > 250) {
                             throw new MaxCharacterException("La descripcion no puede tener más de 250 caracteres");
                         }
+                        //Establecer la propiedad description del objeto Product correspondiente a la la editada.
                         updateProduct(productCopy);
+                        //Establecer la propiedad description del objeto Product correspondiente a la la editada.
                         product.setDescription(event.getNewValue());
                     } catch (TextEmptyException | MaxCharacterException e) {
                         Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
-                        showAlertWarning(e.getMessage());
+                        showAlertWarning("Error de validacion de descripcion", e.getMessage());
                         productTable.refresh();
                     } catch (Exception e) {
                         //Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
@@ -286,8 +314,8 @@ public class ProductViewController {
                 stockColumn.setOnEditCommit(event -> {
                     try {
                         Product product = event.getRowValue();
-                        //int originalStock = product.getStock();
                         Product productCopy = product.clone();
+                        //Validar primero el valor escrito para que solo pueda ser numérico y mayor o igual a 0
                         if (Integer.parseInt(event.getNewValue()) >= 0) {
                             productCopy.setStock(event.getNewValue());
                         } else {
@@ -296,7 +324,7 @@ public class ProductViewController {
                         updateProduct(productCopy);
                         product.setStock(event.getNewValue());
                     } catch (NumberFormatException ex) {
-                        showAlertWarning("El valor del stock debe ser un número válido y mayor o igual a 0");
+                        showAlertWarning("Error de validacíon de stock", "El valor del stock debe ser un número válido y mayor o igual a 0");
                         productTable.refresh();
                     } catch (Exception e) {
                         Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
@@ -307,17 +335,19 @@ public class ProductViewController {
                 priceColumn.setOnEditCommit(event -> {
                     try {
                         Product product = event.getRowValue();
-                        //int originalStock = product.getStock();
                         Product productCopy = product.clone();
+                        //Validar que solo pueda ser un valor numérico que acepte decimales y mayor que 0.
                         if (Float.parseFloat(event.getNewValue()) > 0 && event.getNewValue().matches("^[1-9][0-9]*(\\.[0-9]{1,2})?$")) {
                             productCopy.setPrice(event.getNewValue());
                         } else {
                             throw new NumberFormatException();
                         }
+                        //Llamar al método de lógica updateProduct pasándole el objeto Product.
                         updateProduct(productCopy);
+                        //Establecer la propiedad price del objeto Product correspondiente a la la editada.
                         product.setPrice(event.getNewValue());
                     } catch (NumberFormatException ex) {
-                        showAlertWarning("El valor del precio debe ser un número válido y mayor a 0");
+                        showAlertWarning("Error de validacíon de precio", "El valor del precio debe ser un número válido y mayor a 0");
                         productTable.refresh();
                     } catch (Exception e) {
                         Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
@@ -325,12 +355,18 @@ public class ProductViewController {
                 });
 
                 artistColumn.setCellFactory(ComboBoxTableCell.forTableColumn(artistList));
-                artistColumn.setOnEditCommit((TableColumn.CellEditEvent<Product, Artist> t) -> {
-                    ((Product) t.getTableView().getItems()
-                            .get(t.getTablePosition().getRow()))
-                            .setArtist(t.getNewValue());
-                    Product product = (Product) t.getTableView().getItems().get(t.getTablePosition().getRow());
-                    Artist originalValueLevel = product.getArtist();
+                artistColumn.setOnEditCommit(event -> {
+                    try {
+                        Product product = event.getRowValue();
+                        Product productCopy = product.clone();
+                        productCopy.setArtist(event.getNewValue());
+                        updateProduct(productCopy);
+                        product.setArtist(event.getNewValue());
+                    } catch (Exception e) {
+                        Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
+                        showAlertWarning("Error al actualizar artista", "No se pudo actualizar el artista en la base de datos.");
+                        productTable.refresh();
+                    }
                 });
 
                 btnAddProduct.setOnAction(this::handleAddProduct);
@@ -366,7 +402,7 @@ public class ProductViewController {
                     }
                 }
             });
-
+            //Se muestra una ventana modal con una pequeña guia de uso para la ventana.
             btnInfo.setOnAction(this::handleInfoButton);
             //Inicializar los menu contextuales
             createContextMenu();
@@ -374,8 +410,8 @@ public class ProductViewController {
             //mIDeleteProduct, mIAddToProduct y mIPrint en el caso de hacer
             //click derecho en la tabla
             productTable.setOnMousePressed(this::handleRightClickTable);
-            // Mostrará el Menú contextual con las opciones mIAddToProduct y mIPrint 
-            //en el caso de hacer click derecho fuera de la tabla
+            /* Mostrará el Menú contextual con las opciones mIAddToProduct y mIPrint 
+            en el caso de hacer click derecho fuera de la tabla*/
             productAnchorPane.setOnMouseClicked(this::handleRightClick);
             //Obtener una lista de todos los productos de mi base de datos
             productList.addAll(findAllProducts());
@@ -400,20 +436,38 @@ public class ProductViewController {
             });
             return products;
         } catch (ReadException e) {
-            showAlert("An error occurred while getting the product list");
+            showAlert("Error del servidor", "An error occurred while getting the product list");
         }
         return products;
     }
 
+    private List<Artist> findAllArtist() {
+        List<Artist> artists = null;
+        try {
+            artists = artistManager.findAllArtist(new GenericType<List<Artist>>() {
+            });
+        } catch (ReadException e) {
+            showAlert("Error del servidor", "An error occurred while getting the product list");
+        }
+        return artists;
+    }
+
     private void handleAddProduct(ActionEvent event) {
         try {
+            /*Se creará una nuevo objeto con un constructor por defecto del tipo Producto. El campo image
+            se fijará en una imagen por defecto, tittle se fijará como “Tittle of the product”,
+            description se jará como “Description of the product”, la fecha releaseDate tomará la fecha
+            del día de creación, stock tomará el valor de base 1, price tomará el valor de base 0,00.*/
             Product product = new Product();
+            //artist se fijará en el primer artista obtenido por defecto,
             product.setArtist(artistList.get(0));
+            //Se usará el método de lógica createProduct, pasando como parámetro un objeto Product.
             productManager.create_XML(product);
+            //Si la operación se lleva a cabo sin errores, la fila recién creada se mostrará en la tabla.
             productTable.getItems().add(product);
             refreshProductList();
         } catch (AddException e) {
-            showAlert("An error occurred while creating the product(s)");
+            showAlert("Error del servidor", "An error occurred while creating the product(s)");
         }
     }
 
@@ -431,8 +485,8 @@ public class ProductViewController {
                         cartId.setProductId(selectedProduct.getProductId());
                         cart.setId(cartId);
                         cart.setProduct(selectedProduct);
-                        System.out.println(client.getEmail());
-                        cart.setClient(client);
+                        //System.out.println(client.getEmail());
+                        //cart.setClient(client);
                         cart.setOrderDate(new Date());
                         cart.setQuantity(quantityToAdd);
                         cart.setBought(false);
@@ -442,29 +496,54 @@ public class ProductViewController {
                     throw new NoStockException("No queda stock de ese producto, no podrá ser añadido a su carrito");
                 }
             } else {
-                showAlert("No se ha seleccionado ningún producto para eliminar.");
+                showAlertWarning("Error de seleccion", "No se ha seleccionado ningún producto para eliminar.");
             }
         } catch (AddException e) {
-            showAlert("An error occurred while creating the product(s)");
+            showAlert("Error de servidor", "An error occurred while creating the product(s)");
         } catch (NoStockException e) {
-            showAlertWarning(e.getMessage());
+            showAlertWarning("Stock no disponible", e.getMessage());
         }
     }
 
     private void handleDeleteProduct(ActionEvent event) {
-        Product selectedProduct = productTable.getSelectionModel().getSelectedItem();
+        ObservableList<Product> selectedProducts = productTable.getSelectionModel().getSelectedItems();
+        List<Cart> carts = null;
+        if (selectedProducts.isEmpty()) {
+            showAlertWarning("Error de seleccion", "Please select at least one product to delete");
+            return;
+        }
+        Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmationAlert.setTitle("Confirm Deletion");
+        confirmationAlert.setHeaderText(null);
+        confirmationAlert.setContentText("Do you want to delete the selected product(s)?");
 
-        if (selectedProduct != null) {
+        Optional<ButtonType> result = confirmationAlert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
-                // Elimina el producto de la base de datos
-                productManager.remove(selectedProduct.getProductId().toString());
-                // Elimina el producto de la lista observable
-                productList.remove(selectedProduct);
+                carts = cartManager.findAllCartProducts_XML(new GenericType<List<Cart>>() {
+                });
+                // Elimina cada producto seleccionado
+                for (Product product : new ArrayList<>(selectedProducts)) {
+                    System.out.println("Producto: " + product.getTitle());
+                    for (Cart cartsList : carts) {
+                        System.out.println("Carrito: " + cartsList.getId().getEmail() + cartsList.getId().getProductId());
+                        try {
+                            if (product.getProductId() == cartsList.getId().getProductId()) {
+                                System.out.println("EL PRODUCTO TIENE ESTE CARRITO: " + product.getProductId() + cartsList.getId().getProductId());
+                                cartManager.removeCart(cartsList.getId().getEmail(), cartsList.getId().getProductId().toString());
+                            }
+                        } catch (DeleteException ex) {
+                            Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                    productManager.remove(product.getProductId().toString());
+                    productList.remove(product); // Actualizar la tabla
+                }
+                productTable.getSelectionModel().clearSelection();
+
             } catch (DeleteException e) {
-                showAlert("An error occurred while deleting the product(s)");
+                showAlert("Error de servidor", "An error occurred while deleting the product(s)");
             }
-        } else {
-            showAlert("No se ha seleccionado ningún producto para eliminar.");
         }
     }
 
@@ -472,7 +551,7 @@ public class ProductViewController {
         try {
             productManager.edit_XML(product, product.getProductId().toString());
         } catch (UpdateException e) {
-            showAlert("An error occurred while updating the product");
+            showAlert("Error de servidor", "An error occurred while updating the product");
         }
     }
 
@@ -484,6 +563,7 @@ public class ProductViewController {
 
     private void printItems(ActionEvent event) {
         try {
+            //Se abrirá una ventana donde se puedan imprimir los datos del informe de la tabla de Productos.
             JasperReport report = JasperCompileManager.compileReport(getClass().getResourceAsStream("/eus/tartanga/crud/userInterface/report/productReport.jrxml"));
             JRBeanCollectionDataSource dataItems = new JRBeanCollectionDataSource((Collection<Product>) this.productTable.getItems());
             Map<String, Object> parameters = new HashMap<>();
@@ -491,7 +571,10 @@ public class ProductViewController {
             JasperViewer jasperViewer = new JasperViewer(jasperPrint, false);
             jasperViewer.setVisible(true);
         } catch (JRException ex) {
-            //EXCEPCIONES DE ESAS
+            showAlert("Error al imprimir", "Ha ocurrido un error al imprimir la tabla de Productos");
+            logger.severe("UI GestionUsuariosController: Error printing report: {0}"
+                    + ex.getMessage());
+
         }
     }
 
@@ -530,11 +613,11 @@ public class ProductViewController {
             applyFilter();
         });
 
-        // Filtra por rango de fechas cuando cambian los DatePickers
+        //Filtra los productos para que aparezcan a partir de la fecha seleccionada
         dpFrom.valueProperty().addListener((observable, oldValue, newValue) -> {
             applyFilter();
         });
-
+        //Filtra los productos para que aparezcan los productos de antes de la fecha seleccionada
         dpTo.valueProperty().addListener((observable, oldValue, newValue) -> {
             applyFilter();
         });
@@ -617,7 +700,7 @@ public class ProductViewController {
             MenuItem addItemOutside = new MenuItem("Add new product");
             addItemOutside.setOnAction(this::handleAddProduct);
             contextMenuOutside.getItems().addAll(printItemOutside, addItemOutside);
-        }else{
+        } else {
             contextMenuOutside.getItems().addAll(printItemOutside);
         }
 
@@ -682,18 +765,18 @@ public class ProductViewController {
         });
     }
 
-    private void showAlert(String message) {
+    private void showAlert(String header, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
-        alert.setHeaderText("Error de servidor");
+        alert.setHeaderText(header);
         alert.setContentText(message);
         alert.showAndWait();
     }
 
-    private void showAlertWarning(String message) {
+    private void showAlertWarning(String header, String message) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle("Warning");
-        alert.setHeaderText("Error de validación");
+        alert.setHeaderText(header);
         alert.setContentText(message);
         alert.showAndWait();
     }

@@ -51,7 +51,9 @@ import eus.tartanga.crud.logic.FanetixClientFactory;
 import eus.tartanga.crud.logic.FanetixClientManager;
 import eus.tartanga.crud.model.FanetixClient;
 import java.util.Base64;
+import java.util.logging.Level;
 import java.util.regex.Pattern;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.GenericType;
 import static jxl.biff.BaseCellFeatures.logger;
 
@@ -531,9 +533,10 @@ public class SignUpViewController {
                 // Get an implementation of the "Signable" interface from the "ClientFactory".
                 FanetixClientManager clientManager = FanetixClientFactory.getFanetixClientManager();
                 clientManager.createClient_XML(newUser);
-                newUserValidate = clientManager.findClient_XML(new GenericType<FanetixClient>() {
-                }, email);
-                if (newUserValidate != null) {
+                try {
+                    newUserValidate = clientManager.findClient_XML(new GenericType<FanetixClient>() {
+                    }, email);
+                    if (newUserValidate != null) {
                     // Show an INFORMATION alert with the message "Registration successful."
                     new Alert(Alert.AlertType.CONFIRMATION, "You have successfully registered.", ButtonType.OK).showAndWait();
                     // After accepting the message, close the SignUp window and return control to the SignIn window.
@@ -573,7 +576,9 @@ public class SignUpViewController {
                 }
             }
 
+
         } catch (ReadException | AddException e) {
+
             // Handle server-related errors with an alert message.
             new Alert(Alert.AlertType.ERROR, e.getLocalizedMessage(), ButtonType.OK).showAndWait();
 

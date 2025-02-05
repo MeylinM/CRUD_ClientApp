@@ -14,16 +14,16 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefHeight="768.0" prefWidth="1366.0" stylesheets="@../css/styles.css" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eus.tartanga.crud.userInterface.controllers.CartOrdersViewController"> 
+<VBox prefHeight="768.0" prefWidth="1366.0" stylesheets="@../css/styles.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eus.tartanga.crud.userInterface.controllers.CartOrdersViewController"> 
     <!-- Menú superior -->
     <fx:include fx:id="menuBar" source="MenuBarView.fxml" />
     <!-- Contenido principal -->
     <AnchorPane prefHeight="744.0" prefWidth="1366.0" styleClass="background-pane" stylesheets="@../css/styles.css">
         <children>
             <!-- Titulo de la ventana -->
-            <ImageView fx:id="titleImage" fitHeight="95.0" fitWidth="590.0" layoutX="388.0" layoutY="6.0" pickOnBounds="true" preserveRatio="true" />
+            <ImageView fx:id="titleImage" fitHeight="90.0" fitWidth="426.0" layoutX="489.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true" />
             <!-- Boton de Informacion -->
-            <Button fx:id="btnInfo" layoutX="1260.0" layoutY="14.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="55.0" styleClass="info-button"/>
+            <Button fx:id="btnInfo" layoutX="1260.0" layoutY="14.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="55.0" styleClass="info-button" />
             <!-- Filtros de la ventana My Orders -->
             <ChoiceBox fx:id="cbxArtist" layoutX="53.0" layoutY="101.0" prefHeight="36.0" prefWidth="398.0" styleClass="myChoiceBox" />
             <HBox alignment="CENTER_RIGHT" layoutX="499.0" layoutY="86.0" prefHeight="66.0" prefWidth="816.0">
@@ -39,14 +39,14 @@
             <!-- Tabla con productos -->
             <TableView fx:id="tbCart" editable="true" layoutX="50.0" layoutY="152.0" prefHeight="500.0" prefWidth="1266.0" styleClass="table-view" stylesheets="@../css/styles.css">
                 <columns>
-                    <TableColumn fx:id="tbcProduct" style="-fx-alignment: center;" prefWidth="150.0" text="Product" />
-                    <TableColumn fx:id="tbcArtist"  style="-fx-alignment: center-left;" prefWidth="140.0" text="Artist" />
-                    <TableColumn fx:id="tbcName"  style="-fx-alignment: center-left;" prefWidth="140.0" text="Name" />
-                    <TableColumn fx:id="tbcDescription"  style="-fx-alignment: center-left;" prefWidth="400.0" text="Description" />
-                    <TableColumn fx:id="tbcOrderDate" style="-fx-alignment: center;" prefWidth="150.0" text="Order Date" />
-                    <TableColumn fx:id="tbcPrice" style="-fx-alignment: center;" prefWidth="95.0" text="Price (€)" />
-                    <TableColumn fx:id="tbcQuantity" style="-fx-alignment: center;" prefWidth="95.0" text="Quantity" />
-                    <TableColumn fx:id="tbcSubTotal" style="-fx-alignment: center-right;" prefWidth="95.0" text="Sub Total" />
+                    <TableColumn fx:id="tbcProduct" prefWidth="150.0" style="-fx-alignment: center;" text="Product" />
+                    <TableColumn fx:id="tbcArtist" prefWidth="140.0" style="-fx-alignment: center-left;" text="Artist" />
+                    <TableColumn fx:id="tbcName" prefWidth="140.0" style="-fx-alignment: center-left;" text="Name" />
+                    <TableColumn fx:id="tbcDescription" prefWidth="400.0" style="-fx-alignment: center-left;" text="Description" />
+                    <TableColumn fx:id="tbcOrderDate" prefWidth="150.0" style="-fx-alignment: center;" text="Order Date" />
+                    <TableColumn fx:id="tbcPrice" prefWidth="95.0" style="-fx-alignment: center;" text="Price (€)" />
+                    <TableColumn fx:id="tbcQuantity" prefWidth="95.0" style="-fx-alignment: center;" text="Quantity" />
+                    <TableColumn fx:id="tbcSubTotal" prefWidth="95.0" style="-fx-alignment: center-right;" text="Sub Total" />
                 </columns>
             </TableView>
             <!-- Fila de Total -->

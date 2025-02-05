@@ -32,13 +32,9 @@
                 <MenuItem fx:id="itemMyCart" onAction ="#openMyCart"/>
             </items>
         </Menu>
-        <Menu fx:id="itemHelp" text="Help">
+        <Menu fx:id="menuHelp" text="Help">
             <items>
-                <MenuItem fx:id="itemHelpArtist" text="Help Artist" onAction ="#showHelpArtist"/>
-                <MenuItem fx:id="itemHelpConcert" text="Help Concert" onAction ="#showHelpConcert" />
-                <MenuItem fx:id="itemHelpProduct" text="Help Product" onAction ="#showHelpProduct" />
-                <MenuItem fx:id="itemHelpCart" text="Help Cart" onAction ="#showHelpCart"/>
-                <MenuItem fx:id="itemHelpOrder" text="Help Order" onAction ="#showHelpOrder"/>
+                <MenuItem onAction ="#showHelp"/>
             </items>
         </Menu>
     </menus>

@@ -50,7 +50,6 @@ public class Product implements Serializable, Cloneable {
         this.productId = productId;
     }
 
-   
 
     public String getTitle() {
         return title;
