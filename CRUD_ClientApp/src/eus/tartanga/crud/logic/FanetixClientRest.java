@@ -8,6 +8,7 @@ package eus.tartanga.crud.logic;
 import eus.tartanga.crud.exception.AddException;
 import eus.tartanga.crud.exception.DeleteException;
 import eus.tartanga.crud.exception.ReadException;
+import eus.tartanga.crud.exception.SignInException;
 import eus.tartanga.crud.exception.UpdateException;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.WebApplicationException;

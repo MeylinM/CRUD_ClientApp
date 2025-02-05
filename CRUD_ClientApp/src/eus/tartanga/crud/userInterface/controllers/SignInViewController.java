@@ -9,6 +9,7 @@ import eus.tartanga.crud.encrypt.AsymmetricalClient;
 import eus.tartanga.crud.exception.EncryptException;
 import eus.tartanga.crud.exception.PatternEmailIncorrectException;
 import eus.tartanga.crud.exception.ReadException;
+import eus.tartanga.crud.exception.SignInException;
 import eus.tartanga.crud.exception.TextEmptyException;
 import eus.tartanga.crud.logic.AdministratorFactory;
 import eus.tartanga.crud.logic.AdministratorManager;
@@ -167,6 +168,10 @@ public class SignInViewController {
         } catch (SignInException e) {
             new Alert(Alert.AlertType.ERROR, "At this moment server is not available. Please try later.", ButtonType.OK).showAndWait();
         } catch (IOException ex) {
+            Logger.getLogger(SignInViewController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (TextEmptyException ex) {
+            Logger.getLogger(SignInViewController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (PatternEmailIncorrectException ex) {
             Logger.getLogger(SignInViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
