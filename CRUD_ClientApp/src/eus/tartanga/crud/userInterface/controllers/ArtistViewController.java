@@ -1,6 +1,7 @@
 package eus.tartanga.crud.userInterface.controllers;
 
 import eus.tartanga.crud.exception.AddException;
+import eus.tartanga.crud.exception.DeleteException;
 import eus.tartanga.crud.exception.MaxCharacterException;
 import eus.tartanga.crud.exception.ReadException;
 import eus.tartanga.crud.exception.TextEmptyException;
@@ -8,13 +9,19 @@ import eus.tartanga.crud.exception.UpdateException;
 import eus.tartanga.crud.exception.WrongStockFormatException;
 import eus.tartanga.crud.logic.ArtistFactory;
 import eus.tartanga.crud.logic.ArtistManager;
+import eus.tartanga.crud.logic.ConcertFactory;
+import eus.tartanga.crud.logic.ConcertManager;
+import eus.tartanga.crud.logic.ProductManager;
 import eus.tartanga.crud.model.Artist;
+import eus.tartanga.crud.model.Concert;
+import eus.tartanga.crud.model.Product;
 import eus.tartanga.crud.userInterface.factories.ArtistDateEditingCell;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -35,9 +42,12 @@ import javafx.scene.layout.HBox;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -50,6 +60,13 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.Callback;
 import javax.ws.rs.core.GenericType;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
@@ -117,9 +134,12 @@ public class ArtistViewController {
     private Stage stage;
     private Logger logger = Logger.getLogger(ArtistViewController.class.getName());
     private ObservableList<Artist> artistList = FXCollections.observableArrayList();
+    private ObservableList<Concert> concertList = FXCollections.observableArrayList();
     private ContextMenu contextMenuInside;
     private ContextMenu contextMenuOutside;
     private ArtistManager artistManager;
+    private ConcertManager concertManager;
+    private ProductManager productManager;
 
     public void setStage(Stage stage) {
         this.stage = stage;
@@ -138,7 +158,10 @@ public class ArtistViewController {
             stage.show();
 
             artistManager = ArtistFactory.getArtistManager();
+            concertManager = ConcertFactory.getConcertManager();
 
+            // concertList = FXCollections.observableArrayList(concertManager.findAllConcerts_XML(new GenericType<List<Concert>>(){
+            //   }));
             artistTable.setEditable(true);
             debutColumn.setEditable(true);
 
@@ -152,7 +175,6 @@ public class ArtistViewController {
             artistColumn.setCellValueFactory(new PropertyValueFactory<>("image"));
 
             // Hacer la columna 'debutColumn' editable
-            //NO HACE UPDATE
             final Callback<TableColumn<Artist, Date>, TableCell<Artist, Date>> dateCell
                     = (TableColumn<Artist, Date> param) -> new ArtistDateEditingCell();
             debutColumn.setCellFactory(dateCell);
@@ -278,7 +300,6 @@ public class ArtistViewController {
 
             artistTable.setItems(artistList);
             btnAddArtist.setOnAction(this::handleAddArtist);
-            //ARREGLAR DELETE DEL SERVIDOR
             btnDeleteArtist.setOnAction(this::handleDeleteArtist);
             btnInfo.setOnAction(this::handleInfoButton);
             shopButton.setOnAction(this::handleGoToShop);
@@ -458,39 +479,83 @@ public class ArtistViewController {
     }
 
     private void handleDeleteArtist(ActionEvent event) {
-        Artist selectedProduct = artistTable.getSelectionModel().getSelectedItem();
+        // Obtener el artista seleccionado en la tabla
+        Artist selectedArtist = artistTable.getSelectionModel().getSelectedItem();
 
-        if (selectedProduct != null) {
-            try {
-                // Elimina el producto de la base de datos
-                artistManager.removeArtist(selectedProduct.getArtistId().toString());
-
-                // Elimina el producto de la lista observable
-                artistList.remove(selectedProduct);
-
-                // Muestra un mensaje de confirmación
-                logger.info("Artista eliminado con éxito: " + selectedProduct.getName());
-            } catch (Exception e) {
-                // Maneja errores, como problemas de conexión o restricciones de la base de datos
-                logger.severe("Error al eliminar el artista: " + e.getMessage());
-            }
-        } else {
-            // Maneja el caso en el que no se ha seleccionado ningún producto
+        if (selectedArtist == null) {
             logger.warning("No se ha seleccionado ningún artista para eliminar.");
+            return;
+        }
+
+        try {
+            // 1. Verificar si el artista tiene conciertos asociados
+            boolean hasConcerts = eliminarConciertosAsociados(selectedArtist);
+
+            // Si el artista tiene conciertos asociados, mostrar el alert y no proceder con la eliminación
+            if (hasConcerts) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("No se puede eliminar el artista");
+                alert.setHeaderText("El artista " + selectedArtist.getName() + " tiene conciertos asociados.");
+                alert.setContentText("Elimine los conciertos asociados antes de borrar el artista.");
+                alert.showAndWait();
+                return; // No eliminar el artista si tiene conciertos asociados
+            }
+
+            // 2. Si no tiene conciertos asociados, proceder a eliminarlo
+            logger.info("Intentando eliminar artista con ID: " + selectedArtist.getArtistId());
+            artistManager.removeArtist(selectedArtist.getArtistId().toString());
+            artistList.remove(selectedArtist);
+            logger.info("Artista eliminado con éxito: " + selectedArtist.getName());
+
+        } catch (DeleteException e) {
+            logger.severe("Error al eliminar el artista y sus relaciones: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
+// Método para eliminar los conciertos asociados a un artista
+    private boolean eliminarConciertosAsociados(Artist selectedArtist) {
+        try {
+            // Obtener la lista de todos los conciertos
+            
+            List<Concert> concertList = concertManager.findAllConcerts_XML(new GenericType<List<Concert>>() {
+            });
+            
+            if (concertList == null) {
+                logger.severe("No se pudo obtener la lista de conciertos.");
+                return false;
+            }
+            
+            // Filtrar los conciertos que contienen al artista seleccionado
+            List<Concert> concertsToDelete = concertList.stream()
+                    .filter(concert -> concert.getArtistList() != null && concert.getArtistList().contains(selectedArtist))
+                    .collect(Collectors.toList());
+            
+            if (!concertsToDelete.isEmpty()) {
+                // Si se encontraron conciertos asociados, regresamos 'true' para indicar que no se debe eliminar el artista
+                return true;
+            }
+            
+            // Si no se encontraron conciertos, regresamos 'false'
+            logger.info("No se encontraron conciertos asociados al artista " + selectedArtist.getName());
+            
+        } catch (ReadException ex) {
+            Logger.getLogger(ArtistViewController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+
     private void printItems(ActionEvent event) {
-        /*  try {
-            JasperReport report = JasperCompileManager.compileReport(getClass().getResourceAsStream("/eus/tartanga/crud/userInterface/report/productReport.jrxml"));
-            JRBeanCollectionDataSource dataItems = new JRBeanCollectionDataSource((Collection<Product>) this.productTable.getItems());
+        try {
+            JasperReport report = JasperCompileManager.compileReport(getClass().getResourceAsStream("/eus/tartanga/crud/userInterface/report/artistReport.jrxml"));
+            JRBeanCollectionDataSource dataItems = new JRBeanCollectionDataSource((Collection<Artist>) this.artistTable.getItems());
             Map<String, Object> parameters = new HashMap<>();
             JasperPrint jasperPrint = JasperFillManager.fillReport(report, parameters, dataItems);
             JasperViewer jasperViewer = new JasperViewer(jasperPrint, false);
             jasperViewer.setVisible(true);
         } catch (JRException ex) {
-            //EXCEPCIONES DE ESAS
-        }*/
+            logger.severe("Error printing report: {0}" + ex.getMessage());
+        }
     }
 
     // Filtro de búsqueda
@@ -550,7 +615,6 @@ public class ArtistViewController {
 
     private void updateArtist(Artist artist) {
         try {
-            System.out.println("Intento de update");
             artistManager.updateArtist(artist, artist.getArtistId().toString());
         } catch (UpdateException e) {
             System.out.println(e);

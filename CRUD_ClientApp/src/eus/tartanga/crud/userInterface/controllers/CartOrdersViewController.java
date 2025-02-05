@@ -72,6 +72,10 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.view.JasperViewer;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.event.ActionEvent;
+import javafx.scene.control.Alert;
+import javax.ws.rs.WebApplicationException;
 
 /**
  *

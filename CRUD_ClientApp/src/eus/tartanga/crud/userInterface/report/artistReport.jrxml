@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="b75b7e03-124d-478e-8632-8129fa4b6f21">
+    <property name="ireport.zoom" value="1.0"/>
+    <property name="ireport.x" value="0"/>
+    <property name="ireport.y" value="0"/>
+    <field name="debut" class="java.util.Date"/>
+    <field name="company" class="java.lang.String"/>
+    <field name="name" class="java.lang.String"/>
+    <field name="lastAlbum" class="java.lang.String"/>
+   
+    <background>
+        <band splitType="Stretch"/>
+    </background>
+    <title>
+        <band height="79" splitType="Stretch">
+            <staticText>
+                <reportElement x="219" y="21" width="149" height="37" uuid="12ea4716-3758-4383-b56d-2d7eb600c212"/>
+                <textElement>
+                    <font size="18" isBold="true"/>
+                </textElement>
+                <text><![CDATA[ARTIST REPORT]]></text>
+            </staticText>
+        </band>
+    </title>
+    <pageHeader>
+        <band height="35" splitType="Stretch"/>
+    </pageHeader>
+    <columnHeader>
+        <band height="61" splitType="Stretch">
+            <staticText>
+                <reportElement x="35" y="30" width="100" height="20" uuid="609dacba-402f-4bac-8d93-44cbdfc4f9ab"/>
+                <text><![CDATA[DEBUT]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="160" y="30" width="100" height="20" uuid="27c67220-b34c-4fa8-9799-e3ef240e05f9"/>
+                <text><![CDATA[COMPANY]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="298" y="30" width="100" height="20" uuid="666d3928-64ce-4b34-b2d8-4e5eebe2a6e4"/>
+                <text><![CDATA[NAME]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="430" y="30" width="100" height="20" uuid="d9244f3d-c8fd-48f5-bac6-1b2fcad2beb7"/>
+                <text><![CDATA[LAST ALBUM]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+    <detail>
+        <band height="125" splitType="Stretch">
+            <textField>
+                <reportElement x="35" y="17" width="100" height="20" uuid="7f3718f3-40a7-41a7-8456-513d9c658653"/>
+                <textFieldExpression><![CDATA[new SimpleDateFormat("dd/MM/yyyy").format($F{debut})]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="160" y="17" width="100" height="20" uuid="b95b3e07-a6ff-4ab1-856a-6c9e3d20fef4"/>
+                <textFieldExpression><![CDATA[$F{company}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="298" y="17" width="100" height="20" uuid="5f798d47-fcb6-4141-ba36-538151c5d614"/>
+                <textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="430" y="17" width="100" height="20" uuid="ec5ad09a-e07d-48b1-adf7-1d14e200742a"/>
+                <textFieldExpression><![CDATA[$F{lastAlbum}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+    <columnFooter>
+        <band height="45" splitType="Stretch"/>
+    </columnFooter>
+    <pageFooter>
+        <band height="54" splitType="Stretch"/>
+    </pageFooter>
+    <summary>
+        <band height="42" splitType="Stretch"/>
+    </summary>
+</jasperReport>

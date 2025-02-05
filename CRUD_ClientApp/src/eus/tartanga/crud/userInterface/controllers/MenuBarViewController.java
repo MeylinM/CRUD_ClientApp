@@ -40,28 +40,13 @@ public class MenuBarViewController implements Initializable{
     private MenuItem itemArtist;
 
     @FXML
-    private MenuItem itemMyCart;
-
-    @FXML
-    private MenuItem itemHelpArtist;
-
-    @FXML
-    private MenuItem itemHelpConcert;
-
-    @FXML
-    private MenuItem itemHelpProduct;
-
-    @FXML
-    private MenuItem itemHelpCart;
-
-    @FXML
-    private MenuItem itemHelpOrder;
-
-    @FXML
     private Menu menuArtist;
     
     @FXML
     private Menu menuMyCart;
+    
+    @FXML
+    private Menu menuHelp;
 
     private static FanetixUser loggedUser;
     private static Stage stageMenu;
@@ -80,6 +65,13 @@ public class MenuBarViewController implements Initializable{
                 (observableValue, oldValue, newValue) -> {
                     if (newValue) {
                         menuMyCart.getItems().get(0).fire();
+                    }
+                }
+        );
+        menuHelp.showingProperty().addListener(
+                (observableValue, oldValue, newValue) -> {
+                    if (newValue) {
+                        menuHelp.getItems().get(0).fire();
                     }
                 }
         );
@@ -174,24 +166,23 @@ public class MenuBarViewController implements Initializable{
     }
 
     @FXML
-    private void showHelpArtist() {
+    private void showHelp() {
+        try {
+            //LOGGER.info("Loading help view...");
+            //Load node graph from fxml file
+            FXMLLoader loader
+                    = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/HelpGeneral.fxml"));
+            Parent root = (Parent) loader.load();
+            HelpGeneralController helpController
+                    = ((HelpGeneralController) loader.getController());
+            helpController.initAndShowStage(root);
+            //Initializes and shows help stage
+        } catch (Exception ex) {
+            //If there is an error show message and
+            //log it.
+            System.out.println(ex.getMessage());
 
-    }
-
-    @FXML
-    private void showHelpConcert() {
-    }
-
-    @FXML
-    private void showHelpProduct() {
-    }
-
-    @FXML
-    private void showHelpCart() {
-    }
-
-    @FXML
-    private void showHelpOrder() {
+        }
     }
 
     public static void setUser(FanetixUser user) {
