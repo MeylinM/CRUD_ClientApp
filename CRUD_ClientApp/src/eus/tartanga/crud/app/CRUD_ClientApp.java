@@ -7,6 +7,8 @@ package eus.tartanga.crud.app;
 
 import eus.tartanga.crud.exception.ReadException;
 import eus.tartanga.crud.userInterface.controllers.ConcertViewController;
+import eus.tartanga.crud.userInterface.controllers.SignInViewController;
+import eus.tartanga.crud.userInterface.controllers.SignUpViewController;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import java.io.IOException;
@@ -21,22 +23,22 @@ public class CRUD_ClientApp extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-/*
+        /*
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/SignInView.fxml"));
         Parent root = (Parent) loader.load();
         //Scene scene = new Scene(root);
         SignInViewController controller = ((SignInViewController) loader.getController());
         controller.setStage(stage);
-        controller.initStage(root);
-*/
+        controller.initStage(root);*/
+
+ /*
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ConcertView.fxml"));
         Parent root = (Parent) loader.load();
         //Scene scene = new Scene(root);
         ConcertViewController controller = ((ConcertViewController) loader.getController());
         controller.setStage(stage);
-        controller.initStage(root);
- 
-        /*FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ProductView.fxml"));
+        controller.initStage(root); */
+ /*FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ProductView.fxml"));
         Parent root = (Parent) loader.load();
         //Scene scene = new Scene(root);
         ProductViewController controller = ((ProductViewController) loader.getController());
@@ -49,13 +51,13 @@ public class CRUD_ClientApp extends Application {
         ArtistViewController controller = ((ArtistViewController) loader.getController());
         controller.setStage(stage);
         controller.initStage(root);*/
-
- /*FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/SignUpView.fxml"));
+ 
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/SignUpView.fxml"));
         Parent root = (Parent) loader.load();
         //Scene scene = new Scene(root);
         SignUpViewController controller = ((SignUpViewController) loader.getController());
         controller.setStage(stage);
-        controller.initStage(root);*/
+        controller.initStage(root);
     }
 
     /**

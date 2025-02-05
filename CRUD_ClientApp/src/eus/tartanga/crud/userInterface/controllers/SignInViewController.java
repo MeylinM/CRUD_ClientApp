@@ -76,18 +76,24 @@ public class SignInViewController {
             Scene scene = new Scene(root);
             stage.setScene(scene);
             stage.setTitle("SignIn");
+           
             //Añadir a la ventana el ícono “FanetixLogo.png”.
             stage.getIcons().add(new Image("eus/tartanga/crud/app/resources/logo.png"));
             stage.setResizable(false);
             clientManager = FanetixClientFactory.getFanetixClientManager();
             adminManager = AdministratorFactory.getAdministratorManager();
+           
             tfPassword.setVisible(false);
             pfPassword.textProperty().addListener(this::textPropertyChange);
             tfPassword.textProperty().addListener(this::textPropertyChange);
             tgbtnEyeIcon.setOnAction(this::togglePasswordVisibility);
+             
             hypSignUp.setOnAction(this::handlerHyperlink);
-            hypForgotPassword.setOnAction(this::handlerHyperlink);
+             
+            //hypForgotPassword.setOnAction(this::handlerHyperlink);
+            
             stage.setOnCloseRequest(event -> handleOnActionExit(event));
+            System.out.println("aqui llega 1");
             stage.show();
             logger.info("Showing the SignIn window.");
         } catch (Exception e) {
@@ -206,8 +212,7 @@ public class SignInViewController {
             tidResetPass.setHeaderText("Enter your email.");
             Optional<String> result = tidResetPass.showAndWait();
             if (result.isPresent()) {
-                //ESTO SERIA SI SOLO EL CLIENTE PUEDE HACER EL RESTORE, EL PROBLEMA ES QUE NO TENEMOS UN FANETIXUSERMANAGER PORQUE NO ESTA BIEN LA HERENCIA POR LO VISTO
-                // clientManager.resetPassword(result.get());
+               // clientManager.resetPasswd(result.get());
             }
             showAlert("Email", "An email with the recovery password was sent to: " + result.get(), INFORMATION);
         }

@@ -271,7 +271,7 @@ public class SignUpViewController {
         // Make the "tfShowConfirmPassword" field hidden.
         tfShowConfirmPassword.setVisible(false);
         // Set the CheckBox to be selected 
-        cbxStatus.setSelected(true);
+//        cbxStatus.setSelected(true);
         // Hide all error labels.
         clearErrorLabels();
         setTooltips();
@@ -809,7 +809,7 @@ public class SignUpViewController {
         tfZip.clear();
         tfCity.clear();
         tfMobile.clear();
-        cbxStatus.setSelected(true);
+       // cbxStatus.setSelected(true);
     }
 
     /**

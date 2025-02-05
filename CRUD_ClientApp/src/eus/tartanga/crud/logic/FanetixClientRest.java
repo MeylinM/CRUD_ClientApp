@@ -26,7 +26,7 @@ import javax.ws.rs.core.GenericType;
  *
  * @author Elbire and Meylin
  */
-public class FanetixClientRest implements FanetixClientManager{
+public class FanetixClientRest implements FanetixClientManager {
 
     private WebTarget webTarget;
     private Client client;
