@@ -515,27 +515,33 @@ public class ArtistViewController {
 
 // Método para eliminar los conciertos asociados a un artista
     private boolean eliminarConciertosAsociados(Artist selectedArtist) {
-        // Obtener la lista de todos los conciertos
-        List<Concert> concertList = concertManager.findAllConcerts_XML(new GenericType<List<Concert>>() {
-        });
-
-        if (concertList == null) {
-            logger.severe("No se pudo obtener la lista de conciertos.");
-            return false;
+        try {
+            // Obtener la lista de todos los conciertos
+            
+            List<Concert> concertList = concertManager.findAllConcerts_XML(new GenericType<List<Concert>>() {
+            });
+            
+            if (concertList == null) {
+                logger.severe("No se pudo obtener la lista de conciertos.");
+                return false;
+            }
+            
+            // Filtrar los conciertos que contienen al artista seleccionado
+            List<Concert> concertsToDelete = concertList.stream()
+                    .filter(concert -> concert.getArtistList() != null && concert.getArtistList().contains(selectedArtist))
+                    .collect(Collectors.toList());
+            
+            if (!concertsToDelete.isEmpty()) {
+                // Si se encontraron conciertos asociados, regresamos 'true' para indicar que no se debe eliminar el artista
+                return true;
+            }
+            
+            // Si no se encontraron conciertos, regresamos 'false'
+            logger.info("No se encontraron conciertos asociados al artista " + selectedArtist.getName());
+            
+        } catch (ReadException ex) {
+            Logger.getLogger(ArtistViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        // Filtrar los conciertos que contienen al artista seleccionado
-        List<Concert> concertsToDelete = concertList.stream()
-                .filter(concert -> concert.getArtistList() != null && concert.getArtistList().contains(selectedArtist))
-                .collect(Collectors.toList());
-
-        if (!concertsToDelete.isEmpty()) {
-            // Si se encontraron conciertos asociados, regresamos 'true' para indicar que no se debe eliminar el artista
-            return true;
-        }
-
-        // Si no se encontraron conciertos, regresamos 'false'
-        logger.info("No se encontraron conciertos asociados al artista " + selectedArtist.getName());
         return false;
     }
 
