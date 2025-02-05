@@ -396,6 +396,19 @@ public class CartOrdersViewController {
 
     }
 
+    
+    private List<Product> findAllProducts() {
+        List<Product> products = null;
+        try {
+            products = productManager.findAll_XML(new GenericType<List<Product>>() {
+            });
+            return products;
+        } catch (ReadException e) {
+            showErrorAlert("An error occurred while getting the product list");
+        }
+        return products;
+    }
+    
     private void handleBuyProduct(ActionEvent event) {
         List<Cart> buy = findAllNotBoughtCartProducts();
         try {

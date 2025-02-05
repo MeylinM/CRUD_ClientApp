@@ -20,38 +20,23 @@ import javafx.stage.Stage;
 /**
  * FXML Controller class for MenuBarView.fxml.
  *
- * @author
+ * @author Meylin and Elbire
  */
-public class MenuBarViewController implements Initializable{
-
-    @FXML
-    private MenuBar menu;
-
-    @FXML
-    private MenuItem itemProfile;
-
-    @FXML
-    private MenuItem itemMyOrders;
-
-    @FXML
-    private MenuItem itemLogOut;
-
-    @FXML
-    private MenuItem itemArtist;
+public class MenuBarViewController implements Initializable {
 
     @FXML
     private Menu menuArtist;
-    
+
     @FXML
     private Menu menuMyCart;
-    
+
     @FXML
     private Menu menuHelp;
 
     private static FanetixUser loggedUser;
     private static Stage stageMenu;
     private static final Logger LOGGER = Logger.getLogger("package view");
-    
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         menuArtist.showingProperty().addListener(
@@ -112,22 +97,12 @@ public class MenuBarViewController implements Initializable{
     public void logOut() {
 
         try {
-            // Cargar el archivo FXML de SignInView
+
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/SignInView.fxml"));
-            Parent root = loader.load();
-            // Crear una nueva ventana para SignIn
-            Stage signInStage = new Stage();
-            signInStage.setScene(new Scene(root));
-            signInStage.setTitle("Sign In");
-
-            // Obtener el Stage actual (la ventana que contiene el menú)
-            Stage currentStage = (Stage) menu.getScene().getWindow();
-
-            // Cerrar la ventana actual
-            currentStage.close();
-
-            // Mostrar la ventana de inicio de sesión
-            signInStage.show();
+            Parent root = (Parent) loader.load();
+            SignInViewController controller = ((SignInViewController) loader.getController());
+            controller.setStage(stageMenu);
+            controller.initStage(root);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Error loading SignInView.fxml", e);
         }
@@ -141,7 +116,7 @@ public class MenuBarViewController implements Initializable{
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ArtistView.fxml"));
             Parent root = loader.load();
             ArtistViewController controller = loader.getController();
-            controller.setStage(stageMenu); 
+            controller.setStage(stageMenu);
             controller.initStage(root);
         } catch (IOException e) {
             e.printStackTrace();
@@ -196,7 +171,5 @@ public class MenuBarViewController implements Initializable{
     public static void setStageMenu(Stage stageMenu) {
         MenuBarViewController.stageMenu = stageMenu;
     }
-
-    
 
 }
