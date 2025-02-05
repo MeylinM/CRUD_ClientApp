@@ -15,15 +15,21 @@ import eus.tartanga.crud.logic.ArtistFactory;
 import eus.tartanga.crud.logic.ArtistManager;
 import eus.tartanga.crud.logic.ConcertFactory;
 import eus.tartanga.crud.logic.ConcertManager;
+import eus.tartanga.crud.logic.FanetixClientFactory;
+import eus.tartanga.crud.logic.FanetixClientManager;
 import eus.tartanga.crud.model.Artist;
 import eus.tartanga.crud.model.Concert;
+import eus.tartanga.crud.model.FanetixClient;
+import eus.tartanga.crud.model.FanetixUser;
 import eus.tartanga.crud.userInterface.factories.ConcertDateEditingCell;
 import eus.tartanga.crud.userInterface.factories.ConcertTimeEditingCell;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Collection;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -37,7 +43,9 @@ import javafx.scene.image.ImageView;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.transformation.FilteredList;
@@ -48,12 +56,14 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldTableCell;
@@ -137,6 +147,8 @@ public class ConcertViewController {
     private ArtistManager artistManager;
     private ObservableList<Artist> artistList = FXCollections.observableArrayList();
     private Alert alert;
+    private FanetixClient client;
+    private FanetixClientManager clientManager;
 
     public void setStage(Stage stage) {
         this.stage = stage;
@@ -153,11 +165,14 @@ public class ConcertViewController {
             stage.setResizable(false);
             stage.show();
 
+            //Inicializar las factorias
             concertManager = ConcertFactory.getConcertManager();
             artistManager = ArtistFactory.getArtistManager();
+            clientManager = FanetixClientFactory.getFanetixClientManager();
 
-            // Hacer la tabla editable
-            concertTable.setEditable(true);
+            //Conseguir la información del usuario loggeado
+            FanetixUser user = MenuBarViewController.getLoggedUser();
+            client = getFanetixClient(user.getEmail());
 
             // Configurar columnas básicas
             billboardColumn.setCellValueFactory(new PropertyValueFactory<>("billboard"));
@@ -167,10 +182,6 @@ public class ConcertViewController {
             cityColumn.setCellValueFactory(new PropertyValueFactory<>("city"));
             dateColumn.setCellValueFactory(new PropertyValueFactory<>("concertDate"));
             timeColumn.setCellValueFactory(new PropertyValueFactory<>("concertTime"));
-
-            //Obtener lista de artistas
-            artistList = FXCollections.observableArrayList(artistManager.findAllArtist(new GenericType<List<Artist>>() {
-            }));
 
             //Esta columna no es editable
             billboardColumn.setCellFactory(column -> new TableCell<Concert, byte[]>() {
@@ -201,99 +212,136 @@ public class ConcertViewController {
                 }
             });
 
-            //Hacer las columnas editables REVISAR EL DISEÑO DEL CANVA
-            concertColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-            concertColumn.setOnEditCommit(event -> {
-                Concert concert = event.getRowValue();
-                String concertName = concert.getConcertName();
-                try {
-                    concert.setConcertName(event.getNewValue());
-                    if (concert.getConcertName() == null || concert.getConcertName().isEmpty()) {
-                        throw new TextEmptyException("El nombre del concierto o tour no puede estar vacío");
-                    } else if (concert.getConcertName().length() > 50) {
-                        throw new MaxCharacterException("El nombre del concierto no puede tener mas de 50 caracteres");
+            if (client != null) {
+                dateColumn.setCellFactory(column -> new TableCell<Concert, Date>() {
+                    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+
+                    @Override
+                    protected void updateItem(Date item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty || item == null) {
+                            setText(null);
+                        } else {
+                            setText(dateFormat.format(item));
+                        }
                     }
-                    updateConcert(concert);
-                } catch (TextEmptyException | MaxCharacterException e) {
-                    logger.severe(e.getMessage());
-                    concert.setConcertName(concertName);
-                    concertTable.refresh();
-                    alert.setTitle("Error");
-                    alert.setHeaderText("Error de validación");
-                    alert.setContentText(e.getMessage());
-                    alert.showAndWait();
-                }
-            });
-            //artistColumn
+                });
+                timeColumn.setCellFactory(column -> new TableCell<Concert, Date>() {
+                    private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
 
-            locationColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-            locationColumn.setOnEditCommit(event -> {
-                Concert concert = event.getRowValue();
-                String concertLocation = concert.getLocation();
-                try {
-                    concert.setLocation(event.getNewValue());
-                    if (concert.getLocation() == null || concert.getLocation().isEmpty()) {
-                        throw new TextEmptyException("La ubicación del concierto o tour no puede estar vacío");
-                    } else if (concert.getLocation().length() > 50) {
-                        throw new MaxCharacterException("El nombre del concierto no puede tener mas de 50 caracteres");
+                    @Override
+                    protected void updateItem(Date item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty || item == null) {
+                            setText(null);
+                        } else {
+                            setText(timeFormat.format(item));
+                        }
                     }
-                    updateConcert(concert);
-                } catch (TextEmptyException | MaxCharacterException e) {
-                    logger.severe(e.getMessage());
-                    concert.setLocation(concertLocation);
-                    concertTable.refresh();
-                    alert.setTitle("Error");
-                    alert.setHeaderText("Error de validación");
-                    alert.setContentText(e.getMessage());
-                    alert.showAndWait();
-                }
-                concert.setLocation(event.getNewValue());//ESTO PORQUE AQUI OTRA VEZ SI EN EL OTRO NO TA
-            });
-
-            cityColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-            cityColumn.setOnEditCommit(event -> {
-                Concert concert = event.getRowValue();
-                String concertCity = concert.getCity();
-                try {
-                    concert.setCity(event.getNewValue());
-                    if (concert.getCity() == null || concert.getCity().isEmpty()) {
-                        throw new TextEmptyException("La ubicación del concierto o tour no puede estar vacío");
-                    } else if (concert.getCity().length() > 50) {
-                        throw new MaxCharacterException("El nombre del concierto no puede tener mas de 50 caracteres");
+                });
+                btnAddConcert.setVisible(false);
+                btnDeleteConcert.setVisible(false);
+            } else {
+                //Selección múltiple en tabla para el uso del botón delete.
+                concertTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+                //Hacer la tabla editable
+                concertTable.setEditable(true);
+                //Obtener lista de artistas
+                artistList = FXCollections.observableArrayList(artistManager.findAllArtist(new GenericType<List<Artist>>() {
+                }));
+                //Hacer las columnas editables
+                concertColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+                concertColumn.setOnEditCommit(event -> {
+                    Concert concert = event.getRowValue();
+                    String concertName = concert.getConcertName();
+                    try {
+                        concert.setConcertName(event.getNewValue());
+                        if (concert.getConcertName() == null || concert.getConcertName().isEmpty()) {
+                            throw new TextEmptyException("El nombre del concierto o tour no puede estar vacío");
+                        } else if (concert.getConcertName().length() > 50) {
+                            throw new MaxCharacterException("El nombre del concierto no puede tener mas de 50 caracteres");
+                        }
+                        updateConcert(concert);
+                    } catch (TextEmptyException | MaxCharacterException e) {
+                        logger.severe(e.getMessage());
+                        concert.setConcertName(concertName);
+                        concertTable.refresh();
+                        alert.setTitle("Error");
+                        alert.setHeaderText("Error de validación");
+                        alert.setContentText(e.getMessage());
+                        alert.showAndWait();
                     }
+                });
+
+                locationColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+                locationColumn.setOnEditCommit(event -> {
+                    Concert concert = event.getRowValue();
+                    String concertLocation = concert.getLocation();
+                    try {
+                        concert.setLocation(event.getNewValue());
+                        if (concert.getLocation() == null || concert.getLocation().isEmpty()) {
+                            throw new TextEmptyException("La ubicación del concierto o tour no puede estar vacío");
+                        } else if (concert.getLocation().length() > 50) {
+                            throw new MaxCharacterException("El nombre del concierto no puede tener mas de 50 caracteres");
+                        }
+                        updateConcert(concert);
+                    } catch (TextEmptyException | MaxCharacterException e) {
+                        logger.severe(e.getMessage());
+                        concert.setLocation(concertLocation);
+                        concertTable.refresh();
+                        alert.setTitle("Error");
+                        alert.setHeaderText("Error de validación");
+                        alert.setContentText(e.getMessage());
+                        alert.showAndWait();
+                    }
+                    concert.setLocation(event.getNewValue());//ESTO PORQUE AQUI OTRA VEZ SI EN EL OTRO NO TA
+                });
+
+                cityColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+                cityColumn.setOnEditCommit(event -> {
+                    Concert concert = event.getRowValue();
+                    String concertCity = concert.getCity();
+                    try {
+                        concert.setCity(event.getNewValue());
+                        if (concert.getCity() == null || concert.getCity().isEmpty()) {
+                            throw new TextEmptyException("La ubicación del concierto o tour no puede estar vacío");
+                        } else if (concert.getCity().length() > 50) {
+                            throw new MaxCharacterException("El nombre del concierto no puede tener mas de 50 caracteres");
+                        }
+                        updateConcert(concert);
+                    } catch (TextEmptyException | MaxCharacterException e) {
+                        logger.severe(e.getMessage());
+                        concert.setCity(concertCity);
+                        concertTable.refresh();
+                        alert.setTitle("Error");
+                        alert.setHeaderText("Error de validación");
+                        alert.setContentText(e.getMessage());
+                        alert.showAndWait();
+                    }
+                    concert.setCity(event.getNewValue());//ESTO PORQUE AQUI OTRA VEZ SI EN EL OTRO NO TA
+                });
+
+                final Callback<TableColumn<Concert, Date>, TableCell<Concert, Date>> dateCell
+                        = (TableColumn<Concert, Date> param) -> new ConcertDateEditingCell();
+                dateColumn.setCellFactory(dateCell);
+                dateColumn.setOnEditCommit(event -> {
+                    Concert concert = event.getRowValue();
+                    concert.setConcertDate(event.getNewValue());
                     updateConcert(concert);
-                } catch (TextEmptyException | MaxCharacterException e) {
-                    logger.severe(e.getMessage());
-                    concert.setCity(concertCity);
-                    concertTable.refresh();
-                    alert.setTitle("Error");
-                    alert.setHeaderText("Error de validación");
-                    alert.setContentText(e.getMessage());
-                    alert.showAndWait();
-                }
-                concert.setCity(event.getNewValue());//ESTO PORQUE AQUI OTRA VEZ SI EN EL OTRO NO TA
-            });
+                });
 
-            final Callback<TableColumn<Concert, Date>, TableCell<Concert, Date>> dateCell
-                    = (TableColumn<Concert, Date> param) -> new ConcertDateEditingCell();
-            dateColumn.setCellFactory(dateCell);
-            dateColumn.setOnEditCommit(event -> {
-                Concert concert = event.getRowValue();
-                concert.setConcertDate(event.getNewValue());
-                updateConcert(concert);
-            });
+                final Callback<TableColumn<Concert, Date>, TableCell<Concert, Date>> timeCell
+                        = (TableColumn<Concert, Date> param) -> new ConcertTimeEditingCell();
+                timeColumn.setCellFactory(timeCell);
+                timeColumn.setOnEditCommit(event -> {
+                    Concert concert = event.getRowValue();
+                    concert.setConcertTime(event.getNewValue());
+                    updateConcert(concert);
+                });
+                btnAddConcert.setOnAction(this::handleAddConcert);
+                btnDeleteConcert.setOnAction(this::handleDeleteConcert);
 
-            final Callback<TableColumn<Concert, Date>, TableCell<Concert, Date>> timeCell
-                    = (TableColumn<Concert, Date> param) -> new ConcertTimeEditingCell();
-            timeColumn.setCellFactory(timeCell);
-            timeColumn.setOnEditCommit(event -> {
-                Concert concert = event.getRowValue();
-                concert.setConcertTime(event.getNewValue());
-                updateConcert(concert);
-            });
-
-            btnAddConcert.setOnAction(this::handleAddConcert);
-            btnDeleteConcert.setOnAction(this::handleDeleteConcert);
+            }
             btnInfo.setOnAction(this::handleInfoButton);
             //Inicializar los menu contextuales
             createContextMenu();
@@ -328,7 +376,7 @@ public class ConcertViewController {
             refreshConcertList();
         } catch (AddException e) {
             logger.severe(e.getMessage());
-            showAlert("An error occurred while creating the concert");
+            showAlert("Server error", "An error occurred while creating the concert");
         }
     }
 
@@ -339,22 +387,30 @@ public class ConcertViewController {
     }
 
     private void handleDeleteConcert(ActionEvent event) {
-        Concert selectedConcert = concertTable.getSelectionModel().getSelectedItem();
+        ObservableList<Concert> selectedConcerts = concertTable.getSelectionModel().getSelectedItems();
 
-        if (selectedConcert != null) {
+        if (selectedConcerts.isEmpty()) {
+            showAlert("Error de selección", "No se ha seleccionado ningún concierto");
+            return;
+        }
+        Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmationAlert.setTitle("Confirm Deletion");
+        confirmationAlert.setHeaderText(null);
+        confirmationAlert.setContentText("Do you want to delete the selected concert(s)?");
+
+        Optional<ButtonType> result = confirmationAlert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
-                //Elimina el concierto de la base de datos
-                concertManager.removeConcert(selectedConcert.getConcertId().toString());
-                //Elimina el producto de la lista observable
-                concertList.remove(selectedConcert);
-                logger.log(Level.INFO, "Concierto eliminado con exito{0}", selectedConcert.getConcertName());
-            } catch (DeleteException e) {
-                logger.log(Level.SEVERE, "Error al eliminar el concierto{0}", e.getMessage());
-                showAlert("Error al eliminar el concierto");
+                for (Concert concert : new ArrayList<>(selectedConcerts)) {
+                    concertManager.removeConcert(concert.getConcertId().toString());
+                    //Elimina el producto de la lista observable
+                    concertList.remove(concert);
+                    logger.log(Level.INFO, "Concierto eliminado con exito{0}", concert.getConcertName());
+                }
+            } catch (DeleteException ex) {
+                logger.log(Level.SEVERE, "Error al eliminar el concierto{0}", ex.getMessage());
+                showAlert("Server error", "Error al eliminar el concierto");
             }
-        } else {
-            logger.warning("No se ha seleccionado ningun concieto para eliminar");
-            showAlert("No se ha seleccionado ningun concieto para eliminar");
         }
     }
 
@@ -366,10 +422,14 @@ public class ConcertViewController {
             ConcertHelpController helpController
                     = ((ConcertHelpController) loader.getController());
             //Initializes and shows help stage
-            helpController.initAndShowStage(root);
+            if (client != null) {
+                helpController.initAndShowStageClient(root);
+            } else {
+                helpController.initAndShowStageAdmin(root);
+            }
         } catch (IOException ex) {
             logger.warning("No se ha podido cargar la ayuda");
-            showAlert("No se ha podido cargar la ayuda");
+            showAlert("Error en el help", "No se ha podido cargar la ayuda");
         }
     }
 
@@ -381,7 +441,7 @@ public class ConcertViewController {
             return concerts;
         } catch (ReadException ex) {
             Logger.getLogger(ConcertViewController.class.getName()).log(Level.SEVERE, null, ex);
-            showAlert("Ha ocurrido un error al cargar los conciertos");
+            showAlert("Error de servidor", "Ha ocurrido un error al cargar los conciertos");
         }
         return concerts;
     }
@@ -391,34 +451,42 @@ public class ConcertViewController {
             concertManager.updateConcert_XML(concert, concert.getConcertId().toString());
         } catch (UpdateException e) {
             logger.severe(e.getMessage());
-            showAlert("Ha ocurrido un error al actualizar los conciertos");
+            showAlert("Error de servior", "Ha ocurrido un error al actualizar los conciertos");
         }
     }
 
     private void createContextMenu() {
+        //Crear menú contextual dentro de la tabla
         contextMenuInside = new ContextMenu();
-        MenuItem addItem = new MenuItem("Add new concert");
-        addItem.setOnAction(this::handleAddConcert);
-        MenuItem deleteItem = new MenuItem("Delete");
-        deleteItem.setOnAction(this::handleDeleteConcert);
         MenuItem printItemInside = new MenuItem("Print");
         printItemInside.setOnAction(this::printItems);
-        MenuItem selectArtistItem = new MenuItem("Select artist/s");
-        selectArtistItem.setOnAction(event -> {
-            Concert selectedArtist = concertTable.getSelectionModel().getSelectedItem();
-            if (selectedArtist != null) {
-                showArtistSelectionDialog(selectedArtist);
-            }
-        });
-        contextMenuInside.getItems().addAll(addItem, deleteItem, printItemInside, selectArtistItem);
-
+        if (client != null) {
+            contextMenuInside.getItems().addAll(printItemInside);
+        } else {
+            MenuItem addItem = new MenuItem("Add new concert");
+            addItem.setOnAction(this::handleAddConcert);
+            MenuItem deleteItem = new MenuItem("Delete");
+            deleteItem.setOnAction(this::handleDeleteConcert);
+            MenuItem selectArtistItem = new MenuItem("Select artist/s");
+            selectArtistItem.setOnAction(event -> {
+                Concert selectedArtist = concertTable.getSelectionModel().getSelectedItem();
+                if (selectedArtist != null) {
+                    showArtistSelectionDialog(selectedArtist);
+                }
+            });
+            contextMenuInside.getItems().addAll(addItem, deleteItem, printItemInside, selectArtistItem);
+        }
         // Crear menú contextual para clics fuera de la tabla
         contextMenuOutside = new ContextMenu();
         MenuItem printItemOutside = new MenuItem("Print");
         printItemOutside.setOnAction(this::printItems);
-        MenuItem addItemOutside = new MenuItem("Add new concert");
-        addItemOutside.setOnAction(this::handleAddConcert);
-        contextMenuOutside.getItems().addAll(printItemOutside, addItemOutside);
+        if (client != null) {
+            contextMenuOutside.getItems().addAll(printItemOutside);
+        } else {
+            MenuItem addItemOutside = new MenuItem("Add new concert");
+            addItemOutside.setOnAction(this::handleAddConcert);
+            contextMenuOutside.getItems().addAll(printItemOutside, addItemOutside);
+        }
     }
 
     private void showArtistSelectionDialog(Concert concert) {
@@ -485,7 +553,7 @@ public class ConcertViewController {
             artistStage.show();
         } catch (Exception ex) {
             logger.log(Level.SEVERE, "Error", ex);
-            showAlert("Ha ocurrido un error al seleccionar los artistas");
+            showAlert("Error de selección", "Ha ocurrido un error al seleccionar los artistas");
         }
     }
 
@@ -636,11 +704,21 @@ public class ConcertViewController {
         });
     }
 
-    private void showAlert(String message) {
+    private void showAlert(String header, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
-        alert.setHeaderText("Error de servidor");
+        alert.setHeaderText(header);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    private FanetixClient getFanetixClient(String email) {
+        try {
+            client = clientManager.findClient_XML(new GenericType<FanetixClient>() {
+            }, email);
+        } catch (ReadException ex) {
+            Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return client;
     }
 }

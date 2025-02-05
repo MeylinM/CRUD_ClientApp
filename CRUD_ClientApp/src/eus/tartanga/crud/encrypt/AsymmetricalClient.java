@@ -20,7 +20,7 @@ import java.security.spec.X509EncodedKeySpec;
 //Este metodo se usa para cifrar la contraseña usando una clave publica RSA
 public class AsymmetricalClient {
 
-    public byte[] encyptedData(String passwd) throws EncryptException {
+    public byte[] encryptedData(String passwd) throws EncryptException {
         byte[] encryptedData;
         // Cargar la clave pública desde un recurso del classpath
         try {

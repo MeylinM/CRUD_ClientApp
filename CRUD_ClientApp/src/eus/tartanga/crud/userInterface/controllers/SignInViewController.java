@@ -129,7 +129,7 @@ public class SignInViewController {
             byte[] encryptedPasswrd;
 
             try {
-                encryptedPasswrd = asymmetricalClient.encyptedData(passwrd);
+                encryptedPasswrd = asymmetricalClient.encryptedData(passwrd);
             } catch (EncryptException ex) {
                 logger.severe("Encryption error");
                 new Alert(Alert.AlertType.ERROR, "Error loging in. Please try again.", ButtonType.OK).showAndWait();

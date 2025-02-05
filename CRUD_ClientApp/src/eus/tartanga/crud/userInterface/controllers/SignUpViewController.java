@@ -551,7 +551,7 @@ public class SignUpViewController {
                 byte[] encryptedPassword;
 
                 try {
-                    encryptedPassword = asymmetricalClient.encyptedData(password);
+                    encryptedPassword = asymmetricalClient.encryptedData(password);
                 } catch (EncryptException ex) {
                     LOGGER.severe("Encryption error");
                     new Alert(Alert.AlertType.ERROR, "Error encrypting the password. Please try again.", ButtonType.OK).showAndWait();
