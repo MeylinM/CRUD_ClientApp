@@ -18,7 +18,6 @@ import eus.tartanga.crud.model.FanetixUser;
 import eus.tartanga.crud.model.Product;
 import eus.tartanga.crud.userInterface.factories.CartDateEditingCell;
 import eus.tartanga.crud.userInterface.factories.CartSpinnerEditingCell;
-import eus.tartanga.crud.userInterface.factories.ProductDateEditingCell;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -37,6 +36,7 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -159,8 +159,7 @@ public class CartOrdersViewController {
         //General para ambas vistas de la ventana
         //Añadir a la ventana el ícono “FanetixLogo.png”.
         stage.getIcons().add(new Image("eus/tartanga/crud/app/resources/logo.png"));
-        //Ventana no redimensionable
-        stage.setResizable(false);
+       
         this.isCartView = isCartView;
         clientManager = FanetixClientFactory.getFanetixClientManager();
         FanetixUser user = MenuBarViewController.getLoggedUser();
@@ -250,8 +249,10 @@ public class CartOrdersViewController {
                 }
             }
         });
-         //Cantidad del prodcuto
+        //Cantidad del prodcuto
         tbcQuantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+
+
         /* -Sub total es una columna con un valor calculado con la cantidad y el precio*/
         tbcSubTotal.setCellValueFactory(cellData -> {
             Cart cart = cellData.getValue();
@@ -303,21 +304,39 @@ public class CartOrdersViewController {
                 updateCart(cart);
             });
 
-             //Columna Quantity: Configurar como editable con un Spinner
+            //Columna Quantity: Configurar como editable con un Spinner
             /*
             *donde el valor mínimo será 1 y el máximo será el stock 
             * disponible (Product.getStock()). 
              */
+            tbcQuantity.setEditable(true);
+
             final Callback<TableColumn<Cart, Integer>, TableCell<Cart, Integer>> quantityCellFactory = (TableColumn<Cart, Integer> param) -> new CartSpinnerEditingCell();
             tbcQuantity.setCellFactory(quantityCellFactory);
-
-            tbcQuantity.setEditable(true);
 
             // Manejar el evento cuando se edita el valor de la cantidad
             tbcQuantity.setOnEditCommit(event -> {
                 Cart cart = event.getRowValue();
-                cart.setQuantity(event.getNewValue()); // Actualiza la cantidad en el modelo de datos
-                updateCart(cart); // Actualiza el carrito, puedes personalizar esta lógica
+                int newQuantity = event.getNewValue();
+
+                // Validar que la cantidad no exceda el stock disponible
+                if (newQuantity > Integer.parseInt(cart.getProduct().getStock())) {
+                    cart.setQuantity(event.getOldValue()); // Restaurar el valor anterior
+                    tbCart.refresh();
+
+                    // Mostrar el Alert de manera asincrónica
+                    Platform.runLater(() -> {
+                        Alert alert = new Alert(Alert.AlertType.WARNING);
+                        alert.setTitle("Stock insuficiente");
+                        alert.setHeaderText(null);
+                        alert.setContentText("Solo hay " + cart.getProduct().getStock() + " unidades disponibles.");
+                        alert.showAndWait(); // Esto ahora se ejecutará sin el error
+                    });
+
+                } else {
+                    cart.setQuantity(newQuantity); // Actualizar la cantidad en el carrito
+                    updateCart(cart); // Llamar a tu método para actualizar el carrito
+                }
             });
 
             //"btnBuy". (Botón por defecto)
@@ -514,7 +533,7 @@ public class CartOrdersViewController {
         List<Cart> carts = findAllNotBoughtCartProducts();
         // Iterar sobre cada producto en el carrito
         for (Cart cart : carts) {
-            total += cart.getQuantity() * Float.valueOf(cart.getProduct().getPrice());
+            //total += cart.getQuantity() * Float.valueOf(cart.getProduct().getPrice());
         }
 
         // Formatear el total con el patrón “###.###,##”
