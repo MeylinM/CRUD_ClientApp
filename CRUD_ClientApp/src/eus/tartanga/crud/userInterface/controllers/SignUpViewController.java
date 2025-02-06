@@ -272,6 +272,8 @@ public class SignUpViewController {
         tfShowPassword.setVisible(false);
         // Make the "tfShowConfirmPassword" field hidden.
         tfShowConfirmPassword.setVisible(false);
+        imgEyePasswd.setImage(new Image("/eus/tartanga/crud/app/resources/ShowPasswdSignUp.png"));
+        imgEyeConfirmPasswd.setImage(new Image("/eus/tartanga/crud/app/resources/ShowPasswdSignUp.png"));
         // Set the CheckBox to be selected 
 //        cbxStatus.setSelected(true);
         // Hide all error labels.
@@ -355,24 +357,20 @@ public class SignUpViewController {
      */
     @FXML
     private void handelEyeIconToggleButtonAction(ActionEvent event) {
-
-        Image hiddenEyeIcon = new Image(getClass().getResourceAsStream("eus/tartanga/crud/app/resources/HidePasswdSignUp.png"));
-        Image visibleEyeIcon = new Image(getClass().getResourceAsStream("eus/tartanga/crud/app/resources/ShowPasswdSignUp.png"));
-
         if (tgbEyePasswd.isSelected()) {
             // PasswordField “pfHiddenPassword” will become invisible.
             pfHiddenPassword.setVisible(false);
             // TextField “tfShowPassword” will become visible.
             tfShowPassword.setVisible(true);
             // The imgEyePasswd icon changes to HidePasswdOrange.png.
-            imgEyePasswd.setImage(hiddenEyeIcon);
+            imgEyePasswd.setImage(new Image("/eus/tartanga/crud/app/resources/HidePasswdSingUp.png"));
         } else {
             // TextField “tfShowPassword” will become invisible.
             tfShowPassword.setVisible(false);
             // PasswordField “pfHiddenPassword” will become visible.
             pfHiddenPassword.setVisible(true);
             // The imgEyePasswd icon changes to ShowPasswdOrange.png.
-            imgEyePasswd.setImage(visibleEyeIcon);
+            imgEyePasswd.setImage(new Image("/eus/tartanga/crud/app/resources/ShowPasswdSignUp.png"));
         }
 
         if (tgbEyeConfirmPasswd.isSelected()) {
@@ -381,15 +379,16 @@ public class SignUpViewController {
             // TextField “tfShowConfirmPassword” will become visible.
             tfShowConfirmPassword.setVisible(true);
             // The imgEyeConfirmPasswd icon changes to HidePasswdOrange.png.
-            imgEyeConfirmPasswd.setImage(hiddenEyeIcon);
+            imgEyeConfirmPasswd.setImage(new Image("/eus/tartanga/crud/app/resources/HidePasswdSingUp.png"));
         } else {
             // TextField “tfShowConfirmPassword” will become invisible.
             tfShowConfirmPassword.setVisible(false);
             // PasswordField “pfHiddenConfirmPassword” will become visible.
             pfHiddenConfirmPassword.setVisible(true);
             // The imgEyeConfirmPasswd icon changes to ShowPasswdOrange.png.
-            imgEyeConfirmPasswd.setImage(visibleEyeIcon);
+            imgEyeConfirmPasswd.setImage(new Image("/eus/tartanga/crud/app/resources/ShowPasswdSignUp.png"));
         }
+
     }
 
     /**
@@ -575,7 +574,6 @@ public class SignUpViewController {
                     stage.close(); // Cierra la ventana de SignUp
                 }
             }
-
 
         } catch (ReadException | AddException e) {
 
@@ -814,7 +812,7 @@ public class SignUpViewController {
         tfZip.clear();
         tfCity.clear();
         tfMobile.clear();
-       // cbxStatus.setSelected(true);
+        // cbxStatus.setSelected(true);
     }
 
     /**

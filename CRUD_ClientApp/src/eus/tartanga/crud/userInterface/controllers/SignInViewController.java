@@ -72,7 +72,7 @@ public class SignInViewController {
             stage.setTitle("SignIn");
 
             //Añadir a la ventana el ícono “FanetixLogo.png”.
-            stage.getIcons().add(new Image("eus/tartanga/crud/app/resources/logo.png"));
+            stage.getIcons().add(new Image("/eus/tartanga/crud/app/resources/logo.png"));
             stage.setResizable(false);
             clientManager = FanetixClientFactory.getFanetixClientManager();
             adminManager = AdministratorFactory.getAdministratorManager();
@@ -100,9 +100,9 @@ public class SignInViewController {
         Administrator admin = null;
         String email = this.tfEmail.getText();
         String passwrd = this.pfPassword.getText();
-        try {
+       try {
 
-  /*
+  /* 
             // Validar que los campos estén informados
             if (email.isEmpty() || passwrd.isEmpty()) {
                 throw new TextEmptyException("The fields cannot be empty");
@@ -134,7 +134,7 @@ public class SignInViewController {
             Se puede decodificar fácilmente en el servidor: Una vez recibido, el servidor puede convertir la cadena Base64 
             de nuevo a bytes y desencriptarlos con la clave privada.*/
             // Convertimos la contraseña encriptada a Base64 para enviarla como String
-            String encryptedPasswrdBase64 = Base64.getEncoder().encodeToString(encryptedPasswrd);
+          /*  String encryptedPasswrdBase64 = Base64.getEncoder().encodeToString(encryptedPasswrd);
             logger.info("tras encode");
             user = clientManager.signIn_XML(new GenericType<FanetixClient>() {
             }, email, encryptedPasswrdBase64);
