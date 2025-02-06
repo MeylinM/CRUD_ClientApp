@@ -707,7 +707,8 @@ public class CartOrdersViewController {
         try {
             // Update the cart information on the server using the cart manager
             cartManager.updateCart_XML(cart, cart.getId().getEmail(), cart.getId().getProductId().toString());
-
+            // Calculate the total amount of the cart.
+            updateTotal();
             // Refresh the table view to reflect the updated cart information
             tbCart.refresh();
 
@@ -762,6 +763,13 @@ public class CartOrdersViewController {
             alert.setTitle("Purchase successful");
             alert.setHeaderText(null);
             alert.setContentText("Your products have been successfully purchased.");
+            alert.showAndWait();
+            //Update the database after buy products
+            //Get the updated list of carts
+            List<Cart> updatedCartList = findAllNotBoughtCartProducts();
+
+            // Update the table with the new list
+            tbCart.setItems(FXCollections.observableArrayList(updatedCartList));
 
             // Refresh the table view to reflect the updated cart information
             tbCart.refresh();
@@ -967,8 +975,7 @@ public class CartOrdersViewController {
         // Iterate over each product in the cart
         for (Cart cart : carts) {
             // Calculate the subtotal for each product (quantity * price)
-            // Uncomment this line to enable the total calculation
-            // total += cart.getQuantity() * Float.valueOf(cart.getProduct().getPrice());
+            total += cart.getQuantity() * Float.valueOf(cart.getProduct().getPrice());
         }
 
         // Format the total price using the pattern “###.###,##”
