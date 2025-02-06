@@ -28,7 +28,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.FixMethodOrder;
 import org.junit.runners.MethodSorters;
-/*import static org.testfx.api.FxAssert.verifyThat;
+import static org.testfx.api.FxAssert.verifyThat;
 import org.testfx.framework.junit.ApplicationTest;
 import static org.testfx.matcher.base.NodeMatchers.isVisible;
 import org.testfx.util.WaitForAsyncUtils;
@@ -36,7 +36,7 @@ import org.testfx.util.WaitForAsyncUtils;
 /**
  *
  * @author ElbireTM
- *//*
+ */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ProductViewControllerTest extends ApplicationTest{
     
@@ -72,7 +72,7 @@ public class ProductViewControllerTest extends ApplicationTest{
         //assertEquals(dateEndLocal, LocalDate.now());
         assertEquals(insertedProduct.getPrice(), "0");
         assertEquals(insertedProduct.getStock(), "1");*/
-   /* }
+    }
     
     //@Test
     public void test_delete() {
@@ -169,4 +169,3 @@ public class ProductViewControllerTest extends ApplicationTest{
     
     
 }
-*/

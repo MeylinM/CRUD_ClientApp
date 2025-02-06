@@ -9,6 +9,7 @@ import eus.tartanga.crud.exception.AddException;
 import eus.tartanga.crud.exception.DeleteException;
 import eus.tartanga.crud.exception.ReadException;
 import eus.tartanga.crud.exception.UpdateException;
+import java.util.ResourceBundle;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
@@ -33,6 +34,7 @@ public class ArtistClientRest implements ArtistManager{
 
     private WebTarget webTarget;
     private Client client;
+    //private static final String BASE_URI = ResourceBundle.getBundle("config.config").getString("BASE_URI");
     private static final String BASE_URI = "http://localhost:8080/CRUD_ServerApp/api";
 
     public ArtistClientRest() {
