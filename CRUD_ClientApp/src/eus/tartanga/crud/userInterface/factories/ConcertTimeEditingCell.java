@@ -8,10 +8,29 @@ import javafx.scene.input.KeyCode;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * Celda editable de una tabla en la interfaz de usuario que permite editar la hora
+ * de un concierto. Utiliza un {@link TextField} para permitir que el usuario ingrese
+ * la hora en formato "HH:mm".
+ * 
+ * Esta clase extiende {@link TableCell} y gestiona cómo se muestra y edita la hora
+ * en una celda de la tabla, mostrando la hora de manera legible y permitiendo la edición
+ * con un campo de texto.
+ * 
+ * @author Irati
+ */
 public class ConcertTimeEditingCell extends TableCell<Concert, Date> {
+    
+    // Formato de la hora en "HH:mm"
     private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
-    private TextField textField;
+    private TextField textField;  // Campo de texto para la edición de la hora
 
+    /**
+     * Actualiza la celda con un nuevo valor de hora, o la limpia si está vacía.
+     * 
+     * @param time La hora a mostrar en la celda.
+     * @param empty Indica si la celda está vacía.
+     */
     @Override
     public void updateItem(Date time, boolean empty) {
         super.updateItem(time, empty);
@@ -22,37 +41,53 @@ public class ConcertTimeEditingCell extends TableCell<Concert, Date> {
         }
     }
 
+    /**
+     * Inicia la edición de la celda, mostrando un {@link TextField} para que
+     * el usuario ingrese una nueva hora en formato "HH:mm".
+     */
     @Override
     public void startEdit() {
         if (!isEmpty()) {
             super.startEdit();
             textField = new TextField(getText());
+            
+            // Detectar eventos de teclas en el campo de texto
             textField.setOnKeyPressed(event -> {
                 if (event.getCode() == KeyCode.ENTER) {
-                    commitEdit(parseTime(textField.getText()));
+                    commitEdit(parseTime(textField.getText()));  // Confirmar la edición
                 } else if (event.getCode() == KeyCode.ESCAPE) {
-                    cancelEdit();
+                    cancelEdit();  // Cancelar la edición
                 }
             });
+            
             setText(null);
             setGraphic(textField);
-            textField.selectAll(); // Selecciona todo el texto al empezar la edición
+            textField.selectAll();  // Selecciona todo el texto al empezar la edición
         }
     }
 
+    /**
+     * Cancela la edición y restaura el valor original de la celda.
+     */
     @Override
     public void cancelEdit() {
         super.cancelEdit();
-        setText(timeFormat.format(getItem())); // Restaurar el texto cuando se cancela la edición
+        setText(timeFormat.format(getItem()));  // Restaurar el texto cuando se cancela la edición
         setGraphic(null);
     }
 
+    /**
+     * Parsea una cadena de texto en formato "HH:mm" a un objeto {@link Date}.
+     * 
+     * @param timeString La cadena de texto que representa la hora a convertir.
+     * @return El objeto {@link Date} correspondiente a la hora, o {@code null} si el formato es incorrecto.
+     */
     private Date parseTime(String timeString) {
         try {
             Date date = timeFormat.parse(timeString);
             return date;
         } catch (Exception e) {
-            return null; // Si el formato es incorrecto, no modificar el valor
+            return null;  // Si el formato es incorrecto, no modificar el valor
         }
     }
 }

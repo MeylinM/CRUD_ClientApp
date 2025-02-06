@@ -84,9 +84,22 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.view.JasperViewer;
 
 /**
- * FXML Controller class
+ * Clase controladora de FXML encargada de gestionar la interfaz de usuario
+ * relacionada con los conciertos. Esta clase maneja la lógica detrás de la
+ * vista donde se listan, agregan, eliminan y filtran los conciertos. Gestiona
+ * la tabla de conciertos, proporciona acciones para agregar y eliminar
+ * conciertos, e incluye filtros por texto de búsqueda, fechas y estado de los
+ * conciertos (si son próximos).
  *
- * @author 2dam
+ * El controlador interactúa con los gestores `ConcertManager`, `ArtistManager`
+ * y `FanetixClientManager` para la obtención y manipulación de datos. También
+ * maneja la visualización de alertas para mensajes de error y menús
+ * contextuales para interacciones con clic derecho en la tabla de conciertos.
+ *
+ * La clase está vinculada al archivo FXML `ConcertView.fxml` para el diseño y
+ * las interacciones de la interfaz de usuario.
+ *
+ * @autor Irati
  */
 public class ConcertViewController {
 
@@ -150,16 +163,35 @@ public class ConcertViewController {
     private FanetixClient client;
     private FanetixClientManager clientManager;
 
+    /**
+     * Establece el escenario (ventana) asociado a este controlador.
+     *
+     * @param stage El escenario que se asociará a este controlador.
+     */
     public void setStage(Stage stage) {
         this.stage = stage;
     }
 
+    /**
+     * Inicializa la ventana de conciertos y configura todos los elementos
+     * necesarios para su funcionamiento. Este método establece la escena
+     * principal de la aplicación, configura las columnas de la tabla de
+     * conciertos, y ajusta el comportamiento de edición y visualización de los
+     * conciertos. También maneja la visibilidad de botones y la creación de
+     * menús contextuales para interacción con la interfaz.
+     *
+     * @param root El nodo raíz de la interfaz de usuario en el formato FXML.
+     * @throws WebApplicationException Si ocurre un error en la aplicación web
+     * al cargar los datos.
+     * @throws ReadException Si ocurre un error al leer los datos de la base de
+     * datos o recursos.
+     */
     public void initStage(Parent root) {
         try {
             logger.info("Initializizng Concert stage");
             Scene scene = new Scene(root);
             stage.setScene(scene);
-            stage.setTitle("Concert");
+            stage.setTitle("Concerts");
             //Añadir a la ventana el ícono “FanetixLogo.png”.
             stage.getIcons().add(new Image("eus/tartanga/crud/app/resources/logo.png"));
             stage.setResizable(false);
@@ -257,9 +289,9 @@ public class ConcertViewController {
                     try {
                         concert.setConcertName(event.getNewValue());
                         if (concert.getConcertName() == null || concert.getConcertName().isEmpty()) {
-                            throw new TextEmptyException("El nombre del concierto o tour no puede estar vacío");
+                            throw new TextEmptyException("The concert name cannot be empty.");
                         } else if (concert.getConcertName().length() > 50) {
-                            throw new MaxCharacterException("El nombre del concierto no puede tener mas de 50 caracteres");
+                            throw new MaxCharacterException("The concert name cannot be longer than 50 characters.");
                         }
                         updateConcert(concert);
                     } catch (TextEmptyException | MaxCharacterException e) {
@@ -267,7 +299,7 @@ public class ConcertViewController {
                         concert.setConcertName(concertName);
                         concertTable.refresh();
                         alert.setTitle("Error");
-                        alert.setHeaderText("Error de validación");
+                        alert.setHeaderText("Validation error");
                         alert.setContentText(e.getMessage());
                         alert.showAndWait();
                     }
@@ -280,9 +312,9 @@ public class ConcertViewController {
                     try {
                         concert.setLocation(event.getNewValue());
                         if (concert.getLocation() == null || concert.getLocation().isEmpty()) {
-                            throw new TextEmptyException("La ubicación del concierto o tour no puede estar vacío");
+                            throw new TextEmptyException("The concert location cannot be empty.");
                         } else if (concert.getLocation().length() > 50) {
-                            throw new MaxCharacterException("El nombre del concierto no puede tener mas de 50 caracteres");
+                            throw new MaxCharacterException("The concert location cannot be more than 50 characters.");
                         }
                         updateConcert(concert);
                     } catch (TextEmptyException | MaxCharacterException e) {
@@ -290,11 +322,11 @@ public class ConcertViewController {
                         concert.setLocation(concertLocation);
                         concertTable.refresh();
                         alert.setTitle("Error");
-                        alert.setHeaderText("Error de validación");
+                        alert.setHeaderText("Validation error");
                         alert.setContentText(e.getMessage());
                         alert.showAndWait();
                     }
-                    concert.setLocation(event.getNewValue());//ESTO PORQUE AQUI OTRA VEZ SI EN EL OTRO NO TA
+                    concert.setLocation(event.getNewValue());
                 });
 
                 cityColumn.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -304,9 +336,9 @@ public class ConcertViewController {
                     try {
                         concert.setCity(event.getNewValue());
                         if (concert.getCity() == null || concert.getCity().isEmpty()) {
-                            throw new TextEmptyException("La ubicación del concierto o tour no puede estar vacío");
+                            throw new TextEmptyException("The concert city cannot be empty.");
                         } else if (concert.getCity().length() > 50) {
-                            throw new MaxCharacterException("El nombre del concierto no puede tener mas de 50 caracteres");
+                            throw new MaxCharacterException("The concert city cannot have more than 50 characters.");
                         }
                         updateConcert(concert);
                     } catch (TextEmptyException | MaxCharacterException e) {
@@ -314,11 +346,11 @@ public class ConcertViewController {
                         concert.setCity(concertCity);
                         concertTable.refresh();
                         alert.setTitle("Error");
-                        alert.setHeaderText("Error de validación");
+                        alert.setHeaderText("Validation error");
                         alert.setContentText(e.getMessage());
                         alert.showAndWait();
                     }
-                    concert.setCity(event.getNewValue());//ESTO PORQUE AQUI OTRA VEZ SI EN EL OTRO NO TA
+                    concert.setCity(event.getNewValue());
                 });
 
                 final Callback<TableColumn<Concert, Date>, TableCell<Concert, Date>> dateCell
@@ -366,6 +398,19 @@ public class ConcertViewController {
         }
     }
 
+    /**
+     * Maneja el evento de añadir un nuevo concierto. Crea una nueva instancia
+     * de `Concert`, asigna la lista de artistas al concierto y luego lo añade a
+     * la base de datos a través del `concertManager`. Después de añadir el
+     * concierto, se actualiza la lista de conciertos mostrados en la tabla.
+     *
+     * Si ocurre un error al intentar añadir el concierto, se captura una
+     * `AddException` y se muestra una alerta al usuario con el mensaje de
+     * error.
+     *
+     * @param event El evento de acción que se dispara cuando el usuario hace
+     * clic en el botón para añadir un concierto.
+     */
     private void handleAddConcert(ActionEvent event) {
         try {
 
@@ -380,17 +425,35 @@ public class ConcertViewController {
         }
     }
 
+    /**
+     * Refresca la lista de conciertos mostrados en la tabla. Obtiene la lista
+     * más reciente de conciertos desde la base de datos mediante el método
+     * `findAllConcerts`, actualiza la lista interna de conciertos
+     * (`concertList`) y luego actualiza la vista de la tabla para reflejar los
+     * cambios.
+     */
     private void refreshConcertList() {
         List<Concert> updatedConcerts = findAllConcerts();
         concertList.setAll(updatedConcerts);
         concertTable.refresh();
     }
 
+    /**
+     * Maneja la acción de eliminar uno o más conciertos seleccionados en la
+     * tabla. Si no se ha seleccionado ningún concierto, muestra una alerta de
+     * error. Si se ha seleccionado uno o más conciertos, muestra una
+     * confirmación de eliminación. Si el usuario confirma la eliminación, los
+     * conciertos seleccionados son eliminados de la base de datos y de la lista
+     * de la tabla.
+     *
+     * @param event El evento de acción que se desencadena al hacer clic en el
+     * botón de eliminación.
+     */
     private void handleDeleteConcert(ActionEvent event) {
         ObservableList<Concert> selectedConcerts = concertTable.getSelectionModel().getSelectedItems();
 
         if (selectedConcerts.isEmpty()) {
-            showAlert("Error de selección", "No se ha seleccionado ningún concierto");
+            showAlert("Selection error", "No concert has been selected.");
             return;
         }
         Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -403,17 +466,33 @@ public class ConcertViewController {
             try {
                 for (Concert concert : new ArrayList<>(selectedConcerts)) {
                     concertManager.removeConcert(concert.getConcertId().toString());
-                    //Elimina el producto de la lista observable
+                    //Elimina el concierto de la lista observable
                     concertList.remove(concert);
-                    logger.log(Level.INFO, "Concierto eliminado con exito{0}", concert.getConcertName());
+                    logger.log(Level.INFO, "Concert successfully deleted {0}", concert.getConcertName());
                 }
             } catch (DeleteException ex) {
-                logger.log(Level.SEVERE, "Error al eliminar el concierto{0}", ex.getMessage());
-                showAlert("Server error", "Error al eliminar el concierto");
+                logger.log(Level.SEVERE, "Error deleting the concert {0}", ex.getMessage());
+                showAlert("Server error", "Error deleting the concert");
             }
         }
     }
 
+    /**
+     * Maneja la acción del botón de información. Al hacer clic en el botón,
+     * carga y muestra una ventana de ayuda con información relacionada con la
+     * gestión de conciertos. La ventana de ayuda varía según si el usuario es
+     * un cliente o un administrador.
+     *
+     * Si el usuario es un cliente, se muestra una vista de ayuda para clientes.
+     * Si es un administrador, se muestra una vista de ayuda para
+     * administradores.
+     *
+     * Si ocurre un error al cargar la vista de ayuda, muestra una alerta de
+     * error.
+     *
+     * @param event El evento de acción que se desencadena al hacer clic en el
+     * botón de información.
+     */
     private void handleInfoButton(ActionEvent event) {
         try {
             FXMLLoader loader
@@ -421,18 +500,29 @@ public class ConcertViewController {
             Parent root = (Parent) loader.load();
             ConcertHelpController helpController
                     = ((ConcertHelpController) loader.getController());
-            //Initializes and shows help stage
+            // Inicializa y muestra la ventana de ayuda
             if (client != null) {
                 helpController.initAndShowStageClient(root);
             } else {
                 helpController.initAndShowStageAdmin(root);
             }
         } catch (IOException ex) {
-            logger.warning("No se ha podido cargar la ayuda");
-            showAlert("Error en el help", "No se ha podido cargar la ayuda");
+            logger.warning("Unable to load the help");
+            showAlert("Help error", "Unable to load the help");
         }
     }
 
+    /**
+     * Recupera la lista de todos los conciertos desde el servidor. Realiza una
+     * llamada al servicio para obtener los conciertos en formato XML y los
+     * devuelve como una lista de objetos de tipo {@link Concert}.
+     *
+     * Si ocurre un error al recuperar los conciertos, muestra una alerta de
+     * error.
+     *
+     * @return Una lista de conciertos. Si ocurre un error, devuelve
+     * {@code null}.
+     */
     private List<Concert> findAllConcerts() {
         List<Concert> concerts = null;
         try {
@@ -440,21 +530,47 @@ public class ConcertViewController {
             });
             return concerts;
         } catch (ReadException ex) {
-            Logger.getLogger(ConcertViewController.class.getName()).log(Level.SEVERE, null, ex);
-            showAlert("Error de servidor", "Ha ocurrido un error al cargar los conciertos");
+            logger.severe(ex.getMessage());
+            showAlert("Server error", "An error occurred while loading the concerts");
         }
         return concerts;
     }
 
+    /**
+     * Actualiza los datos de un concierto en el servidor. Realiza una llamada
+     * al servicio para actualizar un concierto específico en el servidor
+     * utilizando su ID como identificador.
+     *
+     * Si ocurre un error durante la actualización, muestra una alerta de error.
+     *
+     * @param concert El objeto {@link Concert} con los datos actualizados a
+     * enviar al servidor.
+     */
     private void updateConcert(Concert concert) {
         try {
             concertManager.updateConcert_XML(concert, concert.getConcertId().toString());
         } catch (UpdateException e) {
             logger.severe(e.getMessage());
-            showAlert("Error de servior", "Ha ocurrido un error al actualizar los conciertos");
+            showAlert("Server error", "An error occurred while updating the concerts");
         }
     }
 
+    /**
+     * Crea y configura los menús contextuales para las interacciones dentro y
+     * fuera de la tabla de conciertos. El menú contextual varía dependiendo de
+     * si el usuario es un cliente o un administrador.
+     *
+     * - Si el usuario es cliente, solo se habilita la opción de imprimir. - Si
+     * el usuario es administrador, se habilitan las opciones para agregar,
+     * eliminar conciertos, seleccionar artistas e imprimir.
+     *
+     * También configura las acciones asociadas a cada opción del menú
+     * contextual: - La opción "Add new concert" llama al método
+     * {@link #handleAddConcert}. - La opción "Delete" llama al método
+     * {@link #handleDeleteConcert}. - La opción "Select artist/s" abre un
+     * diálogo de selección de artistas. - La opción "Print" llama al método
+     * {@link #printItems}.
+     */
     private void createContextMenu() {
         //Crear menú contextual dentro de la tabla
         contextMenuInside = new ContextMenu();
@@ -489,6 +605,19 @@ public class ConcertViewController {
         }
     }
 
+    /**
+     * Muestra un cuadro de diálogo que permite seleccionar artistas para un
+     * concierto.
+     *
+     * Este método crea una ventana emergente donde se muestra una lista de
+     * artistas disponibles. El usuario puede seleccionar o deseleccionar
+     * artistas de la lista. Los artistas seleccionados se agregarán al
+     * concierto y se actualizarán en la base de datos. La ventana también tiene
+     * un botón de confirmación para guardar los cambios.
+     *
+     * @param concert El concierto al que se le agregarán los artistas
+     * seleccionados.
+     */
     private void showArtistSelectionDialog(Concert concert) {
         Stage artistStage = new Stage();
         artistStage.setTitle("Select Artists");
@@ -506,7 +635,7 @@ public class ConcertViewController {
                     protected void updateItem(Artist item, boolean empty) {
                         super.updateItem(item, empty);
                         if (item != null) {
-                            setText(item.getName()); // Mostrar el nombre de la categoría
+                            setText(item.getName()); // Mostrar el nombre del artista
                         } else {
                             setText(null);
                         }
@@ -538,7 +667,7 @@ public class ConcertViewController {
                         concertTable.refresh();
                         logger.log(Level.INFO, "Selected Artist: {0}", concert.getConcertName());
                     } catch (UpdateException ex) {
-                        Logger.getLogger(ConcertViewController.class.getName()).log(Level.SEVERE, null, ex);
+                        logger.severe(ex.getMessage());
                     }
                 }
             });
@@ -553,10 +682,25 @@ public class ConcertViewController {
             artistStage.show();
         } catch (Exception ex) {
             logger.log(Level.SEVERE, "Error", ex);
-            showAlert("Error de selección", "Ha ocurrido un error al seleccionar los artistas");
+            showAlert("Selection error", "An error occurred while selecting the artists");
         }
     }
 
+    /**
+     * Imprime los datos de los conciertos actuales en la tabla en formato de
+     * informe.
+     *
+     * Este método compila y llena un informe de JasperReports con los datos de
+     * los conciertos que están actualmente en la tabla. El informe se genera a
+     * partir del archivo JRXML especificado y se visualiza utilizando
+     * JasperViewer.
+     *
+     * Si ocurre un error durante la generación o visualización del informe, se
+     * registra un mensaje de error.
+     *
+     * @param event El evento de acción que dispara la generación del informe
+     * (por ejemplo, un clic en un botón).
+     */
     private void printItems(ActionEvent event) {
         try {
             //Se abrirá una ventana donde se puedan imprimir los datos del informe de la tabla.
@@ -568,11 +712,23 @@ public class ConcertViewController {
             jasperViewer.setVisible(true);
         } catch (JRException ex) {
             logger.severe("Error printing report: {0}" + ex.getMessage());
-
         }
-
     }
 
+    /**
+     * Maneja el clic derecho en la tabla de conciertos para mostrar el menú
+     * contextual correspondiente.
+     *
+     * Este método detecta si el usuario hace clic derecho sobre la tabla de
+     * conciertos y, en función de ello, muestra el menú contextual adecuado. Si
+     * el menú contextual fuera visible fuera de la tabla, lo oculta antes de
+     * mostrar el menú contextual dentro de la tabla. Si se hace clic con un
+     * botón distinto al derecho, el menú contextual dentro de la tabla se
+     * oculta.
+     *
+     * @param event El evento de mouse que se dispara cuando el usuario
+     * interactúa con la tabla.
+     */
     private void handleRightClickTable(MouseEvent event) {
         if (event.getButton() == MouseButton.SECONDARY) {
             // Ocultar el otro ContextMenu si está visible
@@ -586,6 +742,19 @@ public class ConcertViewController {
         }
     }
 
+    /**
+     * Maneja el clic derecho fuera de la tabla para mostrar el menú contextual
+     * correspondiente.
+     *
+     * Este método detecta si el usuario hace clic derecho fuera de la tabla de
+     * conciertos. Si es así, muestra el menú contextual fuera de la tabla, y
+     * oculta el menú contextual dentro de la tabla si está visible. Si se hace
+     * clic con un botón distinto al derecho, el menú contextual fuera de la
+     * tabla se oculta.
+     *
+     * @param event El evento de mouse que se dispara cuando el usuario
+     * interactúa fuera de la tabla.
+     */
     private void handleRightClick(MouseEvent event) {
         if (event.getButton() == MouseButton.SECONDARY) { // Detectar clic derecho
             // Ocultar el otro ContextMenu si está visible
@@ -599,6 +768,24 @@ public class ConcertViewController {
         }
     }
 
+    /**
+     * Configura los filtros para la tabla de conciertos en base a la entrada
+     * del usuario.
+     *
+     * Este método establece varios oyentes de eventos para aplicar filtros a la
+     * tabla de conciertos según los valores introducidos por el usuario en los
+     * siguientes elementos de la interfaz:
+     * <ul>
+     * <li>El campo de texto para la búsqueda de conciertos (tfSearch), donde el
+     * filtro se aplica mientras el usuario escribe.</li>
+     * <li>El combo box (cbxComingSoon), que filtra los conciertos según si
+     * están próximos a realizarse.</li>
+     * <li>Los dos campos de selección de fechas (dpFrom y dpTo), que filtran
+     * los conciertos según un rango de fechas seleccionado por el usuario.</li>
+     * </ul>
+     * Cada vez que cualquiera de estos valores cambie, se aplica el filtro para
+     * actualizar los conciertos mostrados en la tabla.
+     */
     private void filterConcerts() {
         // Mientras el usuario está escribiendo ese valor se usará para filtrar de la tabla
         tfSearch.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -620,6 +807,28 @@ public class ConcertViewController {
         });
     }
 
+    /**
+     * Aplica los filtros de búsqueda y fechas a la tabla de conciertos.
+     *
+     * Este método obtiene los valores introducidos por el usuario para la
+     * búsqueda de conciertos (campo de texto), la selección de conciertos
+     * próximos (check box), y las fechas de inicio y fin (DatePicker). Luego,
+     * filtra los conciertos según estos parámetros y actualiza la tabla para
+     * mostrar solo los conciertos que cumplen con los criterios establecidos.
+     *
+     * Los filtros aplicados son:
+     * <ul>
+     * <li>Texto de búsqueda (campo de texto): Filtra los conciertos según el
+     * nombre o cualquier otro criterio basado en el texto.</li>
+     * <li>Conciertos próximos (check box): Filtra los conciertos para mostrar
+     * solo aquellos que están próximos a realizarse.</li>
+     * <li>Fechas (rango de fechas): Filtra los conciertos según un rango de
+     * fechas seleccionado por el usuario.</li>
+     * </ul>
+     *
+     * Después de aplicar los filtros, se actualiza la tabla con los conciertos
+     * filtrados y ordenados.
+     */
     private void applyFilter() {
         // Obtener el texto de búsqueda y las fechas seleccionadas
         String searchText = tfSearch.getText();
@@ -627,15 +836,45 @@ public class ConcertViewController {
         LocalDate fromDate = dpFrom.getValue();
         LocalDate toDate = dpTo.getValue();
 
-        // Aplicar el filtrado de productos
+        // Aplicar el filtrado de conciertos
         FilteredList<Concert> filteredConcert = getConcertsBySearchField(searchText, comingSoon, fromDate, toDate);
 
-        // Actualizar la tabla con los productos filtrados
+        // Actualizar la tabla con los conciertos filtrados
         SortedList<Concert> sortedData = new SortedList<>(filteredConcert);
         sortedData.comparatorProperty().bind(concertTable.comparatorProperty());
         concertTable.setItems(sortedData);
     }
 
+    /**
+     * Filtra la lista de conciertos según los criterios de búsqueda, selección
+     * de conciertos próximos y rango de fechas.
+     *
+     * Este método recibe los parámetros de búsqueda, la selección de conciertos
+     * próximos y un rango de fechas, y devuelve una lista filtrada de
+     * conciertos que cumplen con todos los criterios especificados.
+     *
+     * Los filtros aplicados son:
+     * <ul>
+     * <li><strong>Búsqueda por texto</strong>: Filtra conciertos cuyo nombre,
+     * ciudad, ubicación o nombre de algún artista coincidan con el texto
+     * introducido.</li>
+     * <li><strong>Conciertos próximos</strong>: Filtra conciertos que aún no
+     * han ocurrido si el parámetro 'comingSoon' está activado.</li>
+     * <li><strong>Rango de fechas</strong>: Filtra conciertos que ocurran
+     * dentro del rango de fechas especificado.</li>
+     * </ul>
+     *
+     * @param searchText El texto de búsqueda para filtrar conciertos por
+     * nombre, ciudad, ubicación o artistas.
+     * @param comingSoon Si se deben filtrar solo los conciertos que aún no han
+     * ocurrido.
+     * @param fromDate La fecha de inicio del rango de fechas para filtrar los
+     * conciertos.
+     * @param toDate La fecha de finalización del rango de fechas para filtrar
+     * los conciertos.
+     * @return Un objeto {@link FilteredList} que contiene los conciertos que
+     * cumplen con los filtros especificados.
+     */
     private FilteredList<Concert> getConcertsBySearchField(String searchText, boolean comingSoon, LocalDate fromDate, LocalDate toDate) {
         // Crea un FilteredList con la lista de conciertos original
         FilteredList<Concert> filteredData = new FilteredList<>(concertList, p -> true);
@@ -682,6 +921,19 @@ public class ConcertViewController {
         return filteredData;
     }
 
+    /**
+     * Configura el estilo de las filas de la tabla {@link concertTable} para
+     * alternar el color de fondo de cada fila.
+     *
+     * Este método aplica un color de fondo alterno a las filas de la tabla. Las
+     * filas en índices pares tendrán un fondo de color rosa (#ffb6c1), y las
+     * filas en índices impares tendrán un fondo de color rosa claro (#fdd3e1).
+     * Esta alternancia de colores facilita la lectura y mejora la experiencia
+     * visual en la tabla.
+     *
+     * El color de fondo se aplica de manera dinámica cada vez que cambia el
+     * contenido de una fila.
+     */
     private void configureRowStyling() {
         concertTable.setRowFactory(tv -> {
             TableRow<Concert> row = new TableRow<>();
@@ -704,6 +956,20 @@ public class ConcertViewController {
         });
     }
 
+    /**
+     * Muestra una alerta de error con un mensaje personalizado.
+     *
+     * Este método crea y muestra una alerta de tipo
+     * {@link Alert.AlertType#ERROR} para informar al usuario sobre un error. La
+     * alerta contiene un título, un encabezado y un mensaje con el detalle del
+     * error. La alerta se mostrará de forma modal, bloqueando la interacción
+     * con la interfaz hasta que el usuario cierre la ventana de alerta.
+     *
+     * @param header El encabezado que describe el tipo de error (por ejemplo,
+     * "Error de servidor").
+     * @param message El mensaje que proporciona detalles sobre el error
+     * ocurrido (por ejemplo, "Ha ocurrido un error al procesar la solicitud").
+     */
     private void showAlert(String header, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
@@ -712,12 +978,27 @@ public class ConcertViewController {
         alert.showAndWait();
     }
 
+    /**
+     * Recupera un cliente de la base de datos utilizando su dirección de correo
+     * electrónico.
+     *
+     * Este método utiliza el {@link clientManager} para realizar una búsqueda
+     * del cliente asociado a un correo electrónico en la base de datos. Si la
+     * búsqueda es exitosa, devuelve el objeto {@link FanetixClient}
+     * correspondiente. En caso de error, se captura la excepción
+     * {@link ReadException} y se registra el error en los logs.
+     *
+     * @param email La dirección de correo electrónico del cliente que se busca.
+     * @return El objeto {@link FanetixClient} que corresponde al cliente con el
+     * correo electrónico proporcionado. Si no se encuentra un cliente con el
+     * correo especificado, se devuelve null.
+     */
     private FanetixClient getFanetixClient(String email) {
         try {
             client = clientManager.findClient_XML(new GenericType<FanetixClient>() {
             }, email);
         } catch (ReadException ex) {
-            Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, ex);
+            logger.severe(ex.getMessage());
         }
         return client;
     }

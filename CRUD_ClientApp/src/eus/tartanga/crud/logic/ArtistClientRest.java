@@ -18,19 +18,21 @@ import javax.ws.rs.core.GenericType;
 /**
  * Jersey REST client generated for the REST resource: ArtistFacadeREST
  * [eus.tartanga.crud.entities.artist]
- * 
- * <p>This class provides methods to interact with the Artist API, 
- * allowing operations such as retrieving, creating, updating, 
- * and deleting artist records.</p>
- * 
- * <p><b>Usage Example:</b></p>
+ *
+ * <p>
+ * This class provides methods to interact with the Artist API, allowing
+ * operations such as retrieving, creating, updating, and deleting artist
+ * records.</p>
+ *
+ * <p>
+ * <b>Usage Example:</b></p>
  * <pre>
  *     ArtistClientRest client = new ArtistClientRest();
  *     Object response = client.findAllArtist(...);
  *     // Process the response
  *     client.close();
  * </pre>
- * 
+ *
  * @author olaia
  */
 public class ArtistClientRest implements ArtistManager {
@@ -40,7 +42,8 @@ public class ArtistClientRest implements ArtistManager {
     private static final String BASE_URI = "http://localhost:8080/CRUD_ServerApp/api";
 
     /**
-     * Constructor that initializes the REST client and sets up the base URI for API requests.
+     * Constructor that initializes the REST client and sets up the base URI for
+     * API requests.
      */
     public ArtistClientRest() {
         client = javax.ws.rs.client.ClientBuilder.newClient();
@@ -57,8 +60,12 @@ public class ArtistClientRest implements ArtistManager {
      */
     @Override
     public <T> T findAllArtist(GenericType<T> responseType) throws ReadException {
-        WebTarget resource = webTarget;
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+        try {
+            WebTarget resource = webTarget;
+            return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+        } catch (WebApplicationException e) {
+            throw new ReadException(e.getMessage());
+        }
     }
 
     /**
@@ -70,9 +77,13 @@ public class ArtistClientRest implements ArtistManager {
      */
     @Override
     public void updateArtist(Object requestEntity, String id) throws UpdateException {
-        webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{id}))
-                .request(javax.ws.rs.core.MediaType.APPLICATION_XML)
-                .put(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
+        try {
+            webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{id}))
+                    .request(javax.ws.rs.core.MediaType.APPLICATION_XML)
+                    .put(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
+        } catch (WebApplicationException e) {
+            throw new UpdateException(e.getMessage());
+        }
     }
 
     /**
@@ -83,8 +94,12 @@ public class ArtistClientRest implements ArtistManager {
      */
     @Override
     public void createArtist(Object requestEntity) throws AddException {
-        webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML)
-                .post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
+        try {
+            webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML)
+                    .post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
+        } catch (WebApplicationException e) {
+            throw new AddException(e.getMessage());
+        }
     }
 
     /**
@@ -95,9 +110,13 @@ public class ArtistClientRest implements ArtistManager {
      */
     @Override
     public void removeArtist(String id) throws DeleteException {
-        webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{id}))
-                .request()
-                .delete();
+        try {
+            webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{id}))
+                    .request()
+                    .delete();
+        } catch (WebApplicationException e) {
+            throw new DeleteException(e.getMessage());
+        }
     }
 
     /**
@@ -126,8 +145,12 @@ public class ArtistClientRest implements ArtistManager {
      */
     @Override
     public <T> T findArtist(Class<T> responseType, String id) throws ReadException {
-        WebTarget resource = webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{id}));
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+        try {
+            WebTarget resource = webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{id}));
+            return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+        } catch (WebApplicationException e) {
+            throw new ReadException(e.getMessage());
+        }
     }
 
     /**
