@@ -49,6 +49,15 @@
                     </VBox>
                 </children>
             </VBox>
+            <Button fx:id="btnInfo" layoutX="1225.0" layoutY="55.0" mnemonicParsing="false" prefHeight="66.0" prefWidth="70.0" styleClass="info-button">
+                <graphic>
+                    <ImageView fitHeight="66.0" fitWidth="70.0">
+                        <image>
+                            <Image url="@../../app/resources/btnInfo.png" />
+                        </image>
+                    </ImageView>
+                </graphic>
+            </Button>
             <Button fx:id="changePasswd" layoutX="799.0" layoutY="667.0" prefHeight="54.0" prefWidth="178.0" styleClass="button-change" text="Change Password" />
         </children>
     </AnchorPane>
