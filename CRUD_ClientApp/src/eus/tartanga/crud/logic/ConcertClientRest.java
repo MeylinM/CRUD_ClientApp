@@ -9,6 +9,7 @@ import eus.tartanga.crud.exception.AddException;
 import eus.tartanga.crud.exception.DeleteException;
 import eus.tartanga.crud.exception.ReadException;
 import eus.tartanga.crud.exception.UpdateException;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
@@ -26,7 +27,7 @@ import javax.ws.rs.core.GenericType;
  *
  * @author 2dam
  */
-public class ConcertClientRest implements ConcertManager{
+public class ConcertClientRest implements ConcertManager {
 
     private WebTarget webTarget;
     private Client client;
@@ -39,7 +40,11 @@ public class ConcertClientRest implements ConcertManager{
 
     @Override
     public void removeConcert(String id) throws DeleteException {
-        webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{id})).request().delete();
+        try {
+            webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{id})).request().delete();
+        } catch (WebApplicationException e) {
+            throw new DeleteException(e.getMessage());
+        }
     }
 
     @Override
@@ -72,12 +77,20 @@ public class ConcertClientRest implements ConcertManager{
 
     @Override
     public void updateConcert_XML(Object requestEntity, String id) throws UpdateException {
-        webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{id})).request(javax.ws.rs.core.MediaType.APPLICATION_XML).put(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
+        try {
+            webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{id})).request(javax.ws.rs.core.MediaType.APPLICATION_XML).put(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
+        } catch (WebApplicationException e) {
+            throw new UpdateException(e.getMessage());
+        }
     }
 
     @Override
     public void updateConcert_JSON(Object requestEntity, String id) throws UpdateException {
-        webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{id})).request(javax.ws.rs.core.MediaType.APPLICATION_JSON).put(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_JSON));
+        try {
+            webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{id})).request(javax.ws.rs.core.MediaType.APPLICATION_JSON).put(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_JSON));
+        } catch (WebApplicationException e) {
+            throw new UpdateException(e.getMessage());
+        }
     }
 
     @Override
@@ -96,38 +109,62 @@ public class ConcertClientRest implements ConcertManager{
 
     @Override
     public void createConcert_XML(Object requestEntity) throws AddException {
-        webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
+        try {
+            webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
+        } catch (WebApplicationException e) {
+            throw new AddException(e.getMessage());
+        }
     }
 
     @Override
     public void createConcert_JSON(Object requestEntity) throws AddException {
-        webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_JSON));
+        try {
+            webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_JSON));
+        } catch (WebApplicationException e) {
+            throw new AddException(e.getMessage());
+        }
     }
 
     @Override
     public <T> T findConcert_XML(Class<T> responseType, String id) throws ReadException {
-        WebTarget resource = webTarget;
-        resource = resource.path(java.text.MessageFormat.format("{0}", new Object[]{id}));
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+        try {
+            WebTarget resource = webTarget;
+            resource = resource.path(java.text.MessageFormat.format("{0}", new Object[]{id}));
+            return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+        } catch (WebApplicationException e) {
+            throw new ReadException(e.getMessage());
+        }
     }
 
     @Override
     public <T> T findConcert_JSON(Class<T> responseType, String id) throws ReadException {
-        WebTarget resource = webTarget;
-        resource = resource.path(java.text.MessageFormat.format("{0}", new Object[]{id}));
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
+        try {
+            WebTarget resource = webTarget;
+            resource = resource.path(java.text.MessageFormat.format("{0}", new Object[]{id}));
+            return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
+        } catch (WebApplicationException e) {
+            throw new ReadException(e.getMessage());
+        }
     }
 
     @Override
     public <T> T findAllConcerts_XML(GenericType<T> responseType) throws ReadException {
-        WebTarget resource = webTarget;
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+        try {
+            WebTarget resource = webTarget;
+            return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+        } catch (WebApplicationException e) {
+            throw new ReadException(e.getMessage());
+        }
     }
 
     @Override
     public <T> T findAllConcerts_JSON(Class<T> responseType) throws ReadException {
-        WebTarget resource = webTarget;
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
+        try {
+            WebTarget resource = webTarget;
+            return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
+        } catch (WebApplicationException e) {
+            throw new ReadException(e.getMessage());
+        }
     }
 
     @Override

@@ -10,6 +10,8 @@ import eus.tartanga.crud.exception.DeleteException;
 import eus.tartanga.crud.exception.ReadException;
 import eus.tartanga.crud.exception.SignInException;
 import eus.tartanga.crud.exception.UpdateException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
@@ -34,6 +36,7 @@ public class FanetixClientRest implements FanetixClientManager {
     private WebTarget webTarget;
     private Client client;
     private static final String BASE_URI = "http://localhost:8080/CRUD_ServerApp/api";
+    private Logger logger = Logger.getLogger(FanetixClientRest.class.getName());
 
     public FanetixClientRest() {
         client = javax.ws.rs.client.ClientBuilder.newClient();
@@ -88,8 +91,10 @@ public class FanetixClientRest implements FanetixClientManager {
     @Override
     public <T> T signIn_XML(GenericType<T> responseType, String email, String passwd) throws SignInException {
         try {
+            logger.log(Level.SEVERE, "llega al client rest");
             WebTarget resource = webTarget;
             resource = resource.path(java.text.MessageFormat.format("signIn/{0}/{1}", new Object[]{email, passwd}));
+            logger.log(Level.SEVERE, "sale de el client rest");
             return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
         } catch (WebApplicationException e) {
             throw new SignInException(e.getMessage());

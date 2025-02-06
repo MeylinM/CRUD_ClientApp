@@ -1,6 +1,5 @@
 package eus.tartanga.crud.userInterface.controllers;
 
-import static com.sun.xml.internal.ws.spi.db.BindingContextFactory.LOGGER;
 import eus.tartanga.crud.encrypt.AsymmetricalClient;
 import eus.tartanga.crud.exception.EncryptException;
 import eus.tartanga.crud.exception.SignInException;
@@ -82,7 +81,7 @@ public class ChangePasswdViewController {
             try {
                 encryptedPassword = asymmetricalClient.encryptedData(oldPassword);
             } catch (EncryptException ex) {
-                LOGGER.severe("Encryption error");
+                logger.severe("Encryption error");
                 showAlert(AlertType.ERROR, "Error", "Error encrypting the password. Please try again.");
                 return; // Detiene el proceso si la encriptación falla
             }
@@ -114,7 +113,7 @@ public class ChangePasswdViewController {
                 clientManager.updateClient_XML(user, loggedUser.getEmail());
                 passwordChanged = true;
             } catch (UpdateException ex) {
-                LOGGER.log(Level.SEVERE, "Hubo un problema al cambiar la contraseña.", ex);
+                logger.log(Level.SEVERE, "Hubo un problema al cambiar la contraseña.", ex);
             }
 
             // Verificamos si la actualización fue exitosa
@@ -126,10 +125,10 @@ public class ChangePasswdViewController {
             }
 
         } catch (SignInException ex) {
-            LOGGER.log(Level.SEVERE, "Error al validar el usuario", ex);
+            logger.log(Level.SEVERE, "Error al validar el usuario", ex);
             showAlert(AlertType.ERROR, "Error", "Error al validar el usuario.");
         } catch (EncryptException ex) {
-            LOGGER.log(Level.SEVERE, "Error al encriptar la contraseña", ex);
+            logger.log(Level.SEVERE, "Error al encriptar la contraseña", ex);
             showAlert(AlertType.ERROR, "Error", "Error al encriptar la contraseña.");
         }
     }

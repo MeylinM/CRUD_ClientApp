@@ -43,7 +43,7 @@ public class ConcertViewControllerTest extends ApplicationTest {
     public ConcertViewControllerTest() {
     }
 
-    //@Test
+    @Test
     public void test_write() {
         clickOn("#tfEmail");
         write("admin1@fanetix.com");
@@ -66,8 +66,8 @@ public class ConcertViewControllerTest extends ApplicationTest {
         assertEquals(insertedConcert.getConcertDate(), new Date());
         assertEquals(insertedConcert.getConcertTime(), new Date());
     }
+    
     //@Test
-
     public void test_delete() {
         clickOn("#tfEmail");
         write("admin1@fanetix.com");
@@ -102,7 +102,7 @@ public class ConcertViewControllerTest extends ApplicationTest {
         assertTrue(notFound);
     }
 
-    @Test
+    //@Test
     public void test_update() {
         clickOn("#tfEmail");
         write("admin1@fanetix.com");

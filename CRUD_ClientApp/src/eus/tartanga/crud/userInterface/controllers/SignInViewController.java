@@ -92,7 +92,7 @@ public class SignInViewController {
              
             hypSignUp.setOnAction(this::handlerHyperlink);
              
-            //hypForgotPassword.setOnAction(this::handlerHyperlink);
+            hypForgotPassword.setOnAction(this::handlerHyperlink);
             
             stage.setOnCloseRequest(event -> handleOnActionExit(event));
             System.out.println("aqui llega 1");
@@ -145,13 +145,14 @@ public class SignInViewController {
             de nuevo a bytes y desencriptarlos con la clave privada.*/
             // Convertimos la contraseña encriptada a Base64 para enviarla como String
             String encryptedPasswrdBase64 = Base64.getEncoder().encodeToString(encryptedPasswrd);
-
+            logger.info("tras encode");
             user = clientManager.signIn_XML(new GenericType<FanetixClient>() {
             }, email, encryptedPasswrdBase64);
-
+            logger.info("tras encript");
             if (user == null) {
                 admin = adminManager.signIn_XML(new GenericType<Administrator>() {
                 }, email, encryptedPasswrdBase64);
+                logger.info("va al server");
             }
 
             if (user != null || admin != null) {
@@ -204,7 +205,7 @@ public class SignInViewController {
     private void handlerHyperlink(ActionEvent event) {
         if (event.getSource() == hypSignUp) {
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("view/login/SignUpWindow.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/SignUpView.fxml"));
                 Parent root = (Parent) loader.load();
                 SignUpViewController controller = (SignUpViewController) loader.getController();
                 Stage modalStage = new Stage();
