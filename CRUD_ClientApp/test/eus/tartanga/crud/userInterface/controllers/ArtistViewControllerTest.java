@@ -81,7 +81,6 @@ public class ArtistViewControllerTest extends ApplicationTest {
         // Select the second-to-last row (penultimate row)
         Node row = lookup(".table-row-cell").nth(rowCount - 2).query();
 
-        //Selecciona una asignatura para que se habilite el botón de borrado.
         clickOn(row);
         Artist artistDelete = (Artist) tableView.getSelectionModel().getSelectedItem();
         String name = artistDelete.getName();

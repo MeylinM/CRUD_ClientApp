@@ -1,5 +1,9 @@
 package eus.tartanga.crud.userInterface.controllers;
 
+import eus.tartanga.crud.exception.ReadException;
+import eus.tartanga.crud.logic.FanetixClientFactory;
+import eus.tartanga.crud.logic.FanetixClientManager;
+import eus.tartanga.crud.model.FanetixClient;
 import eus.tartanga.crud.model.FanetixUser;
 import java.io.IOException;
 import java.net.URL;
@@ -16,13 +20,14 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.stage.Stage;
+import javax.ws.rs.core.GenericType;
 
 /**
  * FXML Controller class for MenuBarView.fxml.
  *
- * @author
+ * @author Elbire and Meylin
  */
-public class MenuBarViewController implements Initializable{
+public class MenuBarViewController implements Initializable {
 
     @FXML
     private MenuBar menu;
@@ -41,19 +46,32 @@ public class MenuBarViewController implements Initializable{
 
     @FXML
     private Menu menuArtist;
-    
+
     @FXML
     private Menu menuMyCart;
-    
+
     @FXML
     private Menu menuHelp;
 
     private static FanetixUser loggedUser;
     private static Stage stageMenu;
     private static final Logger LOGGER = Logger.getLogger("package view");
-    
+    private FanetixClientManager clientManager;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        clientManager = FanetixClientFactory.getFanetixClientManager();
+        try {
+            FanetixClient user = clientManager.findClient_XML(new GenericType<FanetixClient>() {
+            }, loggedUser.getEmail());
+            if (user == null) {
+                menuMyCart.setVisible(false);
+                itemMyOrders.setVisible(false);
+            }
+        } catch (ReadException ex) {
+            Logger.getLogger(MenuBarViewController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
         menuArtist.showingProperty().addListener(
                 (observableValue, oldValue, newValue) -> {
                     if (newValue) {
@@ -141,7 +159,7 @@ public class MenuBarViewController implements Initializable{
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ArtistView.fxml"));
             Parent root = loader.load();
             ArtistViewController controller = loader.getController();
-            controller.setStage(stageMenu); 
+            controller.setStage(stageMenu);
             controller.initStage(root);
         } catch (IOException e) {
             e.printStackTrace();
@@ -196,7 +214,5 @@ public class MenuBarViewController implements Initializable{
     public static void setStageMenu(Stage stageMenu) {
         MenuBarViewController.stageMenu = stageMenu;
     }
-
-    
 
 }

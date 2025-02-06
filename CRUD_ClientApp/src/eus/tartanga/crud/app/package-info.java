@@ -1,4 +1,4 @@
 /*
- * This package stores the config files of the application.
+ * This package stores the runnable class 
  */
 package eus.tartanga.crud.app;

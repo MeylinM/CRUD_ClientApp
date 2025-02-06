@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package eus.tartanga.crud.userInterface.controllers;
 
 import eus.tartanga.crud.exception.AddException;
@@ -12,7 +7,6 @@ import eus.tartanga.crud.exception.NoStockException;
 import eus.tartanga.crud.exception.ReadException;
 import eus.tartanga.crud.exception.TextEmptyException;
 import eus.tartanga.crud.exception.UpdateException;
-import eus.tartanga.crud.exception.WrongStockFormatException;
 import eus.tartanga.crud.logic.ArtistFactory;
 import eus.tartanga.crud.logic.ArtistManager;
 import eus.tartanga.crud.logic.CartFactory;
@@ -31,8 +25,6 @@ import eus.tartanga.crud.userInterface.factories.ProductDateEditingCell;
 import java.io.ByteArrayInputStream;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import javafx.collections.FXCollections;
@@ -52,7 +44,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
@@ -81,9 +72,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-import javafx.util.converter.FloatStringConverter;
-import javafx.util.converter.IntegerStringConverter;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.GenericType;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
@@ -94,86 +82,187 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.view.JasperViewer;
 
 /**
- * FXML Controller class
+ * Controlador para la vista de productos en la aplicación Fanetix. Gestiona la
+ * visualización, edición y manipulación de productos en la tabla. Dependiendo
+ * del rol del usuario, permite la adición, eliminación y modificación de
+ * productos.
  *
  * @author Elbire
  */
 public class ProductViewController {
 
+    /**
+     * Tabla para mostrar los productos disponibles.
+     */
     @FXML
     private TableView<Product> productTable;
 
+    /**
+     * Columna para mostrar los títulos de los productos.
+     */
     @FXML
     private TableColumn<Product, String> titleColumn;
 
+    /**
+     * Columna para mostrar los artistas asociados a los productos.
+     */
     @FXML
     private TableColumn<Product, Artist> artistColumn;
 
+    /**
+     * Columna para mostrar las descripciones de los productos.
+     */
     @FXML
     private TableColumn<Product, String> descriptionColumn;
 
+    /**
+     * Columna para mostrar las imágenes de los productos.
+     */
     @FXML
     private TableColumn<Product, byte[]> imageColumn;
 
+    /**
+     * Columna para mostrar la fecha de lanzamiento de los productos.
+     */
     @FXML
     private TableColumn<Product, Date> releaseDateColumn;
 
+    /**
+     * Columna para mostrar el stock de los productos.
+     */
     @FXML
     private TableColumn<Product, String> stockColumn;
 
+    /**
+     * Columna para mostrar el precio de los productos.
+     */
     @FXML
     private TableColumn<Product, String> priceColumn;
 
+    /**
+     * Panel principal de la vista de productos.
+     */
     @FXML
     private AnchorPane productAnchorPane;
 
+    /**
+     * Campo de texto para la búsqueda de productos.
+     */
     @FXML
     private TextField tfSearch;
 
+    /**
+     * Casilla de verificación para filtrar productos con stock disponible.
+     */
     @FXML
     private CheckBox cbxStock;
 
+    /**
+     * Botón para añadir un nuevo producto.
+     */
     @FXML
     private Button btnAddProduct;
 
+    /**
+     * Botón para añadir un producto al carrito de compras.
+     */
     @FXML
     private Button btnAddToCart;
 
+    /**
+     * Botón para eliminar un producto seleccionado.
+     */
     @FXML
     private Button btnDeleteProduct;
 
+    /**
+     * Botón para ver más información sobre un producto.
+     */
     @FXML
     private Button btnInfo;
 
+    /**
+     * Selector de fecha para filtrar productos desde una fecha específica.
+     */
     @FXML
     private DatePicker dpFrom;
 
+    /**
+     * Selector de fecha para filtrar productos hasta una fecha específica.
+     */
     @FXML
     private DatePicker dpTo;
-
+    /**
+     * Ventana principal de la vista de productos.
+     */
     private Stage stage;
+    /**
+     * Logger para registrar eventos y errores en el controlador.
+     */
     private Logger logger = Logger.getLogger(ProductViewController.class.getName());
-    private ContextMenu contextMenuInside;
-    private ContextMenu contextMenuOutside;
-    private ProductManager productManager;
-    private ObservableList<Product> productList = FXCollections.observableArrayList();
-    private ArtistManager artistManager;
-    private ObservableList<Artist> artistList = FXCollections.observableArrayList();
-    private CartManager cartManager;
-    private FanetixClientManager clientManager;
-    FanetixClient client;
 
+    /**
+     * Menú contextual para acciones dentro de la tabla de productos.
+     */
+    private ContextMenu contextMenuInside;
+
+    /**
+     * Menú contextual para acciones fuera de la tabla de productos.
+     */
+    private ContextMenu contextMenuOutside;
+
+    /**
+     * Gestor de productos para manejar las operaciones de negocio relacionadas
+     * con productos.
+     */
+    private ProductManager productManager;
+
+    /**
+     * Lista observable de productos para la tabla de visualización.
+     */
+    private ObservableList<Product> productList = FXCollections.observableArrayList();
+
+    /**
+     * Gestor de artistas para manejar la información de artistas en los
+     * productos.
+     */
+    private ArtistManager artistManager;
+
+    /**
+     * Lista observable de artistas disponibles.
+     */
+    private ObservableList<Artist> artistList = FXCollections.observableArrayList();
+
+    /**
+     * Gestor de carritos de compra.
+     */
+    private CartManager cartManager;
+
+    /**
+     * Gestor de clientes de Fanetix.
+     */
+    private FanetixClientManager clientManager;
+
+    /**
+     * Cliente actual logueado en el sistema.
+     */
+    private FanetixClient client;
+
+    /**
+     * Establece la ventana principal de la vista de productos.
+     *
+     * @param stage La ventana a establecer.
+     */
     public void setStage(Stage stage) {
         this.stage = stage;
     }
 
-    //excepcion de longitud de entrada(más de lo que cabe en la base de datos(256)). Mirar el diseño 
-    //todo lo que pide, que nosek tiene k estar activado,.. Mirar test primero de casos de usos, test 
-    //cuando se crea un dato en la tabla que se crea de verdad, otro cuando se borra ese dato, cuando 
-    //se modificand todas y cada una de las columnas se han modificado, otro test de consulta de datos
-    //read,write,update,view
-    //comprobar los datos añadidos en los items de la tabla
-    //Antes de borrar  mirar consistencia en el persistance
+    /**
+     * Inicializa la ventana de la vista de productos.
+     *
+     * @param root El nodo raíz de la escena.
+     * @throws IOException Si ocurre un error de entrada/salida.
+     */
     public void initStage(Parent root) {
         try {
             logger.info("Initializing Product stage");
@@ -207,6 +296,7 @@ public class ProductViewController {
             //Mostrar la ventana de manera diferente en caso de ser un Cliente
             if (client != null) {
 
+                //Formatear el precio de manera que se vea con el €
                 priceColumn.setCellFactory(column -> new TableCell<Product, String>() {
                     @Override
                     protected void updateItem(String price, boolean empty) {
@@ -218,6 +308,7 @@ public class ProductViewController {
                         }
                     }
                 });
+                //Formatear la fecha
                 releaseDateColumn.setCellFactory(column -> new TableCell<Product, Date>() {
                     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
@@ -232,6 +323,7 @@ public class ProductViewController {
                     }
                 });
                 btnAddToCart.setOnAction(this::handleAddToCart);
+                //Ocultar los botones de añadir producto y borrar producto al cliente
                 btnAddProduct.setVisible(false);
                 btnDeleteProduct.setVisible(false);
             } else {
@@ -256,7 +348,7 @@ public class ProductViewController {
                     updateProduct(product);
                 });
 
-                // Hacer las columnas editables
+                //Establecer la factoria de celda de tittle
                 titleColumn.setCellFactory(TextFieldTableCell.forTableColumn());
                 titleColumn.setOnEditCommit(event -> {
                     try {
@@ -282,7 +374,7 @@ public class ProductViewController {
                         Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
                     }
                 });
-
+                //Establecer la factoria de celda de description
                 descriptionColumn.setCellFactory(TextFieldTableCell.forTableColumn());
                 descriptionColumn.setOnEditCommit(event -> {
                     try {
@@ -309,7 +401,7 @@ public class ProductViewController {
                         //Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
                     }
                 });
-
+                //Establecer la factoria de celda de stock
                 stockColumn.setCellFactory(TextFieldTableCell.forTableColumn());
                 stockColumn.setOnEditCommit(event -> {
                     try {
@@ -330,7 +422,7 @@ public class ProductViewController {
                         Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
                     }
                 });
-
+                //Establecer la factoria de celda de price
                 priceColumn.setCellFactory(TextFieldTableCell.forTableColumn());
                 priceColumn.setOnEditCommit(event -> {
                     try {
@@ -353,7 +445,7 @@ public class ProductViewController {
                         Logger.getLogger(ProductViewController.class.getName()).log(Level.SEVERE, null, e);
                     }
                 });
-
+                //Establecer la factoria de celda del producto que es una combobox
                 artistColumn.setCellFactory(ComboBoxTableCell.forTableColumn(artistList));
                 artistColumn.setOnEditCommit(event -> {
                     try {
@@ -370,11 +462,11 @@ public class ProductViewController {
                 });
 
                 btnAddProduct.setOnAction(this::handleAddProduct);
-
                 btnDeleteProduct.setOnAction(this::handleDeleteProduct);
+                //Ocultar el botón de añadir producto al carrito para el administrador
                 btnAddToCart.setVisible(false);
             }
-
+            //Establecer la factoria de celda para la imagen
             imageColumn.setCellFactory(column -> new TableCell<Product, byte[]>() {
                 private final ImageView imageView = new ImageView();
 
@@ -391,7 +483,8 @@ public class ProductViewController {
                         return;
                     }
                     if (imageBytes == null) {
-                        Image noImage = new Image(getClass().getClassLoader().getResourceAsStream("eus/tartanga/crud/app/resources/noImage.png")); // Ruta de la imagen predeterminada
+                        //En caso de que el producto no tenga una imagen como tal colocarle una imagen predeterminada
+                        Image noImage = new Image(getClass().getClassLoader().getResourceAsStream("eus/tartanga/crud/app/resources/noImage.png"));
                         imageView.setImage(noImage);
                         setGraphic(imageView);
                     } else {
@@ -417,7 +510,6 @@ public class ProductViewController {
             productList.addAll(findAllProducts());
             //Cargar la tabla Products con la información de los productos
             productTable.setItems(productList);
-
             //Gestion de los diferentes filtrados con barra de busqueda, stock y por fechas
             filterProducts();
             //Configurar estilos de cada fila de la tabla
@@ -426,9 +518,16 @@ public class ProductViewController {
         } catch (Exception e) {
             String errorMsg = "Error opening window:\n" + e.getMessage();
             logger.severe(errorMsg);
+            showAlert("Error en la ventana", "Ha ocurrido un error al inicializar la ventana");
         }
     }
-
+    
+        /**
+     * Obtiene la lista de todos los productos disponibles.
+     * 
+     * @return Lista de productos o null en caso de error.
+     * @throws ReadException Si ocurre un error al conseguir la lista de productos.
+     */
     private List<Product> findAllProducts() {
         List<Product> products = null;
         try {
@@ -436,22 +535,34 @@ public class ProductViewController {
             });
             return products;
         } catch (ReadException e) {
+            logger.severe("Error al buscar productos: " + e.getMessage());
             showAlert("Error del servidor", "An error occurred while getting the product list");
         }
         return products;
     }
-
+    /**
+     * Obtiene la lista de todos los artistas disponibles.
+     * 
+     * @return Lista de artistas o null en caso de error.
+     * @throws ReadException Si ocurre un error al conseguir la lista de artistas.
+     */
     private List<Artist> findAllArtist() {
         List<Artist> artists = null;
         try {
             artists = artistManager.findAllArtist(new GenericType<List<Artist>>() {
             });
         } catch (ReadException e) {
-            showAlert("Error del servidor", "An error occurred while getting the product list");
+            logger.severe("Error al buscar la lista de artistas disponible: " + e.getMessage());
+            showAlert("Error del servidor", "An error occurred while getting the artist list");
         }
         return artists;
     }
-
+    /**
+     * Agrega un nuevo producto con valores por defecto y lo muestra en la tabla.
+     * 
+     * @param event Evento de acción al hacer clic en "Add Product".
+     * @throws AddException Si ocurre un error al añadir el producto.
+     */
     private void handleAddProduct(ActionEvent event) {
         try {
             /*Se creará una nuevo objeto con un constructor por defecto del tipo Producto. El campo image
@@ -470,7 +581,13 @@ public class ProductViewController {
             showAlert("Error del servidor", "An error occurred while creating the product(s)");
         }
     }
-
+     /**
+     * Agrega el producto seleccionado al carrito si hay stock disponible.
+     * 
+     * @param event Evento de acción al hacer clic en "Add to cart".
+     * @throws AddException Si ocurre un error al añadir el producto al carrito.
+     * @throws NoStockException Si el producto no tiene stock.
+     */
     private void handleAddToCart(ActionEvent event) {
         try {
             Product selectedProduct = productTable.getSelectionModel().getSelectedItem();
@@ -485,8 +602,6 @@ public class ProductViewController {
                         cartId.setProductId(selectedProduct.getProductId());
                         cart.setId(cartId);
                         cart.setProduct(selectedProduct);
-                        //System.out.println(client.getEmail());
-                        //cart.setClient(client);
                         cart.setOrderDate(new Date());
                         cart.setQuantity(quantityToAdd);
                         cart.setBought(false);
@@ -504,7 +619,13 @@ public class ProductViewController {
             showAlertWarning("Stock no disponible", e.getMessage());
         }
     }
-
+    /**
+     * Maneja la eliminación de productos seleccionados en la tabla.
+     * Muestra una alerta de confirmación antes de proceder con la eliminación.
+     * 
+     * @param event El evento que activa la eliminación.
+     * @throws DeleteException Si ocurre un error al eliminar los productos.
+     */
     private void handleDeleteProduct(ActionEvent event) {
         ObservableList<Product> selectedProducts = productTable.getSelectionModel().getSelectedItems();
         List<Cart> carts = null;
@@ -546,7 +667,12 @@ public class ProductViewController {
             }
         }
     }
-
+    /**
+     * Actualiza los datos de un producto.
+     * 
+     * @param product El producto con los datos actualizados.
+     * @throws UpdateException Si ocurre un error al actualizar el producto.
+     */
     private void updateProduct(Product product) {
         try {
             productManager.edit_XML(product, product.getProductId().toString());
@@ -554,13 +680,23 @@ public class ProductViewController {
             showAlert("Error de servidor", "An error occurred while updating the product");
         }
     }
-
+    
+    /**
+     * Refresca la lista de productos en la vista.
+     * Obtiene los productos actualizados y los muestra en la tabla.
+     */
     private void refreshProductList() {
         List<Product> updatedProducts = findAllProducts();
         productList.setAll(updatedProducts);
         productTable.refresh();
     }
-
+    
+    /**
+     * Imprime un informe con los datos de la tabla de productos.
+     * Muestra una ventana con el informe generado.
+     * 
+     * @param event El evento que activa la impresión.
+     */
     private void printItems(ActionEvent event) {
         try {
             //Se abrirá una ventana donde se puedan imprimir los datos del informe de la tabla de Productos.
@@ -577,10 +713,15 @@ public class ProductViewController {
 
         }
     }
-
+    /**
+     * Maneja la acción del botón de información.
+     * Carga y muestra la vista de ayuda para productos, dependiendo del tipo de usuario (cliente o administrador).
+     * 
+     * @param event El evento que activa la carga de la vista de ayuda.
+     */
     private void handleInfoButton(ActionEvent event) {
         try {
-            //LOGGER.info("Loading help view...");
+            logger.info("Loading help view...");
             //Load node graph from fxml file
             FXMLLoader loader
                     = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/HelpProductView.fxml"));
@@ -600,7 +741,10 @@ public class ProductViewController {
 
         }
     }
-
+    /**
+     * Filtra los productos de la tabla en función de la búsqueda de texto, la disponibilidad de stock y las fechas seleccionadas.
+     * Actualiza la tabla en tiempo real mientras el usuario interactúa con los filtros.
+     */
     private void filterProducts() {
         // Mientras el usuario está escribiendo ese valor se usará para filtrar los productos de la tabla
         tfSearch.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -622,7 +766,9 @@ public class ProductViewController {
             applyFilter();
         });
     }
-
+    /**
+     * Aplica los filtros combinados (búsqueda de texto, stock y fechas) a los productos y actualiza la tabla con los resultados.
+     */
     private void applyFilter() {
         // Obtener el texto de búsqueda y las fechas seleccionadas
         String searchText = tfSearch.getText();
@@ -638,7 +784,15 @@ public class ProductViewController {
         sortedData.comparatorProperty().bind(productTable.comparatorProperty());
         productTable.setItems(sortedData);
     }
-
+    /**
+     * Filtra los productos según el texto de búsqueda, la disponibilidad de stock y las fechas seleccionadas.
+     * 
+     * @param searchText El texto de búsqueda para filtrar los productos.
+     * @param inStock Un valor booleano que indica si se deben mostrar productos con stock.
+     * @param fromDate La fecha de inicio para el filtro de fechas.
+     * @param toDate La fecha de fin para el filtro de fechas.
+     * @return Un FilteredList que contiene los productos filtrados.
+     */
     public FilteredList<Product> getProductsBySearchField(String searchText, boolean inStock, LocalDate fromDate, LocalDate toDate) {
         // Crea un FilteredList con la lista de productos original
         FilteredList<Product> filteredData = new FilteredList<>(productList, p -> true);
@@ -675,7 +829,10 @@ public class ProductViewController {
 
         return filteredData;
     }
-
+    /**
+     * Crea los menús contextuales para la tabla y el área fuera de la tabla.
+     * El menú cambia según si el usuario es un cliente o no.
+     */
     private void createContextMenu() {
         contextMenuInside = new ContextMenu();
         MenuItem printItemInside = new MenuItem("Print");
@@ -705,7 +862,11 @@ public class ProductViewController {
         }
 
     }
-
+    /**
+     * Maneja el clic derecho en la tabla. Muestra el menú contextual dentro de la tabla si se hace clic derecho.
+     * 
+     * @param event El evento de clic derecho que activa el menú contextual.
+     */
     private void handleRightClickTable(MouseEvent event) {
         if (event.getButton() == MouseButton.SECONDARY) {
             // Ocultar el otro ContextMenu si está visible
@@ -718,7 +879,11 @@ public class ProductViewController {
             contextMenuInside.hide();
         }
     }
-
+    /**
+     * Maneja el clic derecho fuera de la tabla. Muestra el menú contextual fuera de la tabla si se hace clic derecho.
+     * 
+     * @param event El evento de clic derecho que activa el menú contextual.
+     */
     private void handleRightClick(MouseEvent event) {
         if (event.getButton() == MouseButton.SECONDARY) { // Detectar clic derecho
             // Ocultar el otro ContextMenu si está visible
@@ -731,7 +896,14 @@ public class ProductViewController {
             contextMenuOutside.hide();
         }
     }
-
+    /**
+     * Obtiene un objeto FanetixClient basado en el correo electrónico proporcionado.
+     * Realiza una llamada a la API para encontrar al cliente.
+     * 
+     * @param email El correo electrónico del cliente que se desea obtener.
+     * @return El objeto FanetixClient correspondiente al correo electrónico proporcionado.
+     * @throws ReadException Si ocurre un error al leer los datos del cliente.
+     */
     private FanetixClient getFanetixClient(String email) {
         FanetixClient client = null;
         try {
@@ -742,7 +914,10 @@ public class ProductViewController {
         }
         return client;
     }
-
+    /**
+     * Configura el estilo de las filas en la tabla de productos, alternando el color de fondo
+     * para cada fila. El color de fondo cambia dependiendo de si el índice de la fila es par o impar.
+     */
     private void configureRowStyling() {
         productTable.setRowFactory(tv -> {
             TableRow<Product> row = new TableRow<>();
@@ -764,7 +939,12 @@ public class ProductViewController {
             return row;
         });
     }
-
+    /**
+     * Muestra una alerta de tipo ERROR con el encabezado y mensaje proporcionados.
+     * 
+     * @param header El encabezado del mensaje de error.
+     * @param message El contenido del mensaje de error.
+     */
     private void showAlert(String header, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
@@ -772,7 +952,12 @@ public class ProductViewController {
         alert.setContentText(message);
         alert.showAndWait();
     }
-
+    /**
+     * Muestra una alerta de tipo WARNING con el encabezado y mensaje proporcionados.
+     * 
+     * @param header El encabezado del mensaje de advertencia.
+     * @param message El contenido del mensaje de advertencia.
+     */
     private void showAlertWarning(String header, String message) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle("Warning");
@@ -780,7 +965,13 @@ public class ProductViewController {
         alert.setContentText(message);
         alert.showAndWait();
     }
-
+    /**
+     * Muestra un diálogo para seleccionar la cantidad de un producto a añadir al carrito.
+     * El valor máximo del Spinner será el stock disponible.
+     * 
+     * @param stock La cantidad de stock disponible para el producto.
+     * @return La cantidad seleccionada por el usuario, o 0 si se cancela el diálogo.
+     */
     private int showQuantityDialog(int stock) {
         Dialog<Integer> dialog = new Dialog<>();
         dialog.setTitle("Select Quantity");
