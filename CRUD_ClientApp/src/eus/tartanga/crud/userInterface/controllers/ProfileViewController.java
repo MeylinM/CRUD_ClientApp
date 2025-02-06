@@ -147,7 +147,7 @@ public class ProfileViewController {
             Parent root = (Parent) loader.load();
             ChangePasswdViewController controller = (ChangePasswdViewController) loader.getController();
             controller.setStage(stage);
-            controller.initStage(root);
+          //  controller.initStage(root);
         } catch (IOException ex) {
             Logger.getLogger(ProfileViewController.class.getName()).log(Level.SEVERE, null, ex);
         }

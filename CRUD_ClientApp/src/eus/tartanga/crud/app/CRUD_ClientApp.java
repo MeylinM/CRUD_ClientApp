@@ -26,7 +26,6 @@ import javafx.scene.Parent;
  * @author Meylin, Elbire, Olaia and Irati
  */
 public class CRUD_ClientApp extends Application {
-
     /**
      * The main entry point of the application. 
      * Loads the sign-in view from the FXML file and sets up the controller.

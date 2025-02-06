@@ -81,7 +81,6 @@ public class SignInViewController {
             pfPassword.textProperty().addListener(this::textPropertyChange);
             tfPassword.textProperty().addListener(this::textPropertyChange);
             tgbtnEyeIcon.setOnAction(this::togglePasswordVisibility);
-
             hypSignUp.setOnAction(this::handlerSignUpHyperlink);
             hypForgotPassword.setOnAction(this::handlerForgotPasswdHyperlink);
 
@@ -102,6 +101,51 @@ public class SignInViewController {
         String email = this.tfEmail.getText();
         String passwrd = this.pfPassword.getText();
         try {
+
+  /*
+            // Validar que los campos estén informados
+            if (email.isEmpty() || passwrd.isEmpty()) {
+                throw new TextEmptyException("The fields cannot be empty");
+            }
+
+            // Validación del formato del email
+            String patternEmail = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.(com|org|cn|net|gov|eus|es|io)$";
+            if (!Pattern.matches(patternEmail, email) || email.contains(" ")) {
+                throw new PatternEmailIncorrectException("Email format is not correct");
+            }
+
+            // Encriptación
+            AsymmetricalClient asymmetricalClient = new AsymmetricalClient();
+            byte[] encryptedPasswrd;
+
+            try {
+                encryptedPasswrd = asymmetricalClient.encryptedData(passwrd);
+            } catch (EncryptException ex) {
+                logger.severe("Encryption error");
+                new Alert(Alert.AlertType.ERROR, "Error loging in. Please try again.", ButtonType.OK).showAndWait();
+                return; // Sale del método para evitar seguir con una contraseña inválida
+            }
+
+            logger.info("Handling the accept button.");
+
+            /*La encriptación RSA genera datos binarios: Cuando encriptas la contraseña con RSA, obtienes un byte[], 
+            que no se puede enviar directamente en una petición HTTP de forma segura.
+            Base64 convierte los bytes en una cadena de texto: Esto facilita su envío como parámetro en signIn_XML(...).
+            Se puede decodificar fácilmente en el servidor: Una vez recibido, el servidor puede convertir la cadena Base64 
+            de nuevo a bytes y desencriptarlos con la clave privada.*/
+            // Convertimos la contraseña encriptada a Base64 para enviarla como String
+            String encryptedPasswrdBase64 = Base64.getEncoder().encodeToString(encryptedPasswrd);
+            logger.info("tras encode");
+            user = clientManager.signIn_XML(new GenericType<FanetixClient>() {
+            }, email, encryptedPasswrdBase64);
+            logger.info("tras encript");
+            if (user == null) {
+                admin = adminManager.signIn_XML(new GenericType<Administrator>() {
+                }, email, encryptedPasswrdBase64);
+                logger.info("va al server");
+              */
+
+                //Version que funciona
             logger.info("Handeling the accept button.");
             user = clientManager.signIn_XML(new GenericType<FanetixClient>() {
             }, email, passwrd);
@@ -109,6 +153,7 @@ public class SignInViewController {
             if (user == null) {
                 admin = adminManager.signIn_XML(new GenericType<Administrator>() {
                 }, email, passwrd);
+
             }
             if (user != null || admin != null) {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ArtistView.fxml"));
