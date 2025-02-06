@@ -5,12 +5,7 @@
  */
 package eus.tartanga.crud.userInterface.controllers;
 
-import eus.tartanga.crud.encrypt.AsymmetricalClient;
-import eus.tartanga.crud.exception.EncryptException;
-import eus.tartanga.crud.exception.PatternEmailIncorrectException;
-import eus.tartanga.crud.exception.ReadException;
 import eus.tartanga.crud.exception.SignInException;
-import eus.tartanga.crud.exception.TextEmptyException;
 import eus.tartanga.crud.logic.AdministratorFactory;
 import eus.tartanga.crud.logic.AdministratorManager;
 import eus.tartanga.crud.logic.FanetixClientFactory;
@@ -19,11 +14,8 @@ import eus.tartanga.crud.model.Administrator;
 import eus.tartanga.crud.model.FanetixClient;
 import eus.tartanga.crud.model.FanetixUser;
 import java.io.IOException;
-import java.util.Base64;
-import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -36,7 +28,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.GenericType;
 
 /**
@@ -44,6 +35,7 @@ import javax.ws.rs.core.GenericType;
  */
 public class SignInViewController {
 
+    // Elementos de la vista
     @FXML
     private AnchorPane signIn;
     @FXML
@@ -78,22 +70,20 @@ public class SignInViewController {
             Scene scene = new Scene(root);
             stage.setScene(scene);
             stage.setTitle("SignIn");
-           
+
             //Añadir a la ventana el ícono “FanetixLogo.png”.
             stage.getIcons().add(new Image("eus/tartanga/crud/app/resources/logo.png"));
             stage.setResizable(false);
             clientManager = FanetixClientFactory.getFanetixClientManager();
             adminManager = AdministratorFactory.getAdministratorManager();
-           
+
             tfPassword.setVisible(false);
             pfPassword.textProperty().addListener(this::textPropertyChange);
             tfPassword.textProperty().addListener(this::textPropertyChange);
             tgbtnEyeIcon.setOnAction(this::togglePasswordVisibility);
-             
-            hypSignUp.setOnAction(this::handlerHyperlink);
-             
-            hypForgotPassword.setOnAction(this::handlerHyperlink);
-            
+            hypSignUp.setOnAction(this::handlerSignUpHyperlink);
+            hypForgotPassword.setOnAction(this::handlerForgotPasswdHyperlink);
+
             stage.setOnCloseRequest(event -> handleOnActionExit(event));
             System.out.println("aqui llega 1");
             stage.show();
@@ -108,11 +98,11 @@ public class SignInViewController {
     public void handelAcceptButtonAction(ActionEvent event) {
         FanetixClient user;
         Administrator admin = null;
-
         String email = this.tfEmail.getText();
         String passwrd = this.pfPassword.getText();
-
         try {
+
+  /*
             // Validar que los campos estén informados
             if (email.isEmpty() || passwrd.isEmpty()) {
                 throw new TextEmptyException("The fields cannot be empty");
@@ -153,8 +143,18 @@ public class SignInViewController {
                 admin = adminManager.signIn_XML(new GenericType<Administrator>() {
                 }, email, encryptedPasswrdBase64);
                 logger.info("va al server");
-            }
+              */
 
+                //Version que funciona
+            logger.info("Handeling the accept button.");
+            user = clientManager.signIn_XML(new GenericType<FanetixClient>() {
+            }, email, passwrd);
+            //Sign in falseado
+            if (user == null) {
+                admin = adminManager.signIn_XML(new GenericType<Administrator>() {
+                }, email, passwrd);
+
+            }
             if (user != null || admin != null) {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ArtistView.fxml"));
                 FanetixUser userGeneral = new FanetixUser(email, passwrd);
@@ -164,20 +164,16 @@ public class SignInViewController {
                 ArtistViewController controller = (ArtistViewController) loader.getController();
                 controller.setStage(stage);
                 controller.initStage(root);
-            }
 
+            }
         } catch (SignInException e) {
             new Alert(Alert.AlertType.ERROR, "At this moment server is not available. Please try later.", ButtonType.OK).showAndWait();
         } catch (IOException ex) {
             Logger.getLogger(SignInViewController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (TextEmptyException ex) {
-            Logger.getLogger(SignInViewController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (PatternEmailIncorrectException ex) {
-            Logger.getLogger(SignInViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    // Mostrar/ocultar la contraseña
+// Mostrar/ocultar la contraseña
     private void textPropertyChange(ObservableValue observable, String oldValue, String newValue) {
         if (pfPassword.isVisible()) {
             tfPassword.setText(pfPassword.getText());
@@ -202,28 +198,34 @@ public class SignInViewController {
     }
 
     @FXML
-    private void handlerHyperlink(ActionEvent event) {
-        if (event.getSource() == hypSignUp) {
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/SignUpView.fxml"));
-                Parent root = (Parent) loader.load();
-                SignUpViewController controller = (SignUpViewController) loader.getController();
-                Stage modalStage = new Stage();
-                controller.setStage(modalStage);
-                controller.initStage(root);
-            } catch (IOException ex) {
-                Logger.getLogger(SignInViewController.class.getName()).log(Level.SEVERE, null, ex);
-            }
+    private void handlerSignUpHyperlink(ActionEvent event) {
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/SignUpView.fxml"));
+            Parent root = (Parent) loader.load();
+            SignUpViewController controller = (SignUpViewController) loader.getController();
+            //Stage modalStage = new Stage();
+            controller.setStage(stage);
+            controller.initStage(root);
+        } catch (IOException ex) {
+            Logger.getLogger(SignInViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        if (event.getSource() == hypForgotPassword) {
+
+    }
+
+    @FXML
+    private void handlerForgotPasswdHyperlink(ActionEvent event) {
+
+        showAlert("Server error", "At this moment this opction is not available", INFORMATION);
+        /*
             TextInputDialog tidResetPass = new TextInputDialog();
             tidResetPass.setHeaderText("Enter your email.");
             Optional<String> result = tidResetPass.showAndWait();
             if (result.isPresent()) {
-               // clientManager.resetPasswd(result.get());
+               clientManager.resetPasswd(result.get());
             }
-            showAlert("Email", "An email with the recovery password was sent to: " + result.get(), INFORMATION);
-        }
+            showAlert("Email", "An email with the recovery password was sent to: " + result.get(), INFORMATION);*/
+
     }
 
     // Manejo del evento de cierre de ventana
