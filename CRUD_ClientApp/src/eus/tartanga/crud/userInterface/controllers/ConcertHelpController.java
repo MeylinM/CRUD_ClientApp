@@ -8,6 +8,7 @@ package eus.tartanga.crud.userInterface.controllers;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Modality;
@@ -39,6 +40,8 @@ public class ConcertHelpController {
         stage.initModality(Modality.APPLICATION_MODAL); // Establece que la ventana será modal
         stage.setScene(scene);
         stage.setTitle("Ayuda para la Gestión de Conciertos");
+        //Añadir a la ventana el ícono “FanetixLogo.png”.
+        stage.getIcons().add(new Image("eus/tartanga/crud/app/resources/logo.png"));
         stage.setResizable(false);  // La ventana no es redimensionable
         stage.setMinWidth(800);  // Establece el tamaño mínimo de la ventana
         stage.setMinHeight(600);
@@ -56,6 +59,8 @@ public class ConcertHelpController {
         stage.initModality(Modality.APPLICATION_MODAL); // Establece que la ventana será modal
         stage.setScene(scene);
         stage.setTitle("Ayuda para la Gestión de Conciertos");
+        //Añadir a la ventana el ícono “FanetixLogo.png”.
+        stage.getIcons().add(new Image("eus/tartanga/crud/app/resources/logo.png")); 
         stage.setResizable(false);  // La ventana no es redimensionable
         stage.setMinWidth(800);  // Establece el tamaño mínimo de la ventana
         stage.setMinHeight(600);
