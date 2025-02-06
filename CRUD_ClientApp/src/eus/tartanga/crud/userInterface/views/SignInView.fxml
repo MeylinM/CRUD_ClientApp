@@ -125,7 +125,7 @@
                                 </Hyperlink>
                             </children>
                         </HBox>
-                        <Hyperlink prefHeight="50.0" prefWidth="381.0" text="Did you forget your password?" textFill="#eddf64" underline="true">
+                        <Hyperlink fx:id="hypForgotPassword" prefHeight="50.0" prefWidth="381.0" text="Did you forget your password?" textFill="#eddf64" underline="true">
                             <font>
                                 <Font size="24.0" />
                             </font>

@@ -31,7 +31,7 @@ public class ConcertHelpController {
      * Initializes and show the help window.
      * @param root The FXML document hierarchy root. 
      */
-    public void initAndShowStage(Parent root) {
+    public void initAndShowStageAdmin(Parent root) {
         Scene scene = new Scene(root);
         Stage stage = new Stage();
         stage.initModality(Modality.APPLICATION_MODAL);
@@ -40,7 +40,20 @@ public class ConcertHelpController {
         stage.setResizable(false);
         stage.setMinWidth(800);
         stage.setMinHeight(600);
-        stage.setOnShowing(this::handleWindowShowing);
+        stage.setOnShowing(this::handleWindowShowingAdmin);
+        stage.show();
+    }
+    
+    public void initAndShowStageClient(Parent root) {
+        Scene scene = new Scene(root);
+        Stage stage = new Stage();
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setScene(scene);
+        stage.setTitle("Ayuda para la Gestion de Conicertos");
+        stage.setResizable(false);
+        stage.setMinWidth(800);
+        stage.setMinHeight(600);
+        stage.setOnShowing(this::handleWindowShowingClient);
         stage.show();
     }
     /**
@@ -48,10 +61,17 @@ public class ConcertHelpController {
      * event.
      * @param event  The window event 
      */
-    private void handleWindowShowing(WindowEvent event){
+    private void handleWindowShowingAdmin(WindowEvent event){
         WebEngine webEngine = webView.getEngine();
         //Load help page.eus.tartanga.crud.userInterface.html
         webEngine.load(getClass()
                 .getResource("/eus/tartanga/crud/userInterface/html/helpConcertAdmin.html").toExternalForm());
+    }
+    
+    private void handleWindowShowingClient(WindowEvent event){
+        WebEngine webEngine = webView.getEngine();
+        //Load help page.eus.tartanga.crud.userInterface.html
+        webEngine.load(getClass()
+                .getResource("/eus/tartanga/crud/userInterface/html/helpConcertClient.html").toExternalForm());
     }
 }
