@@ -211,6 +211,7 @@ public class ProductViewControllerTest extends ApplicationTest {
         Node row = lookup(".table-row-cell").nth(0).query();
         clickOn(row);
         //Seleccionar el nodo de todas las filas para poder hacer click en ella.
+        
         Integer tablerow = tableView.getSelectionModel().getSelectedIndex();
         Node tableColumnTitle = lookup("#titleColumn").nth(tablerow + 1).query();
         // Node tableColumTeachers = lookup("#artistColumn").nth(tablerow + 1).query();
