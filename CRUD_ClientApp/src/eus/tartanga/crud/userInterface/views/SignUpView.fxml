@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="signUpView" fx:id="signUpView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="744.0" prefWidth="1366.0" styleClass="background-pane" stylesheets="@../css/signUpView.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eus.tartanga.crud.userInterface.controllers.SignUpViewController">
+   
+    <children>
+        <ImageView fitHeight="351.0" fitWidth="355.0" layoutX="109.0" layoutY="190.0" pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@../../app/resources/logo.png" />
+            </image>
+        </ImageView>
+      <ImageView fitHeight="750.0" fitWidth="774.0" layoutX="579.0" layoutY="16.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../../app/resources/signUpCuadrado.PNG" />
+         </image>
+      </ImageView>
+        <VBox layoutX="611.0" layoutY="46.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="674.0" prefWidth="694.0" spacing="15.0">
+            <children>
+                <VBox alignment="TOP_RIGHT" prefHeight="60.0" prefWidth="694.0">
+                    <children>
+                        <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">
+                            <children>
+                                <Label fx:id="labelFullName" alignment="CENTER" contentDisplay="CENTER" prefHeight="30.0" prefWidth="341.0" text="Full name">
+                                    <font>
+                                        <Font name="Algerian" size="20.0" />
+                                    </font>
+                                    <HBox.margin>
+                                        <Insets />
+                                    </HBox.margin>
+                                </Label>
+                                <TextField fx:id="tfFullName" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="490.0" />
+                            </children>
+                            <VBox.margin>
+                                <Insets />
+                            </VBox.margin>
+                        </HBox>
+                        <Label fx:id="labelErrorFullName" prefHeight="34.0" prefWidth="361.0" textFill="#fff600">
+                            <VBox.margin>
+                                <Insets left="168.0" />
+                            </VBox.margin>
+                        </Label>
+                    </children>
+                    <VBox.margin>
+                        <Insets />
+                    </VBox.margin>
+                </VBox>
+                <VBox alignment="TOP_RIGHT" prefHeight="60.0" prefWidth="694.0">
+                    <children>
+                        <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">
+                            <children>
+                                <Label fx:id="labelEmail" alignment="CENTER" contentDisplay="CENTER" prefHeight="33.0" prefWidth="335.0" text="E-mail">
+                                    <font>
+                                        <Font name="Algerian" size="20.0" />
+                                    </font>
+                                    <HBox.margin>
+                                        <Insets />
+                                    </HBox.margin>
+                                </Label>
+                                <TextField fx:id="tfEmail" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="489.0" />
+                            </children>
+                            <VBox.margin>
+                                <Insets />
+                            </VBox.margin>
+                        </HBox>
+                        <Label fx:id="labelErrorEmail" prefHeight="26.0" prefWidth="357.0" textFill="#fff600">
+                            <VBox.margin>
+                                <Insets left="168.0" />
+                            </VBox.margin>
+                        </Label>
+                    </children>
+                </VBox>
+                <VBox alignment="TOP_RIGHT" prefHeight="60.0" prefWidth="694.0">
+                    <children>
+                        <HBox alignment="CENTER_RIGHT" prefHeight="67.0" prefWidth="566.0">
+                            <children>
+                                <Label fx:id="labelPasswd" alignment="CENTER" contentDisplay="CENTER" prefHeight="33.0" prefWidth="253.0" text="Password">
+                                    <font>
+                                        <Font name="Algerian" size="20.0" />
+                                    </font>
+                                    <HBox.margin>
+                                        <Insets />
+                                    </HBox.margin>
+                                </Label>
+                                <StackPane prefHeight="59.0" prefWidth="406.0">
+                                    <children>
+                                        <TextField fx:id="tfShowPassword" prefHeight="26.0" prefWidth="443.0" />
+                                        <PasswordField fx:id="pfHiddenPassword" accessibleRole="PASSWORD_FIELD" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="449.0" />
+                                    </children>
+                                </StackPane>
+                                <ToggleButton fx:id="tgbEyePasswd" mnemonicParsing="false" prefHeight="14.0" prefWidth="26.0">
+                                    <graphic>
+                                        <ImageView fx:id="imgEyePasswd" accessibleRole="TOGGLE_BUTTON" fitHeight="24.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true">
+                                            <image>
+                                                <Image url="@../../resources/images/ShowPasswdOrange.png" />
+                                            </image>
+                                        </ImageView>
+                                    </graphic>
+                                </ToggleButton>
+                            </children>
+                        </HBox>
+                        <Label fx:id="labelErrorPasswd" prefHeight="22.0" prefWidth="362.0" textFill="#fff600" />
+                    </children>
+                    <padding>
+                        <Insets bottom="5.0" />
+                    </padding>
+                </VBox>
+                <VBox alignment="TOP_RIGHT" prefHeight="60.0" prefWidth="694.0">
+                    <children>
+                        <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="423.0">
+                            <children>
+                                <Label fx:id="labelRepeatPasswd" alignment="CENTER" contentDisplay="CENTER" prefHeight="47.0" prefWidth="337.0" text="Repeat password" textAlignment="CENTER">
+                                    <font>
+                                        <Font name="Algerian" size="20.0" />
+                                    </font>
+                                    <HBox.margin>
+                                        <Insets />
+                                    </HBox.margin>
+                                </Label>
+                                <StackPane prefHeight="37.0" prefWidth="320.0">
+                                    <children>
+                                        <TextField fx:id="tfShowConfirmPassword" prefHeight="25.0" prefWidth="330.0" />
+                                        <PasswordField fx:id="pfHiddenConfirmPassword" accessibleRole="PASSWORD_FIELD" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="450.0" />
+                                    </children>
+                                </StackPane>
+                                <ToggleButton fx:id="tgbEyeConfirmPasswd" mnemonicParsing="false" prefHeight="17.0" prefWidth="24.0">
+                                    <graphic>
+                                        <ImageView fx:id="imgEyeConfirmPasswd" accessibleRole="TOGGLE_BUTTON" fitHeight="24.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true">
+                                            <image>
+                                                <Image url="@../../resources/images/ShowPasswdOrange.png" />
+                                            </image>
+                                        </ImageView>
+                                    </graphic>
+                                </ToggleButton>
+                            </children>
+                        </HBox>
+                        <Label fx:id="labelErrorConfirmPasswd" prefHeight="22.0" prefWidth="362.0" textFill="#fff600" />
+                    </children>
+                </VBox>
+                <VBox alignment="TOP_RIGHT" prefHeight="60.0" prefWidth="694.0">
+                    <children>
+                        <HBox alignment="CENTER_RIGHT" prefHeight="42.0" prefWidth="694.0">
+                            <children>
+                                <Label alignment="CENTER" prefHeight="28.0" prefWidth="338.0" text="Street">
+                                    <font>
+                                        <Font name="Algerian" size="20.0" />
+                                    </font>
+                                    <HBox.margin>
+                                        <Insets />
+                                    </HBox.margin>
+                                </Label>
+                                <TextField fx:id="tfStreet" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="490.0" />
+                            </children>
+                        </HBox>
+                        <Label fx:id="labelErrorStreet" prefHeight="18.0" prefWidth="362.0" textFill="#fff600" />
+                    </children>
+                </VBox>
+                <HBox alignment="CENTER_RIGHT" prefHeight="60.0" prefWidth="694.0">
+                    <children>
+                        <VBox prefHeight="60.0" prefWidth="546.0">
+                            <children>
+                                <HBox alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="414.0">
+                                    <children>
+                                        <Label alignment="CENTER" prefHeight="28.0" prefWidth="245.0" text="ZIP   ">
+                                            <font>
+                                                <Font name="Algerian" size="20.0" />
+                                            </font>
+                                            <HBox.margin>
+                                                <Insets />
+                                            </HBox.margin>
+                                        </Label>
+                                        <TextField fx:id="tfZip" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="229.0" />
+                                    </children>
+                                    <VBox.margin>
+                                        <Insets right="5.0" />
+                                    </VBox.margin>
+                                </HBox>
+                                <Label fx:id="labelErrorZip" prefHeight="23.0" prefWidth="162.0" textFill="#fff600" wrapText="true">
+                                    <VBox.margin>
+                                        <Insets left="221.0" />
+                                    </VBox.margin>
+                                </Label>
+                            </children>
+                        </VBox>
+                        <VBox prefHeight="54.0" prefWidth="359.0">
+                            <children>
+                                <HBox alignment="CENTER_RIGHT" prefHeight="24.0" prefWidth="220.0">
+                                    <children>
+                                        <Label alignment="CENTER" prefHeight="27.0" prefWidth="124.0" text="City">
+                                            <font>
+                                                <Font name="Algerian" size="20.0" />
+                                            </font>
+                                            <HBox.margin>
+                                                <Insets />
+                                            </HBox.margin>
+                                            <padding>
+                                                <Insets right="3.0" />
+                                            </padding>
+                                        </Label>
+                                        <TextField fx:id="tfCity" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="188.0" />
+                                    </children>
+                                </HBox>
+                                <Label fx:id="labelErrorCity" prefHeight="38.0" prefWidth="153.0" textFill="#fff600" wrapText="true">
+                                    <VBox.margin>
+                                        <Insets left="35.0" />
+                                    </VBox.margin>
+                                </Label>
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+                <HBox alignment="CENTER_RIGHT" prefHeight="59.0" prefWidth="694.0">
+                    <children>
+                        <VBox alignment="CENTER_RIGHT" prefHeight="42.0" prefWidth="455.0">
+                            <children>
+                                <HBox alignment="CENTER_RIGHT" prefHeight="60.0" prefWidth="354.0">
+                                    <children>
+                                        <Label alignment="CENTER" prefHeight="34.0" prefWidth="281.0" text="MOBILE">
+                                            <font>
+                                                <Font name="Algerian" size="20.0" />
+                                            </font>
+                                            <HBox.margin>
+                                                <Insets />
+                                            </HBox.margin>
+                                        </Label>
+                                        <TextField fx:id="tfMobile" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="229.0" />
+                                    </children>
+                                </HBox>
+                                <Label fx:id="labelErrorMobile" prefHeight="38.0" prefWidth="158.0" textFill="#fff600" wrapText="true" />
+                            </children>
+                        </VBox>
+                        <HBox alignment="CENTER" prefHeight="42.0" prefWidth="277.0" />
+                    </children>
+                </HBox>
+                <VBox alignment="CENTER" prefHeight="72.0" prefWidth="580.0">
+                    <children>
+                        <Button fx:id="btnSignUp" alignment="CENTER" contentDisplay="CENTER" defaultButton="true" graphicTextGap="0.0" mnemonicParsing="false" onAction="#handleSignUp" prefHeight="42.0" prefWidth="166.0" styleClass="yellow-button" text="SIGN UP" textAlignment="CENTER">
+                            <VBox.margin>
+                                <Insets />
+                            </VBox.margin>
+                            <font>
+                                <Font size="24.0" />
+                            </font>
+                        </Button>
+                        <Label fx:id="labelErrorEmpty" alignment="CENTER" contentDisplay="CENTER" prefHeight="18.0" prefWidth="290.0" textAlignment="CENTER" textFill="#fff600">
+                            <VBox.margin>
+                                <Insets left="200.0" />
+                            </VBox.margin>
+                        </Label>
+                    </children>
+                </VBox>
+                <HBox alignment="CENTER" prefHeight="26.0" prefWidth="615.0">
+                    <VBox.margin>
+                        <Insets />
+                    </VBox.margin>
+                    <padding>
+                        <Insets left="200.0" />
+                    </padding>
+                    <children>
+                        <Label alignment="CENTER_RIGHT" contentDisplay="CENTER" prefHeight="26.0" prefWidth="689.0" text="Do you already have an account?" textAlignment="CENTER">
+                            <font>
+                                <Font name="System Bold" size="16.0" />
+                            </font>
+                        </Label>
+                        <Hyperlink fx:id="hypSignUp" prefHeight="26.0" prefWidth="686.0" text="Sign In" textAlignment="CENTER" textFill="#ffde59" underline="true">
+                            <font>
+                                <Font name="System Bold" size="16.0" />
+                            </font>
+                        </Hyperlink>
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+      
+    </children>
+</AnchorPane>

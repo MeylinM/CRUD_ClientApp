@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+
+<head>
+    <title>Artist Help page</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font: 16px arial, sans-serif;
+        }
+
+        h3 {
+            font: 20px arial, sans-serif;
+            text-decoration: underline;
+            font-weight: bold;
+        }
+
+        h4 {
+            font: 18px arial, sans-serif;
+            text-decoration: underline;
+            font-weight: bold;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <h3>Gestión de Artistas: Ayuda</h3>
+        <img src="../../app/resources/artistAdmin.png" alt="Ventana de gestión de artistas para administradores." />
+        <h4>Descripción general</h4>
+        <p>Esta ventana permite realizar las operaciones de mantenimiento
+            básico de los artistas de Fanetix. El administrador podrá mediante los controles
+            de los que dispone la ventana crear, modificar y eliminar los diferentes artistas de
+            la aplicación. Así mismo podrá generar un informe que contiene un listado
+            de todos los artistas de la aplicacion. Además, el administrador también puede realizar
+            las operaciones disponibles para los clientes, como la búsqueda y filtrado de artistas, así como
+            acceder a la tienda de productos y la sección de conciertos.</p>
+        <h4>Operaciones</h4>
+        <strong>Crear artistas</strong>
+        <p>Para crear un artista podrá hacerlo de 2 maneras o bien con el botón <strong>Add Artist</strong>
+            o bien dando click derecho en la pantalla pulsando en el menu de contexto la opcion con el mismo nombre.
+            Esto creará de base un artista nuevo con valores de base. Si no se produce ningún error, se creará el artista
+            y aparecerá en la tabla de artistas que se muestra en la ventana.</p>
+        <strong>Modificar datos de el artista</strong>
+        <p>Para modificar los datos de un artista primero deberá hacer doble click en la variable que se quiere modificar.
+            Se tendrá que tener en cuenta que se tendrá que cumplir las diferentes validaciones que se han establecido.
+            Una vez realizado el cambio deberá pulsar el botón "ENTER", en caso de querer cancelar la modificacion se podrá
+            hacer mediante el botón "ESC" o pulsando fuera de la variable editada.</p>
+            <p>Si no se produce ningún error, se modificarán los datos del artista y los datos actualizados del artista 
+            aparecerán en la tabla de artistas que se muestra en la ventana.</p>
+        <strong>Eliminar artistas</strong>
+        <p>Para eliminar un artista deberá seleccionar el artista a borrar
+            haciendo click en fila deseada de la tabla de artistas. A continuación, pulse en el botón
+            <strong>Delete</strong>, y se le solicitará confirmación para eliminar el artista.
+            Si confirma el borrado y no se produce ningún error se eliminará el artista y se actualizará
+            la tabla de artistas que se muestra en la ventana.
+        </p>
+          <strong>Búsqueda y filtrado de artistas</strong>
+        <p>El administrador puede buscar artistas ingresando su nombre o el de la compañía discográfica en la barra de búsqueda.
+            También puede aplicar filtros para organizar la lista de artistas según su fecha de debut.</p>
+        <strong>Acceder a la tienda de productos</strong>
+        <p>Pulsando el botón <strong>Tienda</strong>, se redirigirá a la sección donde podrá explorar y gestionar los productos
+            relacionados con los artistas.</p>
+        <strong>Consultar conciertos</strong>
+        <p>Pulsando el botón <strong>Conciertos</strong>, accederá a la sección donde podrá consultar los eventos y
+            conciertos de los artistas disponibles en la aplicación.</p>
+        <strong>Imprimir listado de artistas</strong>
+        <p>Dando click derecho en la pnatalla, pulsando en el menú de contexto la opción <strong>Imprint</strong> se abrirá una ventana donde puede ver un documento
+            que contiene un listado de los artistas que existen en la aplicación:<br><br>
+            <img src="../../app/resources/reportArtist.PNG" alt="Ventana de informe de artista" /><br><br>
+            Mediante los botones de la parte superior de la ventana podrá imprimir o almacenar dicho informe.
+        </p>
+       <strong>Ayuda</strong>
+        <p>Pulsando el botón <strong>Ayuda</strong> verá este documento de ayuda.</p>
+    </div>
+</body>
+
+</html>

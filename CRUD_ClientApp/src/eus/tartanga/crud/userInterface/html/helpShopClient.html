@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ayuda Tienda Cliente</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        h3 {
+            font: 20px arial, sans-serif;
+            text-decoration: underline;
+            font-weight: bold;
+        }
+
+        h4 {
+            font: 18px arial, sans-serif;
+            text-decoration: underline;
+            font-weight: bold;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <h3>Gestión de Tienda: Ayuda</h3>
+        <img src="../../app/resources/shopClient.png" alt="Ventana de gestión de tienda para clientes." />
+        <h4>Descripción general</h4>
+        <p>Esta ventana permite a los clientes realizar operaciones básicas en la tienda de productos de Fanetix.
+            Los clientes podrán añadir productos al carrito y filtrar los productos disponibles.Así mismo podrá 
+            generar un informe que contiene un listado de todos los productos de la aplicacion.</p>
+        <h4>Operaciones</h4>
+        <strong>Añadir productos al carrito</strong>
+        <p>Para añadir un producto al carrito, podrá hacerlo de 2 maneras: con el botón <strong>Add to Cart</strong>
+        o dando click derecho en el producto dentro de la tabla y seleccionando la opción con el mismo nombre en el 
+        menú de contexto. </p>
+        <p>Si el producto no tiene stock, aparecerá una alerta advirtiendo que no puede añadirlo al carrito. 
+        En caso de que tenga stock, aparecerá una ventana preguntando al usuario la cantidad de ese producto 
+        que quiere añadir a su carrito. Si no se produce ningún error, el producto se añadirá al carrito.</p>
+        <strong>Imprimir listado de productos</strong>
+        <p>Pulsando el botón <strong>Print</strong> disponible al dar click derecho se abrirá una ventana donde
+            se verá un documento que contiene un listado de los productos que existen en la aplicación:<br><br>
+            <img src="../../app/resources/reportProduct.PNG" alt="Ventana de informe de productos" /><br><br>
+            Mediante los botones de la parte superior de la ventana podrá imprimir o almacenar dicho informe.
+        </p>
+        <strong>Filtrar productos</strong>
+        <p>Podrá filtrar los productos de diferentes maneras:</p>
+        <ul>
+            <li>Escribiendo en el buscador, donde se filtrarán los datos de la tabla en base al título, descripción y nombre del artista.</li>
+            <li>Utilizando el checkbox de <strong>Available products</strong> para mostrar solo los productos disponibles.</li>
+            <li>Filtrando en base a las fechas introducidas en los dos date pickers que aparecen.</li>
+        </ul>
+        <strong>Salir de la aplicación</strong>
+        <p>Pulsando el botón <strong>x</strong> se cerrará la aplicación.</p>
+        <strong>Ayuda</strong>
+        <p>Pulsando el botón de ayuda verá este documento de ayuda.</p>
+    </div>
+</body>
+
+</html>

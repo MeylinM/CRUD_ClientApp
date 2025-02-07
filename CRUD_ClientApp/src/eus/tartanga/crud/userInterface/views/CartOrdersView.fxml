@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox prefHeight="768.0" prefWidth="1366.0" stylesheets="@../css/styles.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eus.tartanga.crud.userInterface.controllers.CartOrdersViewController"> 
+    <!-- Menú superior -->
+    <fx:include fx:id="menuBar" source="MenuBarView.fxml" />
+    <!-- Contenido principal -->
+    <AnchorPane prefHeight="744.0" prefWidth="1366.0" styleClass="background-pane" stylesheets="@../css/styles.css">
+        <children>
+            <!-- Titulo de la ventana -->
+            <ImageView fx:id="titleImage" fitHeight="90.0" fitWidth="426.0" layoutX="489.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true" />
+            <!-- Boton de Informacion -->
+            <Button fx:id="btnInfo" layoutX="1260.0" layoutY="14.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="55.0" styleClass="info-button" />
+            <!-- Filtros de la ventana My Orders -->
+            <ChoiceBox fx:id="cbxArtist" layoutX="53.0" layoutY="101.0" prefHeight="36.0" prefWidth="398.0" styleClass="myChoiceBox" />
+            <HBox alignment="CENTER_RIGHT" layoutX="499.0" layoutY="86.0" prefHeight="66.0" prefWidth="816.0">
+                <children>
+                    <DatePicker fx:id="dpFrom" prefHeight="37.0" prefWidth="137.0" promptText="From...">
+                        <HBox.margin>
+                            <Insets right="25.0" />
+                        </HBox.margin>
+                    </DatePicker>
+                    <DatePicker fx:id="dpTo" promptText="To..." />
+                </children>
+            </HBox>
+            <!-- Tabla con productos -->
+            <TableView fx:id="tbCart" editable="true" layoutX="50.0" layoutY="152.0" prefHeight="500.0" prefWidth="1266.0" styleClass="table-view" stylesheets="@../css/styles.css">
+                <columns>
+                    <TableColumn fx:id="tbcProduct" prefWidth="150.0" style="-fx-alignment: center;" text="Product" />
+                    <TableColumn fx:id="tbcArtist" prefWidth="140.0" style="-fx-alignment: center-left;" text="Artist" />
+                    <TableColumn fx:id="tbcName" prefWidth="140.0" style="-fx-alignment: center-left;" text="Name" />
+                    <TableColumn fx:id="tbcDescription" prefWidth="400.0" style="-fx-alignment: center-left;" text="Description" />
+                    <TableColumn fx:id="tbcOrderDate" prefWidth="150.0" style="-fx-alignment: center;" text="Order Date" />
+                    <TableColumn fx:id="tbcPrice" prefWidth="95.0" style="-fx-alignment: center;" text="Price (€)" />
+                    <TableColumn fx:id="tbcQuantity" prefWidth="95.0" style="-fx-alignment: center;" text="Quantity" />
+                    <TableColumn fx:id="tbcSubTotal" prefWidth="95.0" style="-fx-alignment: center-right;" text="Sub Total" />
+                </columns>
+            </TableView>
+            <!-- Fila de Total -->
+            <HBox fx:id="footer" layoutX="1152.0" layoutY="652.0" prefHeight="48.0" prefWidth="154.0" spacing="20.0">
+                <Label prefHeight="48.0" prefWidth="129.0" styleClass="totalLabel" text="TOTAL:">
+                    <font>
+                        <Font name="System Bold" size="16.0" />
+                    </font>
+                </Label>
+                <Label fx:id="totalPriceLabel" alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="48.0" prefWidth="152.0" styleClass="totalValueLabel" text="0.00" textAlignment="RIGHT">
+                    <font>
+                        <Font name="System Bold" size="16.0" />
+                    </font>
+                </Label>
+            </HBox>
+            <!-- Botones inferiores -->
+            <HBox layoutX="50.0" layoutY="664.0" prefHeight="36.0" prefWidth="225.0" spacing="20.0">
+            <StackPane prefHeight="36.0" prefWidth="101.0">
+               <children>
+                  <Button fx:id="btnPrint" defaultButton="true" prefHeight="36.0" prefWidth="104.0" styleClass="yellow-button" text="PRINT">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Button>
+                      <Button fx:id="btnBuy" defaultButton="true" prefHeight="36.0" prefWidth="108.0" styleClass="yellow-button" text="BUY">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Button>
+               </children>
+            </StackPane>
+                <Button fx:id="btnClearCart" prefHeight="36.0" prefWidth="117.0" styleClass="yellow-button" text="CLEAR CART">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Button>
+            </HBox>
+                  
+        </children>
+    </AnchorPane>
+</VBox>
