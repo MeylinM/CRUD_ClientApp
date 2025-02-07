@@ -1,14 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package eus.tartanga.crud.app;
 
 import eus.tartanga.crud.exception.ReadException;
-import eus.tartanga.crud.userInterface.controllers.ConcertViewController;
-import eus.tartanga.crud.userInterface.controllers.SignUpViewController;
-import eus.tartanga.crud.userInterface.controllers.ProductViewController;
 import eus.tartanga.crud.userInterface.controllers.SignInViewController;
 import javafx.application.Application;
 import javafx.stage.Stage;

@@ -261,7 +261,6 @@ public class ProductViewController {
      * Inicializa la ventana de la vista de productos.
      *
      * @param root El nodo raíz de la escena.
-     * @throws IOException Si ocurre un error de entrada/salida.
      */
     public void initStage(Parent root) {
         try {
@@ -526,7 +525,7 @@ public class ProductViewController {
      * Obtiene la lista de todos los productos disponibles.
      * 
      * @return Lista de productos o null en caso de error.
-     * @throws ReadException Si ocurre un error al conseguir la lista de productos.
+     * ReadException Si ocurre un error al conseguir la lista de productos.
      */
     private List<Product> findAllProducts() {
         List<Product> products = null;
@@ -544,7 +543,7 @@ public class ProductViewController {
      * Obtiene la lista de todos los artistas disponibles.
      * 
      * @return Lista de artistas o null en caso de error.
-     * @throws ReadException Si ocurre un error al conseguir la lista de artistas.
+     * ReadException Si ocurre un error al conseguir la lista de artistas.
      */
     private List<Artist> findAllArtist() {
         List<Artist> artists = null;
@@ -561,7 +560,7 @@ public class ProductViewController {
      * Agrega un nuevo producto con valores por defecto y lo muestra en la tabla.
      * 
      * @param event Evento de acción al hacer clic en "Add Product".
-     * @throws AddException Si ocurre un error al añadir el producto.
+     * AddException Si ocurre un error al añadir el producto.
      */
     private void handleAddProduct(ActionEvent event) {
         try {
@@ -585,8 +584,8 @@ public class ProductViewController {
      * Agrega el producto seleccionado al carrito si hay stock disponible.
      * 
      * @param event Evento de acción al hacer clic en "Add to cart".
-     * @throws AddException Si ocurre un error al añadir el producto al carrito.
-     * @throws NoStockException Si el producto no tiene stock.
+     * AddException Si ocurre un error al añadir el producto al carrito.
+     * NoStockException Si el producto no tiene stock.
      */
     private void handleAddToCart(ActionEvent event) {
         try {
@@ -624,7 +623,7 @@ public class ProductViewController {
      * Muestra una alerta de confirmación antes de proceder con la eliminación.
      * 
      * @param event El evento que activa la eliminación.
-     * @throws DeleteException Si ocurre un error al eliminar los productos.
+     * DeleteException Si ocurre un error al eliminar los productos.
      */
     private void handleDeleteProduct(ActionEvent event) {
         ObservableList<Product> selectedProducts = productTable.getSelectionModel().getSelectedItems();
@@ -671,7 +670,7 @@ public class ProductViewController {
      * Actualiza los datos de un producto.
      * 
      * @param product El producto con los datos actualizados.
-     * @throws UpdateException Si ocurre un error al actualizar el producto.
+     * UpdateException Si ocurre un error al actualizar el producto.
      */
     private void updateProduct(Product product) {
         try {
@@ -902,7 +901,7 @@ public class ProductViewController {
      * 
      * @param email El correo electrónico del cliente que se desea obtener.
      * @return El objeto FanetixClient correspondiente al correo electrónico proporcionado.
-     * @throws ReadException Si ocurre un error al leer los datos del cliente.
+     * ReadException Si ocurre un error al leer los datos del cliente.
      */
     private FanetixClient getFanetixClient(String email) {
         FanetixClient client = null;

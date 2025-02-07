@@ -99,7 +99,7 @@ import net.sf.jasperreports.view.JasperViewer;
  * La clase está vinculada al archivo FXML `ConcertView.fxml` para el diseño y
  * las interacciones de la interfaz de usuario.
  *
- * @autor Irati
+ * @author Irati
  */
 public class ConcertViewController {
 
@@ -183,8 +183,6 @@ public class ConcertViewController {
      * @param root El nodo raíz de la interfaz de usuario en el formato FXML.
      * @throws WebApplicationException Si ocurre un error en la aplicación web
      * al cargar los datos.
-     * @throws ReadException Si ocurre un error al leer los datos de la base de
-     * datos o recursos.
      */
     public void initStage(Parent root) {
         try {

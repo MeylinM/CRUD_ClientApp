@@ -244,7 +244,7 @@ public class SignUpViewController {
     /**
      * Initializes and configures the registration window (SignUp).
      *
-     * @param root The root node to be used for creating the scene of the
+     * @param stage The root node to be used for creating the scene of the
      * window.
      */
     public void setStage(Stage stage) {
@@ -400,9 +400,9 @@ public class SignUpViewController {
      * signable interface.
      *
      * @param event The action event triggered by the button click.
-     * @throws ServerErrorException If there is an issue with server
+     * ServerErrorException If there is an issue with server
      * availability.
-     * @throws UserExistErrorException If the email address already exists in
+     * UserExistErrorException If the email address already exists in
      * the system.
      */
     @FXML

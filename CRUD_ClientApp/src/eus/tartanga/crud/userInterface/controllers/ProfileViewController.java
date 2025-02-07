@@ -112,8 +112,7 @@ public class ProfileViewController {
     /**
      * Initializes the controller class.
      *
-     * @param root
-     * @param user
+     * @param root El nodo raíz de la escena.
      */
     public void initStage(Parent root) {
         try {
