@@ -47,9 +47,9 @@ public class ArtistViewControllerTest extends ApplicationTest {
     //@Test
     public void test_write() throws NotBoundException, MalformedURLException {
         clickOn("#tfEmail");
-        write("admin1@fanetix.com");
+        write("admin@gmail.com");
         clickOn("#pfPassword");
-        write("password123");
+        write("abcd*1234");
         clickOn("#btnAccept");
         tableView = lookup("#artistTable").query();
         Integer count = tableView.getItems().size();
@@ -67,9 +67,9 @@ public class ArtistViewControllerTest extends ApplicationTest {
     // @Test
     public void test_delete() {
         clickOn("#tfEmail");
-        write("admin1@fanetix.com");
+        write("admin@gmail.com");
         clickOn("#pfPassword");
-        write("password123");
+        write("abcd*1234");
         clickOn("#btnAccept");
         Node tableColumnName = lookup("#nameColumn").nth(0).query();
         clickOn(tableColumnName);
@@ -97,9 +97,9 @@ public class ArtistViewControllerTest extends ApplicationTest {
     @Test
     public void test_update() {
         clickOn("#tfEmail");
-        write("admin1@fanetix.com");
+        write("admin@gmail.com");
         clickOn("#pfPassword");
-        write("password123");
+        write("abcd*1234");
         clickOn("#btnAccept");
 
         tableView = lookup("#artistTable").query();
@@ -147,5 +147,65 @@ public class ArtistViewControllerTest extends ApplicationTest {
         assertEquals("COMPAÑIA", modifiedArtist.getCompany());
         assertEquals("LAST ALBUM", modifiedArtist.getLastAlbum());
     }
+    
+    //@Test
+    public void testFilterArtistsBySearch() {
+        clickOn("#tfEmail");
+        write("olaia@gmail.com");
+        clickOn("#pfPassword");
+        write("abcd*1234");
+        clickOn("#btnAccept");
+
+        // Escribir en el TextField para filtrar
+        clickOn("#searchField");
+        write("YG Entertaiment");
+
+        // Esperar un poco para que se apliquen los filtros
+        sleep(1000);
+
+        // Verificar que los conciertos que contienen "Eminem" en name, compañia o último album estén presentes
+        ObservableList<Artist> artists = tableView.getItems();
+
+        for (Artist artist : artists) {
+            String name = artist.getName().toLowerCase();
+            String company = artist.getCompany().toLowerCase();
+            //String lastAlbum = artist.getLastAlbum().toLowerCase();
+
+            assertTrue(name.contains("yg entertaiment") || company.contains("yg entertaiment"));
+        }
+    }
+    
+    //@Test
+    public void testFilterProductsByDate() {
+        clickOn("#tfEmail");
+        write("olaia@gmail.com");
+        clickOn("#pfPassword");
+        write("abcd*1234");
+        clickOn("#btnAccept");
+  
+        clickOn("#dpFrom");
+        write("01/01/2025");
+        push(KeyCode.ENTER);
+
+        clickOn("#dpTo");
+        write("31/12/2016");
+        push(KeyCode.ENTER);
+
+        ObservableList<Artist> artists = tableView.getItems();
+        // Crear las fechas de comparación
+        java.util.Date fromDate = java.sql.Date.valueOf("2025-01-01");
+        java.util.Date toDate = java.sql.Date.valueOf("2016-12-31");
+
+        for (Artist artist : artists) {
+            java.util.Date releaseDate = artist.getDebut();
+
+            // Verificar que la fecha esté dentro del rango esperado
+            assertTrue(releaseDate.equals(fromDate) || releaseDate.after(fromDate));
+            assertTrue(releaseDate.equals(toDate) || releaseDate.before(toDate));
+        }
+    }
+
 
 }
+
+
