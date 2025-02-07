@@ -6,7 +6,7 @@
 package eus.tartanga.crud.exception;
 
 /**
- *
+ * Custom exception for no stock on product
  * @author Elbire
  */
 public class NoStockException extends Exception {

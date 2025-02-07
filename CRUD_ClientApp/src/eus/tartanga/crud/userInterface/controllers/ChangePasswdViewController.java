@@ -23,6 +23,12 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javax.ws.rs.core.GenericType;
 
+/**
+ * Controlador para la vista de cambio de contraseña
+ *
+ * @author Irati
+ */
+
 public class ChangePasswdViewController {
 
     @FXML

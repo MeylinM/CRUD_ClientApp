@@ -31,6 +31,8 @@ import javafx.stage.Stage;
 import javax.ws.rs.core.GenericType;
 
 /**
+ * 
+ * Controlador para la ventana de SignIn
  * @author Elbire
  */
 public class SignInViewController {

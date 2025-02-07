@@ -9,7 +9,7 @@ import java.util.Date;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- *
+ * Clase que representa un Administrador en el sistema Fanetix.
  * @author Meylin and Irati
  */
 

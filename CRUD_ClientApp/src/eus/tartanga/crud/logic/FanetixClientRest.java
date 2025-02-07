@@ -19,16 +19,8 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
 
 /**
- * Jersey REST client generated for REST resource:FanetixClientFacadeREST
- * [eus.tartanga.crud.entities.fanetixclient]<br>
- * USAGE:
- * <pre>
- *        FanetixClientRest client = new FanetixClientRest();
- *        Object response = client.XXX(...);
- *        // do whatever with response
- *        client.close();
- * </pre>
- *
+*   Implementación de {@link FanetixClientManager} que gestiona la comunicación 
+ * con el servidor RESTful para operaciones CRUD sobre clientes Fanetix.
  * @author Elbire and Meylin
  */
 public class FanetixClientRest implements FanetixClientManager {

@@ -1,14 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package eus.tartanga.crud.encrypt;
-
-/**
- *
- * @author Irati y Meylin
- */
 import static com.google.common.io.ByteStreams.toByteArray;
 import eus.tartanga.crud.exception.EncryptException;
 import javax.crypto.Cipher;
@@ -17,7 +7,13 @@ import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.spec.X509EncodedKeySpec;
 
-//Este metodo se usa para cifrar la contraseña usando una clave publica RSA
+/**
+ * La clase AsymmetricalClient cifra una contraseña utilizando una clave pública RSA cargada desde un archivo de recursos.
+ * Utiliza el algoritmo RSA con el esquema de padding PKCS1.
+ * En caso de error, lanza una EncryptException.
+ * 
+ * @author Irati y Meylin
+ */
 public class AsymmetricalClient {
 
     public byte[] encryptedData(String passwd) throws EncryptException {

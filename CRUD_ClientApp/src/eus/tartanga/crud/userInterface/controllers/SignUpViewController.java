@@ -58,6 +58,7 @@ import javax.ws.rs.core.GenericType;
 import static jxl.biff.BaseCellFeatures.logger;
 
 /**
+ * Controlador para la ventana de SignUp
  * @author Meylin, Elbire
  */
 public class SignUpViewController {

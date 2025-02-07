@@ -10,7 +10,7 @@ import java.util.Date;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- *
+ * Clase que representa un Carrito de Compras en el sistema Fanetix.
  * @author Meylin
  */
 

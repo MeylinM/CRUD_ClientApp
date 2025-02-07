@@ -1,13 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template isn the editor.
- */
 package eus.tartanga.crud.exception;
 
 /**
- *
- * @author 2dam
+ * Custom exception for server error adding
+ * @author Everyone
  */
 public class AddException extends Exception {
 

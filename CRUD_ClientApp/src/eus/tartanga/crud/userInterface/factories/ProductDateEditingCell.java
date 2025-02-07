@@ -15,7 +15,8 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableCell;
 
 /**
- *
+ * Clase personalizada que extiende {@link TableCell} para proporcionar una celda de edición con un selector de fechas en una tabla.
+ * Esta celda permite editar las fechas de los productos, validando que la fecha seleccionada esté dentro del rango permitido (1980-2030).
  * @author Elbire
  */
 public class ProductDateEditingCell extends TableCell<Product, Date> {

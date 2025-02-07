@@ -6,7 +6,8 @@
 package eus.tartanga.crud.logic;
 
 /**
- *
+ * Clase {@code AdministratorFactory} que proporciona una instancia única de {@link AdministratorManager}.
+ * Si no existe, crea una nueva instancia de {@link AdministratorRest}.
  * @author meyli
  */
 public class AdministratorFactory {

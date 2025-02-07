@@ -18,16 +18,10 @@ import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
 /**
- * Jersey REST client generated for REST resource:AdministratorFacadeREST
- * [eus.tartanga.crud.entities.administrator]<br>
- * USAGE:
- * <pre>
- *        AdministratorRest client = new AdministratorRest();
- *        Object response = client.XXX(...);
- *        // do whatever with response
- *        client.close();
- * </pre>
- *
+ * 
+ * Implementación de {@link AdministratorManager} que gestiona la comunicación con el servidor REST.
+ * Permite realizar operaciones CRUD sobre administradores mediante peticiones HTTP.
+ * 
  * @author 2dam
  */
 public class AdministratorRest implements AdministratorManager {

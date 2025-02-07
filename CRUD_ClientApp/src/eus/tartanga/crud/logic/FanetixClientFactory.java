@@ -6,7 +6,8 @@
 package eus.tartanga.crud.logic;
 
 /**
- *
+ * Clase {@code FanetixClientFactory} que proporciona una instancia única de {@link FanetixClientManager}.
+ * Si no existe, crea una nueva instancia de {@link FanetixClientRest}.
  * @author meyli
  */
 public class FanetixClientFactory {

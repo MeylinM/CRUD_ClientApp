@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package eus.tartanga.crud.logic;
 
 import eus.tartanga.crud.exception.AddException;
@@ -25,14 +20,6 @@ import javax.ws.rs.core.GenericType;
  * operations such as retrieving, creating, updating, and deleting artist
  * records.</p>
  *
- * <p>
- * <b>Usage Example:</b></p>
- * <pre>
- *     ArtistClientRest client = new ArtistClientRest();
- *     Object response = client.findAllArtist(...);
- *     // Process the response
- *     client.close();
- * </pre>
  *
  * @author olaia
  */

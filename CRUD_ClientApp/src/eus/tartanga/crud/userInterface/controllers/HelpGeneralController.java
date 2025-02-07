@@ -15,8 +15,8 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 /**
- *
- * @author 2dam
+ *  Controlador para la ventana de ayuda general de la aplicación.
+ * @author Elbire
  */
 public class HelpGeneralController {
       /**

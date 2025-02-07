@@ -9,7 +9,10 @@ import java.io.Serializable;
 import javax.xml.bind.annotation.XmlElement;
 
 /**
- *
+ * Representa un usuario dentro del sistema Fanetix.
+ * Esta es una clase base que almacena la información básica 
+ * de un usuario, incluyendo su correo electrónico y contraseña.
+ * 
  * @author Meylin, Elbire
  */
 public class FanetixUser implements Serializable {

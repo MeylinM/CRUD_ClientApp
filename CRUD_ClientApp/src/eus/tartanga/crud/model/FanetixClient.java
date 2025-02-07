@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- *
+ * Clase que representa a un cliente en el sistema Fanetix.
  * @author Meylin, Irati and Elbire
  */
 @XmlRootElement

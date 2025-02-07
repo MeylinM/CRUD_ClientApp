@@ -6,7 +6,7 @@
 package eus.tartanga.crud.exception;
 
 /**
- *
+ * Custom exception for exceeding character
  * @author Elbire
  */
 public class MaxCharacterException extends Exception {

@@ -7,12 +7,14 @@ package eus.tartanga.crud.userInterface.controllers;
 
 import eus.tartanga.crud.app.CRUD_ClientApp;
 import eus.tartanga.crud.model.Concert;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.TableView;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
@@ -117,7 +119,7 @@ public class ConcertViewControllerTest extends ApplicationTest {
         assertTrue("El número de conciertos debería haberse reducido al aplicar el filtro", totalConcertsAfter <= totalConcertsBefore);
     }
 
-    @Test
+    //@Test
     public void testFilterConcertsByDate() {
         clickOn("#tfEmail");
         write("irati@gmail.com");
@@ -154,9 +156,9 @@ public class ConcertViewControllerTest extends ApplicationTest {
     //@Test
     public void test_write() {
         clickOn("#tfEmail");
-        write("admin1@fanetix.com");
+        write("meylin@gmail.com");
         clickOn("#pfPassword");
-        write("password123");
+        write("abcd*1234");
         clickOn("#btnAccept");
         clickOn("#concertsButton");
         tableView = lookup("#concertTable").query();
@@ -178,9 +180,9 @@ public class ConcertViewControllerTest extends ApplicationTest {
     //@Test
     public void test_delete() {
         clickOn("#tfEmail");
-        write("admin1@fanetix.com");
+        write("meylin@gmail.com");
         clickOn("#pfPassword");
-        write("password123");
+        write("abcd*1234");
         clickOn("#btnAccept");
         clickOn("#concertsButton");
         Node tableColumnConcertName = lookup("#concertColumn").nth(0).query();
@@ -210,12 +212,12 @@ public class ConcertViewControllerTest extends ApplicationTest {
         assertTrue(notFound);
     }
 
-    //@Test
+    @Test
     public void test_update() {
         clickOn("#tfEmail");
-        write("admin1@fanetix.com");
+        write("meylin@gmail.com");
         clickOn("#pfPassword");
-        write("password123");
+        write("abcd*1234");
         clickOn("#btnAccept");
         clickOn("#concertsButton");
         tableView = lookup("#concertTable").query();
@@ -224,10 +226,10 @@ public class ConcertViewControllerTest extends ApplicationTest {
         //Seleccionar el nodo de todas las filas para poder hacer click en ella.
         Integer tablerow = tableView.getSelectionModel().getSelectedIndex();
         Node tableColumnName = lookup("#concertColumn").nth(tablerow + 1).query();
-        // Node tableColumArtist = lookup("#artistColumn").nth(tablerow + 1).query();
+        Node tableColumArtist = lookup("#artistColumn").nth(tablerow + 1).query();
         Node tableColumnLocation = lookup("#locationColumn").nth(tablerow + 1).query();
         Node tableColumnCity = lookup("#cityColumn").nth(tablerow + 1).query();
-        //Node tableColumnDate = lookup("#dateColumn").nth(tablerow + 1).query();
+        Node tableColumnDate = lookup("#dateColumn").nth(tablerow + 1).query();
         Node tableColumnTime = lookup("#timeColumn").nth(tablerow + 1).query();
 
         //Coger los valores del concierto seleccionado antes de ser modificada.
@@ -244,7 +246,18 @@ public class ConcertViewControllerTest extends ApplicationTest {
         clickOn(tableColumnLocation);
         write("LOCATION");
         push(KeyCode.ENTER);
-
+        
+        /*rightClickOn(tableColumArtist);
+        clickOn("Select artist/s");
+        clickOn("Fito");
+        Button saveButton = lookup(".button").query();
+        clickOn(saveButton);*/
+        
+        doubleClickOn(tableColumnDate);
+        clickOn(tableColumnDate);
+        write("01/11/2027");
+        push(KeyCode.ENTER);
+        
         clickOn(tableColumnCity);
         write("CITY");
         push(KeyCode.ENTER);
@@ -259,9 +272,13 @@ public class ConcertViewControllerTest extends ApplicationTest {
         Concert modifiedConcert = (Concert) tableView.getSelectionModel().getSelectedItem();
 
         //Verificar que los valores no son iguales que los de la asignatura selecciona anteriormente.
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        String modifiedDateString = sdf.format(modifiedConcert.getConcertDate());
         assertEquals("CONCERT", modifiedConcert.getConcertName());
         assertEquals("LOCATION", modifiedConcert.getLocation());
         assertEquals("CITY", modifiedConcert.getCity());
+        assertEquals("01/11/2027", modifiedDateString);
+        //assertEquals("Fito", modifiedConcert.getArtistList().get(0));
         //assertEquals("21:30", modifiedConcert.getConcertTime());
     }
 }

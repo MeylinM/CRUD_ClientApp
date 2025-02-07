@@ -19,13 +19,6 @@ import javax.xml.ws.WebServiceException;
  * updating, and retrieving cart items. The client communicates with the server 
  * using both XML and JSON formats.
  * 
- * USAGE:
- * <pre>
- * CartClientRest client = new CartClientRest();
- * Object response = client.XXX(...);
- * // do whatever with response
- * client.close();
- * </pre>
  * 
  * @author meylin
  */

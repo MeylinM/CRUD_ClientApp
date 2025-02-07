@@ -9,7 +9,7 @@ import java.io.Serializable;
 
 
 /**
- *
+ * Clase que representa la clave primaria compuesta para la entidad Cart.
  * @author Meylin
  */
 

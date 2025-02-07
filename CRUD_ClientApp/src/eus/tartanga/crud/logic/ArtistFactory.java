@@ -11,12 +11,6 @@ package eus.tartanga.crud.logic;
  * <p>This class follows the Singleton pattern to ensure that only one 
  * instance of {ArtistManager} is created and used throughout the application.</p>
  * 
- * <p><b>Usage Example:</b></p>
- * <pre>
- *     ArtistManager manager = ArtistFactory.getArtistManager();
- *     manager.createArtist(artist);
- * </pre>
- * 
  * @author olaia
  */
 public class ArtistFactory {

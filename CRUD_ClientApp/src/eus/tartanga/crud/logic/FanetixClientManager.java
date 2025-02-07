@@ -14,7 +14,8 @@ import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.GenericType;
 /**
- *
+ * 
+ * Interface that defines the operations for managing administrators.
  * @author Elbire and Meylin
  */
 public interface FanetixClientManager {
