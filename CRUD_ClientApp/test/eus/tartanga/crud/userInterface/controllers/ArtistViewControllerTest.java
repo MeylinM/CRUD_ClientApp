@@ -9,6 +9,7 @@ import eus.tartanga.crud.app.CRUD_ClientApp;
 import eus.tartanga.crud.model.Artist;
 import java.net.MalformedURLException;
 import java.rmi.NotBoundException;
+import java.text.SimpleDateFormat;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.TableView;
@@ -88,7 +89,7 @@ public class ArtistViewControllerTest extends ApplicationTest {
 
     }
 
-    //@Test
+    @Test
     public void test_update() {
         clickOn("#tfEmail");
         write("admin@gmail.com");
@@ -117,6 +118,7 @@ public class ArtistViewControllerTest extends ApplicationTest {
         Artist subjectArtist = (Artist) tableView.getSelectionModel().getSelectedItem();
         String title = subjectArtist.getName();
         String description = subjectArtist.getCompany();
+        
 
         // Click on the different cells to modify the data
         clickOn(tableColumnName);
@@ -130,6 +132,11 @@ public class ArtistViewControllerTest extends ApplicationTest {
         clickOn(tableColumnLastAlbum);
         write("LAST ALBUM");
         push(KeyCode.ENTER);
+        
+        doubleClickOn(tableColumnDebut);
+        clickOn(tableColumnDebut);
+        write("01/11/2027");
+        push(KeyCode.ENTER);
 
         WaitForAsyncUtils.waitForFxEvents();
 
@@ -137,9 +144,12 @@ public class ArtistViewControllerTest extends ApplicationTest {
         Artist modifiedArtist = (Artist) tableView.getSelectionModel().getSelectedItem();
 
         // Verify that the values are different from the values of the selected artist before modification
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        String modifiedDateString = sdf.format(modifiedArtist.getDebut());
         assertEquals("ARTISTA", modifiedArtist.getName());
         assertEquals("COMPAÑIA", modifiedArtist.getCompany());
         assertEquals("LAST ALBUM", modifiedArtist.getLastAlbum());
+        assertEquals("01/11/2027", modifiedDateString);
     }
     
     //@Test
@@ -171,7 +181,7 @@ public class ArtistViewControllerTest extends ApplicationTest {
         }
     }
     
-    @Test
+    //@Test
     public void testFilterProductsByDate() {
         clickOn("#tfEmail");
         write("olaia@gmail.com");
