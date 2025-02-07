@@ -76,21 +76,24 @@ public class ProfileViewController {
 
     @FXML
     private Label lbDate;
-    
+
     @FXML
     private Label lbName;
-    
+
     @FXML
     private Label lbPhone;
-    
+
     @FXML
     private Label lbCity;
-        
+
     @FXML
     private Label lbStreet;
-    
+
     @FXML
     private Label lbZIP;
+
+    @FXML
+    private Button btnInfo;
 
     private Stage stage;
     private Logger logger = Logger.getLogger(ProfileViewController.class.getName());
@@ -135,6 +138,7 @@ public class ProfileViewController {
             adminManager = AdministratorFactory.getAdministratorManager();
             findClient(user.getEmail());
             changePasswd.setOnAction(this::handleChangePasswd);
+            btnInfo.setOnAction(this::handleInfoButton);
         } catch (Exception e) {
             String errorMsg = "Error" + e.getMessage();
             logger.severe(errorMsg);
@@ -147,7 +151,7 @@ public class ProfileViewController {
             Parent root = (Parent) loader.load();
             ChangePasswdViewController controller = (ChangePasswdViewController) loader.getController();
             controller.setStage(stage);
-            controller.initStage(root);
+            //  controller.initStage(root);
         } catch (IOException ex) {
             Logger.getLogger(ProfileViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -172,8 +176,8 @@ public class ProfileViewController {
     private void loadAdminData(Administrator admin) {
         // Mostrar solo email, password e incorporation date
         emailField.setText(admin.getEmail());
-        passwordField.setText(admin.getPasswd());        
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());      
+        passwordField.setText(admin.getPasswd());
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         dateField.setText(sdf.format(admin.getIncorporationDate()));
 
         // Ocultar todos los demás campos excepto los requeridos
@@ -207,5 +211,19 @@ public class ProfileViewController {
             logger.severe("El cliente es nulo");
         }
 
+    }
+
+    private void handleInfoButton(ActionEvent event) {
+        try {
+            FXMLLoader loader
+                    = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/HelpProfileView.fxml"));
+            Parent root = (Parent) loader.load();
+            HelpProfileViewController helpController
+                    = ((HelpProfileViewController) loader.getController());
+            // Inicializa y muestra la ventana de ayuda
+            helpController.initAndShowStage(root);
+        } catch (IOException ex) {
+            logger.warning("Unable to load the help");
+        }
     }
 }

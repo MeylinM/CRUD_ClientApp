@@ -27,9 +27,9 @@
                 <Image url="@../../app/resources/SignInTittle.png" />
             </image>
         </ImageView>
-        <ImageView fx:id="blancoImg" fitHeight="193.0" fitWidth="584.0" layoutX="407.0" layoutY="485.0" opacity="0.6" pickOnBounds="true" preserveRatio="true">
+        <ImageView fx:id="blancoImg" fitHeight="150.0" fitWidth="601.0" layoutX="427.0" layoutY="485.0" opacity="0.6" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@../../app/resources/blanco.jpg" />
+                <Image url="@../../app/resources/blancoImg.jpg" />
             </image>
         </ImageView>
         <VBox alignment="CENTER" layoutX="209.0" layoutY="184.0" prefHeight="470.0" prefWidth="1009.0">
@@ -85,7 +85,7 @@
                                 <Insets bottom="10.0" />
                             </padding>
                             <graphic>
-                                <ImageView fitHeight="51.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                                <ImageView fx:id="ivEyeIcon" fitHeight="51.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
                                     <image>
                                         <Image url="@../../app/resources/ShowPasswd.png" />
                                     </image>
@@ -125,7 +125,7 @@
                                 </Hyperlink>
                             </children>
                         </HBox>
-                        <Hyperlink prefHeight="50.0" prefWidth="381.0" text="Did you forget your password?" textFill="#eddf64" underline="true">
+                        <Hyperlink fx:id="hypForgotPassword" prefHeight="50.0" prefWidth="381.0" text="Did you forget your password?" textFill="#eddf64" underline="true">
                             <font>
                                 <Font size="24.0" />
                             </font>

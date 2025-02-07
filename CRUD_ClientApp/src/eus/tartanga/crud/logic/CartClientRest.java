@@ -3,8 +3,8 @@ package eus.tartanga.crud.logic;
 import eus.tartanga.crud.exception.AddException;
 import eus.tartanga.crud.exception.ReadException;
 import eus.tartanga.crud.exception.UpdateException;
-import java.util.ResourceBundle;
 import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
@@ -55,9 +55,13 @@ public class CartClientRest implements CartManager {
      */
     @Override
     public <T> T findByArtist_XML(Class<T> responseType, String artistName) throws ReadException {
-        WebTarget resource = webTarget;
-        resource = resource.path(java.text.MessageFormat.format("byArtist/{0}", new Object[]{artistName}));
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+        try {
+            WebTarget resource = webTarget;
+            resource = resource.path(java.text.MessageFormat.format("byArtist/{0}", new Object[]{artistName}));
+            return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+        } catch (WebApplicationException e) {
+            throw new ReadException(e.getMessage());
+        }
     }
 
     /**
@@ -71,9 +75,13 @@ public class CartClientRest implements CartManager {
      */
     @Override
     public <T> T findByArtist_JSON(Class<T> responseType, String artistName) throws ReadException {
-        WebTarget resource = webTarget;
-        resource = resource.path(java.text.MessageFormat.format("byArtist/{0}", new Object[]{artistName}));
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
+        try {
+            WebTarget resource = webTarget;
+            resource = resource.path(java.text.MessageFormat.format("byArtist/{0}", new Object[]{artistName}));
+            return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
+        } catch (WebApplicationException e) {
+            throw new ReadException(e.getMessage());
+        }
     }
 
     /**
@@ -86,9 +94,13 @@ public class CartClientRest implements CartManager {
      */
     @Override
     public <T> T findAllNotBoughtProducts_XML(GenericType<T> responseType) throws ReadException {
-        WebTarget resource = webTarget;
-        resource = resource.path("notbought");
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+        try {
+            WebTarget resource = webTarget;
+            resource = resource.path("notbought");
+            return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+        } catch (WebApplicationException e) {
+            throw new ReadException(e.getMessage());
+        }
     }
 
     /**
@@ -101,9 +113,13 @@ public class CartClientRest implements CartManager {
      */
     @Override
     public <T> T findAllNotBoughtProducts_JSON(GenericType<T> responseType) throws ReadException {
-        WebTarget resource = webTarget;
-        resource = resource.path("notbought");
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
+        try {
+            WebTarget resource = webTarget;
+            resource = resource.path("notbought");
+            return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
+        } catch (WebApplicationException e) {
+            throw new ReadException(e.getMessage());
+        }
     }
 
     /**
@@ -118,9 +134,13 @@ public class CartClientRest implements CartManager {
      */
     @Override
     public <T> T findCart_XML(GenericType<T> responseType, String email, String productId) throws ReadException {
-        WebTarget resource = webTarget;
-        resource = resource.path(java.text.MessageFormat.format("{0}/{1}", new Object[]{email, productId}));
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+        try {
+            WebTarget resource = webTarget;
+            resource = resource.path(java.text.MessageFormat.format("{0}/{1}", new Object[]{email, productId}));
+            return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+        } catch (WebApplicationException e) {
+            throw new ReadException(e.getMessage());
+        }
     }
 
     /**
@@ -134,9 +154,13 @@ public class CartClientRest implements CartManager {
      * @throws ReadException If an error occurs during reading the data.
      */
     public <T> T findCart_JSON(GenericType<T> responseType, String email, String productId) throws ReadException {
-        WebTarget resource = webTarget;
-        resource = resource.path(java.text.MessageFormat.format("{0}/{1}", new Object[]{email, productId}));
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
+        try {
+            WebTarget resource = webTarget;
+            resource = resource.path(java.text.MessageFormat.format("{0}/{1}", new Object[]{email, productId}));
+            return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
+        } catch (WebApplicationException e) {
+            throw new ReadException(e.getMessage());
+        }
     }
 
     /**
@@ -149,9 +173,13 @@ public class CartClientRest implements CartManager {
      */
     @Override
     public <T> T findAllBoughtProducts_XML(GenericType<T> responseType) throws ReadException {
-        WebTarget resource = webTarget;
-        resource = resource.path("bought");
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+        try {
+            WebTarget resource = webTarget;
+            resource = resource.path("bought");
+            return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+        } catch (WebApplicationException e) {
+            throw new ReadException(e.getMessage());
+        }
     }
 
     /**
@@ -164,9 +192,13 @@ public class CartClientRest implements CartManager {
      */
     @Override
     public <T> T findAllBoughtProducts_JSON(GenericType<T> responseType) throws ReadException {
-        WebTarget resource = webTarget;
-        resource = resource.path("bought");
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
+        try {
+            WebTarget resource = webTarget;
+            resource = resource.path("bought");
+            return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
+        } catch (WebApplicationException e) {
+            throw new ReadException(e.getMessage());
+        }
     }
 
     /**
@@ -178,7 +210,9 @@ public class CartClientRest implements CartManager {
      */
     @Override
     public void removeCart(String email, String productId) throws ClientErrorException {
+
         webTarget.path(java.text.MessageFormat.format("{0}/{1}", new Object[]{email, productId})).request().delete();
+
     }
 
     /**
@@ -189,7 +223,11 @@ public class CartClientRest implements CartManager {
      */
     @Override
     public void addToCart(Object requestEntity) throws AddException {
-        webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
+        try {
+            webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
+        } catch (WebApplicationException e) {
+            throw new AddException(e.getMessage());
+        }
     }
 
     /**
@@ -202,7 +240,11 @@ public class CartClientRest implements CartManager {
      */
     @Override
     public void updateCart_XML(Object requestEntity, String email, String productId) throws UpdateException {
-        webTarget.path(java.text.MessageFormat.format("{0}/{1}", new Object[]{email, productId})).request(javax.ws.rs.core.MediaType.APPLICATION_XML).put(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
+        try {
+            webTarget.path(java.text.MessageFormat.format("{0}/{1}", new Object[]{email, productId})).request(javax.ws.rs.core.MediaType.APPLICATION_XML).put(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
+        } catch (WebApplicationException e) {
+            throw new UpdateException(e.getMessage());
+        }
     }
 
     /**
@@ -215,7 +257,11 @@ public class CartClientRest implements CartManager {
      */
     @Override
     public void updateCart_JSON(Object requestEntity, String email, String productId) throws UpdateException {
-        webTarget.path(java.text.MessageFormat.format("{0}/{1}", new Object[]{email, productId})).request(javax.ws.rs.core.MediaType.APPLICATION_JSON).put(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_JSON));
+        try {
+            webTarget.path(java.text.MessageFormat.format("{0}/{1}", new Object[]{email, productId})).request(javax.ws.rs.core.MediaType.APPLICATION_JSON).put(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_JSON));
+        } catch (WebApplicationException e) {
+            throw new UpdateException(e.getMessage());
+        }
     }
 
     /**
@@ -228,6 +274,7 @@ public class CartClientRest implements CartManager {
      */
     @Override
     public <T> T findAllCartProducts_XML(GenericType<T> responseType) throws WebServiceException {
+
         WebTarget resource = webTarget;
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
     }
@@ -242,6 +289,7 @@ public class CartClientRest implements CartManager {
      */
     @Override
     public <T> T findAllCartProducts_JSON(GenericType<T> responseType) throws WebServiceException {
+
         WebTarget resource = webTarget;
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
     }
@@ -258,9 +306,13 @@ public class CartClientRest implements CartManager {
      */
     @Override
     public <T> T findBetweenDate_XML(Class<T> responseType, String startDate, String endDate) throws ReadException {
-        WebTarget resource = webTarget;
-        resource = resource.path(java.text.MessageFormat.format("betweenDates/{0}/{1}", new Object[]{startDate, endDate}));
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+        try {
+            WebTarget resource = webTarget;
+            resource = resource.path(java.text.MessageFormat.format("betweenDates/{0}/{1}", new Object[]{startDate, endDate}));
+            return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+        } catch (WebApplicationException e) {
+            throw new ReadException(e.getMessage());
+        }
     }
 
     /**
@@ -275,9 +327,13 @@ public class CartClientRest implements CartManager {
      */
     @Override
     public <T> T findBetweenDate_JSON(Class<T> responseType, String startDate, String endDate) throws ReadException {
-        WebTarget resource = webTarget;
-        resource = resource.path(java.text.MessageFormat.format("betweenDates/{0}/{1}", new Object[]{startDate, endDate}));
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
+        try {
+            WebTarget resource = webTarget;
+            resource = resource.path(java.text.MessageFormat.format("betweenDates/{0}/{1}", new Object[]{startDate, endDate}));
+            return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
+        } catch (WebApplicationException e) {
+            throw new ReadException(e.getMessage());
+        }
     }
 
     /**

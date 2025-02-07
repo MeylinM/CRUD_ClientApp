@@ -1,18 +1,25 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package eus.tartanga.crud.logic;
 
 /**
- *
- * @author 2dam
+ * Fábrica de objetos para la gestión de productos.
+ * Esta clase proporciona un único punto de acceso para obtener una instancia de 
+ * ProductManager. Si aún no se ha creado, se instancia un objeto de tipo 
+ * ProductClientRest que implementa la interfaz ProductManager.
+ * 
+ * @author Elbire
  */
 public class ProductFactory {
-    
+
+    // Instancia estática de ProductManager
     private static ProductManager productManager;
 
+    /**
+     * Obtiene la instancia de ProductManager.
+     * Si la instancia no ha sido creada previamente, se crea una nueva instancia
+     * de ProductClientRest.
+     * 
+     * @return La instancia de ProductManager.
+     */
     public static ProductManager getProductManager() {
         if (productManager == null) {
             productManager = new ProductClientRest();

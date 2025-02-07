@@ -8,6 +8,7 @@ package eus.tartanga.crud.userInterface.controllers;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Modality;
@@ -15,43 +16,79 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 /**
- * Controller class for help window . 
- * It shows a help page that explains how to use the user's data management window.
- * The view is defined in Help.fmxl file and the help page is help.html.
- *
- * @author javi
+ * Controlador para la ventana de ayuda.
+ * Esta clase maneja la visualización de una página de ayuda que explica cómo usar la ventana de gestión de conciertos del usuario.
+ * La vista se define en el archivo Help.fxml y la página de ayuda se encuentra en help.html.
+ * 
+ * @author Irati
  */
 public class ConcertHelpController {
+    
     /**
-     * The control that shows the help page.
+     * El control que muestra la página de ayuda.
      */
     @FXML
     private WebView webView;
+    
     /**
-     * Initializes and show the help window.
-     * @param root The FXML document hierarchy root. 
+     * Inicializa y muestra la ventana de ayuda para el administrador.
+     * @param root La jerarquía raíz del documento FXML. 
      */
-    public void initAndShowStage(Parent root) {
+    public void initAndShowStageAdmin(Parent root) {
         Scene scene = new Scene(root);
         Stage stage = new Stage();
-        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.initModality(Modality.APPLICATION_MODAL); // Establece que la ventana será modal
         stage.setScene(scene);
-        stage.setTitle("Ayuda para la Gestion de Conicertos");
-        stage.setResizable(false);
-        stage.setMinWidth(800);
+        stage.setTitle("Ayuda para la Gestión de Conciertos");
+        //Añadir a la ventana el ícono “FanetixLogo.png”.
+        stage.getIcons().add(new Image("eus/tartanga/crud/app/resources/logo.png"));
+        stage.setResizable(false);  // La ventana no es redimensionable
+        stage.setMinWidth(800);  // Establece el tamaño mínimo de la ventana
         stage.setMinHeight(600);
-        stage.setOnShowing(this::handleWindowShowing);
+        stage.setOnShowing(this::handleWindowShowingAdmin); // Define el comportamiento cuando la ventana se muestra
         stage.show();
     }
+    
     /**
-     * Initializes window state. It implements behavior for WINDOW_SHOWING type 
-     * event.
-     * @param event  The window event 
+     * Inicializa y muestra la ventana de ayuda para el cliente.
+     * @param root La jerarquía raíz del documento FXML. 
      */
-    private void handleWindowShowing(WindowEvent event){
+    public void initAndShowStageClient(Parent root) {
+        Scene scene = new Scene(root);
+        Stage stage = new Stage();
+        stage.initModality(Modality.APPLICATION_MODAL); // Establece que la ventana será modal
+        stage.setScene(scene);
+        stage.setTitle("Ayuda para la Gestión de Conciertos");
+        //Añadir a la ventana el ícono “FanetixLogo.png”.
+        stage.getIcons().add(new Image("eus/tartanga/crud/app/resources/logo.png")); 
+        stage.setResizable(false);  // La ventana no es redimensionable
+        stage.setMinWidth(800);  // Establece el tamaño mínimo de la ventana
+        stage.setMinHeight(600);
+        stage.setOnShowing(this::handleWindowShowingClient); // Define el comportamiento cuando la ventana se muestra
+        stage.show();
+    }
+    
+    /**
+     * Inicializa el estado de la ventana. Implementa el comportamiento para el evento de tipo WINDOW_SHOWING.
+     * Este método se llama cuando la ventana de ayuda para el administrador se está mostrando.
+     * @param event El evento de la ventana
+     */
+    private void handleWindowShowingAdmin(WindowEvent event){
         WebEngine webEngine = webView.getEngine();
-        //Load help page.eus.tartanga.crud.userInterface.html
+        // Carga la página de ayuda para el administrador
         webEngine.load(getClass()
                 .getResource("/eus/tartanga/crud/userInterface/html/helpConcertAdmin.html").toExternalForm());
+    }
+    
+    /**
+     * Inicializa el estado de la ventana. Implementa el comportamiento para el evento de tipo WINDOW_SHOWING.
+     * Este método se llama cuando la ventana de ayuda para el cliente se está mostrando.
+     * @param event El evento de la ventana
+     */
+    private void handleWindowShowingClient(WindowEvent event) {
+        WebEngine webEngine = webView.getEngine();
+        // Carga la página de ayuda para el cliente
+        webEngine.load(getClass()
+                .getResource("/eus/tartanga/crud/userInterface/html/helpConcertClient.html").toExternalForm());
     }
 }

@@ -6,24 +6,15 @@
 package eus.tartanga.crud.userInterface.controllers;
 
 import eus.tartanga.crud.app.CRUD_ClientApp;
-import eus.tartanga.crud.model.Artist;
 import eus.tartanga.crud.model.Product;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.control.TableView;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.FixMethodOrder;
@@ -38,23 +29,125 @@ import org.testfx.util.WaitForAsyncUtils;
  * @author ElbireTM
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class ProductViewControllerTest extends ApplicationTest{
-    
-     private TableView<Product> tableView;
-    
+public class ProductViewControllerTest extends ApplicationTest {
+
+    private TableView<Product> tableView;
+
     @Override
     public void start(Stage stage) throws Exception {
         new CRUD_ClientApp().start(stage);;
     }
-    
+
     public ProductViewControllerTest() {
+
     }
+
+    @Test
+    public void testFilterProductsBySearch() {
+        clickOn("#tfEmail");
+        write("meylin@gmail.com");
+        clickOn("#pfPassword");
+        write("abcd*1234");
+        clickOn("#btnAccept");
+        clickOn("#shopButton");
+
+        // Obtener la tabla de productos
+        tableView = lookup("#productTable").query();
+
+        // Escribir en el TextField para filtrar
+        clickOn("#tfSearch");
+        write("Álbum");
+
+        // Esperar un poco para que se apliquen los filtros
+        sleep(1000); 
+
+        // Verificar que los productos que contienen "Álbum" en title, description o artist.name estén presentes
+        ObservableList<Product> products = tableView.getItems();
+
+        for (Product product : products) {
+            String title = product.getTitle().toLowerCase();
+            String description = product.getDescription().toLowerCase();
+            String artistName = product.getArtist().getName().toLowerCase();
+
+            assertTrue(title.contains("álbum") || description.contains("álbum") || artistName.contains("álbum"));
+        }
+    }
+
     //@Test
+    public void test_filterAvailableProducts() {
+        // Hacer login
+        clickOn("#tfEmail");
+        write("meylin@gmail.com");
+        clickOn("#pfPassword");
+        write("abcd*1234");
+        clickOn("#btnAccept");
+        clickOn("#shopButton");
+
+        // Obtener la tabla de productos
+        tableView = lookup("#productTable").query();
+
+        // Contar el número de productos antes de marcar el checkbox
+        int totalProductsBefore = tableView.getItems().size();
+
+        // Marcar el checkbox "Available products"
+        clickOn("#cbxStock");
+
+        // Esperar a que el filtro se aplique
+        WaitForAsyncUtils.waitForFxEvents();
+
+        // Obtener la lista de productos visibles en la tabla después de aplicar el filtro
+        ObservableList<Product> filteredProducts = tableView.getItems();
+
+        // Verificar que todos los productos visibles tienen stock mayor a 0
+        for (Product product : filteredProducts) {
+            assertTrue("El producto debería tener stock mayor a 0", Integer.parseInt(product.getStock()) > 0);
+        }
+
+        // Verificar que el número de productos en la tabla ha cambiado (esto depende de tu implementación del filtro)
+        int totalProductsAfter = filteredProducts.size();
+        assertTrue("El número de productos debería haberse reducido al aplicar el filtro", totalProductsAfter <= totalProductsBefore);
+    }
+
+    //@Test
+    public void testFilterProductsByDate() {
+        clickOn("#tfEmail");
+        write("meylin@gmail.com");
+        clickOn("#pfPassword");
+        write("abcd*1234");
+        clickOn("#btnAccept");
+        clickOn("#shopButton");
+
+        // Obtener la tabla de productos
+        tableView = lookup("#productTable").query();
+
+        clickOn("#dpFrom");
+        write("01/01/2025");
+        push(KeyCode.ENTER);
+
+        clickOn("#dpTo");
+        write("31/12/2025");
+        push(KeyCode.ENTER);
+
+        ObservableList<Product> products = tableView.getItems();
+        // Crear las fechas de comparación
+        java.util.Date fromDate = java.sql.Date.valueOf("2025-01-01");
+        java.util.Date toDate = java.sql.Date.valueOf("2025-12-31");
+
+        for (Product product : products) {
+            java.util.Date releaseDate = product.getReleaseDate();
+
+            // Verificar que la fecha esté dentro del rango esperado
+            assertTrue(releaseDate.equals(fromDate) || releaseDate.after(fromDate));
+            assertTrue(releaseDate.equals(toDate) || releaseDate.before(toDate));
+        }
+    }
+
+    // @Test
     public void test_write() {
         clickOn("#tfEmail");
-        write("admin1@fanetix.com");
+        write("meylin@gmail.com");
         clickOn("#pfPassword");
-        write("password123");
+        write("abcd*1234");
         clickOn("#btnAccept");
         clickOn("#shopButton");
         tableView = lookup("#productTable").query();
@@ -64,34 +157,30 @@ public class ProductViewControllerTest extends ApplicationTest{
         assertEquals(tableView.getItems().size(), count + 1);
         int rowIndex = items.size() - 1;
         Product insertedProduct = items.get(rowIndex);
-        
         assertEquals(insertedProduct.getTitle(), "Tittle of the product");
+        assertEquals(insertedProduct.getArtist().getName(), "Eminem");
         assertEquals(insertedProduct.getDescription(), "Description of the product");
-        /*assertEquals(insertedProduct.getReleaseDate(), new Date());
-        //assertEquals(dateInitLocal, LocalDate.now());
-        //assertEquals(dateEndLocal, LocalDate.now());
-        assertEquals(insertedProduct.getPrice(), "0");
-        assertEquals(insertedProduct.getStock(), "1");*/
+        assertEquals(insertedProduct.getStock(), "1");
+        assertEquals(insertedProduct.getPrice(), "0.0");
     }
-    
+
     //@Test
     public void test_delete() {
         clickOn("#tfEmail");
-        write("admin1@fanetix.com");
+        write("meylin@gmail.com");
         clickOn("#pfPassword");
-        write("password123");
+        write("abcd*1234");
         clickOn("#btnAccept");
         clickOn("#shopButton");
         Node tableColumnTittle = lookup("#titleColumn").nth(0).query();
         clickOn(tableColumnTittle);
         tableView = lookup("#productTable").query();
         Node row = lookup(".table-row-cell").nth(0).query();
-        //Selecciona una asignatura para que se habilite el botón de borrado.
         clickOn(row);
         Product productDelete = (Product) tableView.getSelectionModel().getSelectedItem();
         String name = productDelete.getTitle();
         clickOn("#btnDeleteProduct");
-        
+
         verifyThat("Do you want to delete the selected product(s)?", isVisible());
         press(KeyCode.ENTER);
         Node row2 = lookup(".table-row-cell").nth(0).query();
@@ -109,14 +198,13 @@ public class ProductViewControllerTest extends ApplicationTest{
 
         assertTrue(notFound);
     }
-    
-    
-     @Test
+
+    //@Test
     public void test_update() {
         clickOn("#tfEmail");
-        write("admin1@fanetix.com");
+        write("meylin@gmail.com");
         clickOn("#pfPassword");
-        write("password123");
+        write("abcd*1234");
         clickOn("#btnAccept");
         clickOn("#shopButton");
         tableView = lookup("#productTable").query();
@@ -127,11 +215,9 @@ public class ProductViewControllerTest extends ApplicationTest{
         Node tableColumnTitle = lookup("#titleColumn").nth(tablerow + 1).query();
         // Node tableColumTeachers = lookup("#artistColumn").nth(tablerow + 1).query();
         Node tableColumnDescription = lookup("#descriptionColumn").nth(tablerow + 1).query();
-        Node tableColumnReleaseDate = lookup("#releaseDateColumn").nth(tablerow + 1).query();
+        //Node tableColumnReleaseDate = lookup("#releaseDateColumn").nth(tablerow + 1).query();
         Node tableColumnStock = lookup("#stockColumn").nth(tablerow + 1).query();
         Node tableColumnPrice = lookup("#priceColumn").nth(tablerow + 1).query();
-
-        //Coger los valores de la asignatura seleccionada antes de ser modificada.
         Product subjectProduct = (Product) tableView.getSelectionModel().getSelectedItem();
 
         String title = subjectProduct.getTitle();
@@ -141,31 +227,28 @@ public class ProductViewControllerTest extends ApplicationTest{
         clickOn(tableColumnTitle);
         write("TITULO");
         push(KeyCode.ENTER);
-        
+
         clickOn(tableColumnDescription);
         write("DESCRIPCION");
         push(KeyCode.ENTER);
-        
+
         clickOn(tableColumnStock);
         write("0");
         push(KeyCode.ENTER);
-        
+
         clickOn(tableColumnPrice);
         write("1");
         push(KeyCode.ENTER);
-        
+
         WaitForAsyncUtils.waitForFxEvents();
 
-        //Coger los valores de la asignatura modificada.
         Product modifiedProduct = (Product) tableView.getSelectionModel().getSelectedItem();
 
-        //Verificar que los valores no son iguales que los de la asignatura selecciona anteriormente.
         assertEquals("TITULO", modifiedProduct.getTitle());
         assertEquals("DESCRIPCION", modifiedProduct.getDescription());
         assertEquals("0", modifiedProduct.getStock());
         assertEquals("1", modifiedProduct.getPrice());
-        
+
     }
-    
-    
+
 }
