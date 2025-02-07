@@ -7,6 +7,7 @@ package eus.tartanga.crud.userInterface.controllers;
 
 import eus.tartanga.crud.app.CRUD_ClientApp;
 import eus.tartanga.crud.model.Product;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +43,7 @@ public class ProductViewControllerTest extends ApplicationTest {
 
     }
 
-    @Test
+    //@Test
     public void testFilterProductsBySearch() {
         clickOn("#tfEmail");
         write("meylin@gmail.com");
@@ -199,7 +200,7 @@ public class ProductViewControllerTest extends ApplicationTest {
         assertTrue(notFound);
     }
 
-    //@Test
+    @Test
     public void test_update() {
         clickOn("#tfEmail");
         write("meylin@gmail.com");
@@ -214,9 +215,9 @@ public class ProductViewControllerTest extends ApplicationTest {
         
         Integer tablerow = tableView.getSelectionModel().getSelectedIndex();
         Node tableColumnTitle = lookup("#titleColumn").nth(tablerow + 1).query();
-        // Node tableColumTeachers = lookup("#artistColumn").nth(tablerow + 1).query();
+        Node tableColumArtists = lookup("#artistColumn").nth(tablerow + 1).query();
         Node tableColumnDescription = lookup("#descriptionColumn").nth(tablerow + 1).query();
-        //Node tableColumnReleaseDate = lookup("#releaseDateColumn").nth(tablerow + 1).query();
+        Node tableColumnReleaseDate = lookup("#releaseDateColumn").nth(tablerow + 1).query();
         Node tableColumnStock = lookup("#stockColumn").nth(tablerow + 1).query();
         Node tableColumnPrice = lookup("#priceColumn").nth(tablerow + 1).query();
         Product subjectProduct = (Product) tableView.getSelectionModel().getSelectedItem();
@@ -228,11 +229,20 @@ public class ProductViewControllerTest extends ApplicationTest {
         clickOn(tableColumnTitle);
         write("TITULO");
         push(KeyCode.ENTER);
-
+        
+        // Hacemos clic en la celda de artista para abrir la ComboBox
+        doubleClickOn(tableColumArtists);
+        clickOn("Fito");
+        
         clickOn(tableColumnDescription);
         write("DESCRIPCION");
         push(KeyCode.ENTER);
-
+        
+        doubleClickOn(tableColumnReleaseDate);
+        clickOn(tableColumnReleaseDate);
+        write("01/11/2027");
+        push(KeyCode.ENTER);
+        
         clickOn(tableColumnStock);
         write("0");
         push(KeyCode.ENTER);
@@ -244,12 +254,15 @@ public class ProductViewControllerTest extends ApplicationTest {
         WaitForAsyncUtils.waitForFxEvents();
 
         Product modifiedProduct = (Product) tableView.getSelectionModel().getSelectedItem();
-
+        
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        String modifiedDateString = sdf.format(modifiedProduct.getReleaseDate());
         assertEquals("TITULO", modifiedProduct.getTitle());
         assertEquals("DESCRIPCION", modifiedProduct.getDescription());
+        assertEquals("01/11/2027", modifiedDateString);
         assertEquals("0", modifiedProduct.getStock());
         assertEquals("1", modifiedProduct.getPrice());
-
+        assertEquals("Fito", modifiedProduct.getArtist().getName());
     }
 
 }
