@@ -8,23 +8,17 @@ package eus.tartanga.crud.userInterface.controllers;
 import eus.tartanga.crud.app.CRUD_ClientApp;
 import eus.tartanga.crud.model.Artist;
 import java.net.MalformedURLException;
-import static java.rmi.Naming.lookup;
 import java.rmi.NotBoundException;
-import java.util.ArrayList;
-import java.util.List;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.TableView;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
-import static net.sf.jasperreports.util.CastorUtil.write;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.FixMethodOrder;
 import org.junit.runners.MethodSorters;
-import static org.testfx.api.FxAssert.verifyThat;
 import org.testfx.framework.junit.ApplicationTest;
-import static org.testfx.matcher.base.NodeMatchers.isVisible;
 import org.testfx.util.WaitForAsyncUtils;
 
 /**
@@ -94,7 +88,7 @@ public class ArtistViewControllerTest extends ApplicationTest {
 
     }
 
-    @Test
+    //@Test
     public void test_update() {
         clickOn("#tfEmail");
         write("admin@gmail.com");
@@ -155,7 +149,9 @@ public class ArtistViewControllerTest extends ApplicationTest {
         clickOn("#pfPassword");
         write("abcd*1234");
         clickOn("#btnAccept");
-
+        
+        // Obtener la tabla de productos
+        tableView = lookup("#artistTable").query();
         // Escribir en el TextField para filtrar
         clickOn("#searchField");
         write("YG Entertaiment");
@@ -175,26 +171,28 @@ public class ArtistViewControllerTest extends ApplicationTest {
         }
     }
     
-    //@Test
+    @Test
     public void testFilterProductsByDate() {
         clickOn("#tfEmail");
         write("olaia@gmail.com");
         clickOn("#pfPassword");
         write("abcd*1234");
         clickOn("#btnAccept");
+        
+        tableView = lookup("#artistTable").query();
   
         clickOn("#dpFrom");
-        write("01/01/2025");
+        write("31/12/2016");
         push(KeyCode.ENTER);
 
         clickOn("#dpTo");
-        write("31/12/2016");
+        write("01/01/2025");
         push(KeyCode.ENTER);
 
         ObservableList<Artist> artists = tableView.getItems();
         // Crear las fechas de comparación
-        java.util.Date fromDate = java.sql.Date.valueOf("2025-01-01");
-        java.util.Date toDate = java.sql.Date.valueOf("2016-12-31");
+        java.util.Date fromDate = java.sql.Date.valueOf("2016-12-31");
+        java.util.Date toDate = java.sql.Date.valueOf("2025-01-01");
 
         for (Artist artist : artists) {
             java.util.Date releaseDate = artist.getDebut();

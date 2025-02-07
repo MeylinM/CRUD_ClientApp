@@ -539,6 +539,8 @@ public class ArtistViewController {
             artistTable.setItems(artistList);
             // Configure the styles of each row in the table
             configureRowStyling();
+            
+            filterArtists();
 
         } catch (Exception e) {
             logger.severe("Error initializing Artist stage: " + e.getMessage());
@@ -763,13 +765,7 @@ public class ArtistViewController {
         }
 
         artistTable.getItems().add(artist); // Adds the artist to the table
-        artistTable.refresh();
-
-        Alert alert = new Alert(AlertType.INFORMATION);
-        alert.setTitle("Información");
-        alert.setHeaderText("Artista añadido correctamente");
-        alert.setContentText("Si desea editar el artista recién añadido, por favor, refresque la página seleccionando 'Artist' en el menú.");
-        alert.showAndWait();
+        refreshArtistList();
     }
 
     /**
@@ -991,6 +987,12 @@ public class ArtistViewController {
         } catch (UpdateException e) {
             System.out.println(e);
         }
+    }
+    
+    private void refreshArtistList() {
+        List<Artist> updatedArtist = findAllArtists();
+        artistList.setAll(updatedArtist);
+        artistTable.refresh();
     }
 
 }
