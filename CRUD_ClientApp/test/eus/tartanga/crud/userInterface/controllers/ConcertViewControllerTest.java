@@ -7,8 +7,9 @@ package eus.tartanga.crud.userInterface.controllers;
 
 import eus.tartanga.crud.app.CRUD_ClientApp;
 import eus.tartanga.crud.model.Concert;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -43,6 +44,113 @@ public class ConcertViewControllerTest extends ApplicationTest {
     public ConcertViewControllerTest() {
     }
 
+    @Test
+    public void testFilterConcertsBySearch() {
+        clickOn("#tfEmail");
+        write("irati@gmail.com");
+        clickOn("#pfPassword");
+        write("abcd*1234");
+        clickOn("#btnAccept");
+        clickOn("#concertsButton");
+
+        // Obtener la tabla de conciertos
+        tableView = lookup("#concertTable").query();
+
+        // Escribir en el TextField para filtrar
+        clickOn("#tfSearch");
+        write("Eminem");
+
+        // Esperar un poco para que se apliquen los filtros
+        sleep(1000);
+
+        // Verificar que los conciertos que contienen "Eminem" en concert, city, location o artist.name estén presentes
+        ObservableList<Concert> concerts = tableView.getItems();
+
+        for (Concert concert : concerts) {
+            String name = concert.getConcertName().toLowerCase();
+            String location = concert.getLocation().toLowerCase();
+            String city = concert.getCity().toLowerCase();
+            String artistName = concert.getArtistNames().toLowerCase();
+
+            assertTrue(name.contains("eminem") || location.contains("eminem") || city.contains("eminem") || artistName.contains("eminem"));
+        }
+    }
+    
+    //@Test 
+    public void test_filterComingSoonConcerts() {
+        // Hacer login
+        clickOn("#tfEmail");
+        write("irati@gmail.com");
+        clickOn("#pfPassword");
+        write("abcd*1234");
+        clickOn("#btnAccept");
+        clickOn("#concertsButton");
+
+        // Obtener la tabla de conciertos
+        tableView = lookup("#concertTable").query();
+
+        // Contar el número de conciertos antes de marcar el checkbox
+        int totalConcertsBefore = tableView.getItems().size();
+
+        // Marcar el checkbox "Coming Soon"
+        clickOn("#cbxComingSoon");
+
+        // Esperar a que el filtro se aplique
+        WaitForAsyncUtils.waitForFxEvents();
+
+        // Obtener la lista de conciertos visibles en la tabla después de aplicar el filtro
+        ObservableList<Concert> filteredConcerts = tableView.getItems();
+
+        // Obtener la fecha actual
+        LocalDate currentDate = LocalDate.now();
+
+        // Verificar que todos los conciertos visibles tienen fecha mayor que la fecha actual
+        for (Concert concert : filteredConcerts) {
+            LocalDate concertDate = concert.getConcertDate().toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate();
+            assertTrue("El concierto debería tener una fecha futura", concertDate.isAfter(currentDate));
+        }
+
+        // Verificar que el número de conciertos en la tabla ha cambiado (esto depende de tu implementación del filtro)
+        int totalConcertsAfter = filteredConcerts.size();
+        assertTrue("El número de conciertos debería haberse reducido al aplicar el filtro", totalConcertsAfter <= totalConcertsBefore);
+    }
+
+    //@Test
+    public void testFilterConcertsByDate() {
+        clickOn("#tfEmail");
+        write("irati@gmail.com");
+        clickOn("#pfPassword");
+        write("abcd*1234");
+        clickOn("#btnAccept");
+        clickOn("#concertsButton");
+
+        // Obtener la tabla de conciertos
+        tableView = lookup("#concertTable").query();
+
+        clickOn("#dpFrom");
+        write("01/01/2025");
+        push(KeyCode.ENTER);
+
+        clickOn("#dpTo");
+        write("31/12/2025");
+        push(KeyCode.ENTER);
+
+        ObservableList<Concert> concerts = tableView.getItems();
+        // Crear las fechas de comparación
+        java.util.Date fromDate = java.sql.Date.valueOf("2025-01-01");
+        java.util.Date toDate = java.sql.Date.valueOf("2025-12-31");
+
+        for (Concert concert : concerts) {
+            java.util.Date date = concert.getConcertDate();
+
+            // Verificar que la fecha esté dentro del rango esperado
+            assertTrue(date.equals(fromDate) || date.after(fromDate));
+            assertTrue(date.equals(toDate) || date.before(toDate));
+        }
+    }
+
     //@Test
     public void test_write() {
         clickOn("#tfEmail");
@@ -66,7 +174,7 @@ public class ConcertViewControllerTest extends ApplicationTest {
         //assertEquals(insertedConcert.getConcertDate(), new Date());
         //assertEquals(insertedConcert.getConcertTime(), new Date());
     }
-    
+
     //@Test
     public void test_delete() {
         clickOn("#tfEmail");
