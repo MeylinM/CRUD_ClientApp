@@ -520,12 +520,12 @@ public class ProductViewController {
             showAlert("Error en la ventana", "Ha ocurrido un error al inicializar la ventana");
         }
     }
-    
-        /**
+
+    /**
      * Obtiene la lista de todos los productos disponibles.
-     * 
-     * @return Lista de productos o null en caso de error.
-     * ReadException Si ocurre un error al conseguir la lista de productos.
+     *
+     * @return Lista de productos o null en caso de error. ReadException Si
+     * ocurre un error al conseguir la lista de productos.
      */
     private List<Product> findAllProducts() {
         List<Product> products = null;
@@ -539,11 +539,12 @@ public class ProductViewController {
         }
         return products;
     }
+
     /**
      * Obtiene la lista de todos los artistas disponibles.
-     * 
-     * @return Lista de artistas o null en caso de error.
-     * ReadException Si ocurre un error al conseguir la lista de artistas.
+     *
+     * @return Lista de artistas o null en caso de error. ReadException Si
+     * ocurre un error al conseguir la lista de artistas.
      */
     private List<Artist> findAllArtist() {
         List<Artist> artists = null;
@@ -556,9 +557,11 @@ public class ProductViewController {
         }
         return artists;
     }
+
     /**
-     * Agrega un nuevo producto con valores por defecto y lo muestra en la tabla.
-     * 
+     * Agrega un nuevo producto con valores por defecto y lo muestra en la
+     * tabla.
+     *
      * @param event Evento de acción al hacer clic en "Add Product".
      * AddException Si ocurre un error al añadir el producto.
      */
@@ -580,9 +583,10 @@ public class ProductViewController {
             showAlert("Error del servidor", "An error occurred while creating the product(s)");
         }
     }
-     /**
+
+    /**
      * Agrega el producto seleccionado al carrito si hay stock disponible.
-     * 
+     *
      * @param event Evento de acción al hacer clic en "Add to cart".
      * AddException Si ocurre un error al añadir el producto al carrito.
      * NoStockException Si el producto no tiene stock.
@@ -618,12 +622,13 @@ public class ProductViewController {
             showAlertWarning("Stock no disponible", e.getMessage());
         }
     }
+
     /**
-     * Maneja la eliminación de productos seleccionados en la tabla.
-     * Muestra una alerta de confirmación antes de proceder con la eliminación.
-     * 
-     * @param event El evento que activa la eliminación.
-     * DeleteException Si ocurre un error al eliminar los productos.
+     * Maneja la eliminación de productos seleccionados en la tabla. Muestra una
+     * alerta de confirmación antes de proceder con la eliminación.
+     *
+     * @param event El evento que activa la eliminación. DeleteException Si
+     * ocurre un error al eliminar los productos.
      */
     private void handleDeleteProduct(ActionEvent event) {
         ObservableList<Product> selectedProducts = productTable.getSelectionModel().getSelectedItems();
@@ -666,11 +671,12 @@ public class ProductViewController {
             }
         }
     }
+
     /**
      * Actualiza los datos de un producto.
-     * 
-     * @param product El producto con los datos actualizados.
-     * UpdateException Si ocurre un error al actualizar el producto.
+     *
+     * @param product El producto con los datos actualizados. UpdateException Si
+     * ocurre un error al actualizar el producto.
      */
     private void updateProduct(Product product) {
         try {
@@ -679,21 +685,21 @@ public class ProductViewController {
             showAlert("Error de servidor", "An error occurred while updating the product");
         }
     }
-    
+
     /**
-     * Refresca la lista de productos en la vista.
-     * Obtiene los productos actualizados y los muestra en la tabla.
+     * Refresca la lista de productos en la vista. Obtiene los productos
+     * actualizados y los muestra en la tabla.
      */
     private void refreshProductList() {
         List<Product> updatedProducts = findAllProducts();
         productList.setAll(updatedProducts);
         productTable.refresh();
     }
-    
+
     /**
-     * Imprime un informe con los datos de la tabla de productos.
-     * Muestra una ventana con el informe generado.
-     * 
+     * Imprime un informe con los datos de la tabla de productos. Muestra una
+     * ventana con el informe generado.
+     *
      * @param event El evento que activa la impresión.
      */
     private void printItems(ActionEvent event) {
@@ -712,10 +718,12 @@ public class ProductViewController {
 
         }
     }
+
     /**
-     * Maneja la acción del botón de información.
-     * Carga y muestra la vista de ayuda para productos, dependiendo del tipo de usuario (cliente o administrador).
-     * 
+     * Maneja la acción del botón de información. Carga y muestra la vista de
+     * ayuda para productos, dependiendo del tipo de usuario (cliente o
+     * administrador).
+     *
      * @param event El evento que activa la carga de la vista de ayuda.
      */
     private void handleInfoButton(ActionEvent event) {
@@ -740,9 +748,11 @@ public class ProductViewController {
 
         }
     }
+
     /**
-     * Filtra los productos de la tabla en función de la búsqueda de texto, la disponibilidad de stock y las fechas seleccionadas.
-     * Actualiza la tabla en tiempo real mientras el usuario interactúa con los filtros.
+     * Filtra los productos de la tabla en función de la búsqueda de texto, la
+     * disponibilidad de stock y las fechas seleccionadas. Actualiza la tabla en
+     * tiempo real mientras el usuario interactúa con los filtros.
      */
     private void filterProducts() {
         // Mientras el usuario está escribiendo ese valor se usará para filtrar los productos de la tabla
@@ -765,8 +775,10 @@ public class ProductViewController {
             applyFilter();
         });
     }
+
     /**
-     * Aplica los filtros combinados (búsqueda de texto, stock y fechas) a los productos y actualiza la tabla con los resultados.
+     * Aplica los filtros combinados (búsqueda de texto, stock y fechas) a los
+     * productos y actualiza la tabla con los resultados.
      */
     private void applyFilter() {
         // Obtener el texto de búsqueda y las fechas seleccionadas
@@ -783,11 +795,14 @@ public class ProductViewController {
         sortedData.comparatorProperty().bind(productTable.comparatorProperty());
         productTable.setItems(sortedData);
     }
+
     /**
-     * Filtra los productos según el texto de búsqueda, la disponibilidad de stock y las fechas seleccionadas.
-     * 
+     * Filtra los productos según el texto de búsqueda, la disponibilidad de
+     * stock y las fechas seleccionadas.
+     *
      * @param searchText El texto de búsqueda para filtrar los productos.
-     * @param inStock Un valor booleano que indica si se deben mostrar productos con stock.
+     * @param inStock Un valor booleano que indica si se deben mostrar productos
+     * con stock.
      * @param fromDate La fecha de inicio para el filtro de fechas.
      * @param toDate La fecha de fin para el filtro de fechas.
      * @return Un FilteredList que contiene los productos filtrados.
@@ -812,14 +827,17 @@ public class ProductViewController {
 
             // Filtra por fechas (si las fechas están definidas)
             boolean matchesDate = true;
+            Date productReleaseDate = product.getReleaseDate();
             if (fromDate != null && toDate != null) {
-                Date productReleaseDate = product.getReleaseDate();  // Esto es Date
-                // Convertimos LocalDate a Date para la comparación
                 java.sql.Date fromSQLDate = java.sql.Date.valueOf(fromDate);
                 java.sql.Date toSQLDate = java.sql.Date.valueOf(toDate);
-
-                // Comparamos las fechas
                 matchesDate = !productReleaseDate.before(fromSQLDate) && !productReleaseDate.after(toSQLDate);
+            } else if (fromDate != null) {
+                java.sql.Date fromSQLDate = java.sql.Date.valueOf(fromDate);
+                matchesDate = !productReleaseDate.before(fromSQLDate);
+            } else if (toDate != null) {
+                java.sql.Date toSQLDate = java.sql.Date.valueOf(toDate);
+                matchesDate = !productReleaseDate.after(toSQLDate);
             }
 
             // Devuelve true solo si el producto cumple con todos los filtros
@@ -828,9 +846,10 @@ public class ProductViewController {
 
         return filteredData;
     }
+
     /**
-     * Crea los menús contextuales para la tabla y el área fuera de la tabla.
-     * El menú cambia según si el usuario es un cliente o no.
+     * Crea los menús contextuales para la tabla y el área fuera de la tabla. El
+     * menú cambia según si el usuario es un cliente o no.
      */
     private void createContextMenu() {
         contextMenuInside = new ContextMenu();
@@ -861,9 +880,11 @@ public class ProductViewController {
         }
 
     }
+
     /**
-     * Maneja el clic derecho en la tabla. Muestra el menú contextual dentro de la tabla si se hace clic derecho.
-     * 
+     * Maneja el clic derecho en la tabla. Muestra el menú contextual dentro de
+     * la tabla si se hace clic derecho.
+     *
      * @param event El evento de clic derecho que activa el menú contextual.
      */
     private void handleRightClickTable(MouseEvent event) {
@@ -878,9 +899,11 @@ public class ProductViewController {
             contextMenuInside.hide();
         }
     }
+
     /**
-     * Maneja el clic derecho fuera de la tabla. Muestra el menú contextual fuera de la tabla si se hace clic derecho.
-     * 
+     * Maneja el clic derecho fuera de la tabla. Muestra el menú contextual
+     * fuera de la tabla si se hace clic derecho.
+     *
      * @param event El evento de clic derecho que activa el menú contextual.
      */
     private void handleRightClick(MouseEvent event) {
@@ -895,13 +918,15 @@ public class ProductViewController {
             contextMenuOutside.hide();
         }
     }
+
     /**
-     * Obtiene un objeto FanetixClient basado en el correo electrónico proporcionado.
-     * Realiza una llamada a la API para encontrar al cliente.
-     * 
+     * Obtiene un objeto FanetixClient basado en el correo electrónico
+     * proporcionado. Realiza una llamada a la API para encontrar al cliente.
+     *
      * @param email El correo electrónico del cliente que se desea obtener.
-     * @return El objeto FanetixClient correspondiente al correo electrónico proporcionado.
-     * ReadException Si ocurre un error al leer los datos del cliente.
+     * @return El objeto FanetixClient correspondiente al correo electrónico
+     * proporcionado. ReadException Si ocurre un error al leer los datos del
+     * cliente.
      */
     private FanetixClient getFanetixClient(String email) {
         FanetixClient client = null;
@@ -913,9 +938,11 @@ public class ProductViewController {
         }
         return client;
     }
+
     /**
-     * Configura el estilo de las filas en la tabla de productos, alternando el color de fondo
-     * para cada fila. El color de fondo cambia dependiendo de si el índice de la fila es par o impar.
+     * Configura el estilo de las filas en la tabla de productos, alternando el
+     * color de fondo para cada fila. El color de fondo cambia dependiendo de si
+     * el índice de la fila es par o impar.
      */
     private void configureRowStyling() {
         productTable.setRowFactory(tv -> {
@@ -938,9 +965,11 @@ public class ProductViewController {
             return row;
         });
     }
+
     /**
-     * Muestra una alerta de tipo ERROR con el encabezado y mensaje proporcionados.
-     * 
+     * Muestra una alerta de tipo ERROR con el encabezado y mensaje
+     * proporcionados.
+     *
      * @param header El encabezado del mensaje de error.
      * @param message El contenido del mensaje de error.
      */
@@ -951,9 +980,11 @@ public class ProductViewController {
         alert.setContentText(message);
         alert.showAndWait();
     }
+
     /**
-     * Muestra una alerta de tipo WARNING con el encabezado y mensaje proporcionados.
-     * 
+     * Muestra una alerta de tipo WARNING con el encabezado y mensaje
+     * proporcionados.
+     *
      * @param header El encabezado del mensaje de advertencia.
      * @param message El contenido del mensaje de advertencia.
      */
@@ -964,12 +995,14 @@ public class ProductViewController {
         alert.setContentText(message);
         alert.showAndWait();
     }
+
     /**
-     * Muestra un diálogo para seleccionar la cantidad de un producto a añadir al carrito.
-     * El valor máximo del Spinner será el stock disponible.
-     * 
+     * Muestra un diálogo para seleccionar la cantidad de un producto a añadir
+     * al carrito. El valor máximo del Spinner será el stock disponible.
+     *
      * @param stock La cantidad de stock disponible para el producto.
-     * @return La cantidad seleccionada por el usuario, o 0 si se cancela el diálogo.
+     * @return La cantidad seleccionada por el usuario, o 0 si se cancela el
+     * diálogo.
      */
     private int showQuantityDialog(int stock) {
         Dialog<Integer> dialog = new Dialog<>();
