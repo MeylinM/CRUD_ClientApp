@@ -25,17 +25,25 @@
     <title>
         <band height="79" splitType="Stretch">
             <staticText>
-                <reportElement x="222" y="31" width="150" height="20"/>
-                <textElement>
-                    <font size="14" isBold="true"/>
+                <reportElement x="200" y="20" width="200" height="30"/> <!-- Ajustamos la posición -->
+                <textElement textAlignment="Center">
+                    <font size="22" isBold="true"/> <!-- Aumentamos el tamaño del título -->
                 </textElement>
-                <text><![CDATA[Shop Report]]></text>
+                <text><![CDATA[Fanetix]]></text>
             </staticText>
         </band>
     </title>
     
     <pageHeader>
-        <band height="35" splitType="Stretch"/>
+        <band height="50">
+            <staticText>
+                <reportElement x="180" y="15" width="250" height="25"/>
+                <textElement textAlignment="Center">
+                    <font size="12" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Shop Report - Product List]]></text>
+            </staticText>
+        </band>
     </pageHeader>
     
     <!-- Column Headers -->
@@ -131,7 +139,15 @@
     </columnFooter>
 
     <pageFooter>
-        <band height="54" splitType="Stretch"/>
+        <band height="30">
+            <textField>
+                <reportElement x="450" y="5" width="100" height="20"/>
+                <textElement textAlignment="Right">
+                    <font size="10"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Page " + $V{PAGE_NUMBER} + " of " + $V{PAGE_NUMBER}]]></textFieldExpression>
+            </textField>
+        </band>
     </pageFooter>
 
     <summary>

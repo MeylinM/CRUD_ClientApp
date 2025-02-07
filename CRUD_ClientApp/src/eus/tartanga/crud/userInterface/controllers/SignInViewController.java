@@ -167,7 +167,7 @@ public class SignInViewController {
 
             }
         } catch (SignInException e) {
-            new Alert(Alert.AlertType.ERROR, "At this moment server is not available. Please try later.", ButtonType.OK).showAndWait();
+            new Alert(Alert.AlertType.ERROR, "User can't be found", ButtonType.OK).showAndWait();
         } catch (IOException ex) {
             Logger.getLogger(SignInViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
