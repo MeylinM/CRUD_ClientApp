@@ -10,6 +10,7 @@ import eus.tartanga.crud.exception.DeleteException;
 import eus.tartanga.crud.exception.ReadException;
 import eus.tartanga.crud.exception.SignInException;
 import eus.tartanga.crud.exception.UpdateException;
+import java.util.ResourceBundle;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
@@ -34,6 +35,7 @@ public class AdministratorRest implements AdministratorManager {
     private WebTarget webTarget;
     private Client client;
     private static final String BASE_URI = "http://localhost:8080/CRUD_ServerApp/api";
+    //private static final String BASE_URI = ResourceBundle.getBundle("config.config").getString("BASE_URI");
 
     public AdministratorRest() {
         client = javax.ws.rs.client.ClientBuilder.newClient();

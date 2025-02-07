@@ -130,22 +130,12 @@ public class MenuBarViewController implements Initializable {
     public void logOut() {
 
         try {
-            // Cargar el archivo FXML de SignInView
+
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/SignInView.fxml"));
-            Parent root = loader.load();
-            // Crear una nueva ventana para SignIn
-            Stage signInStage = new Stage();
-            signInStage.setScene(new Scene(root));
-            signInStage.setTitle("Sign In");
-
-            // Obtener el Stage actual (la ventana que contiene el menú)
-            Stage currentStage = (Stage) menu.getScene().getWindow();
-
-            // Cerrar la ventana actual
-            currentStage.close();
-
-            // Mostrar la ventana de inicio de sesión
-            signInStage.show();
+            Parent root = (Parent) loader.load();
+            SignInViewController controller = ((SignInViewController) loader.getController());
+            controller.setStage(stageMenu);
+            controller.initStage(root);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Error loading SignInView.fxml", e);
         }

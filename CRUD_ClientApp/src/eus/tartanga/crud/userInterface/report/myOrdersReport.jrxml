@@ -5,21 +5,20 @@
               name="report name" pageWidth="595" pageHeight="842" columnWidth="535"
               leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20"
               uuid="56fee01d-8277-437e-835b-ec47302e7d28">
-    
+
     <property name="ireport.zoom" value="1.0"/>
     <property name="ireport.x" value="0"/>
     <property name="ireport.y" value="0"/>
-    
-    <field name="title" class="java.lang.String"/>
-    <field name="product" class="eus.tartanga.crud.model.Product"/>
+
+    <!-- Campos de Cart -->
     <field name="quantity" class="java.lang.Integer"/>
-    <field name="bought" class="java.lang.Boolean"/>
     <field name="orderDate" class="java.util.Date"/>
-    
+
     <background>
         <band splitType="Stretch"/>
     </background>
-    
+
+    <!-- Título -->
     <title>
         <band height="79" splitType="Stretch">
             <staticText>
@@ -27,73 +26,46 @@
                 <textElement>
                     <font size="14" isBold="true"/>
                 </textElement>
-                <!-- Cambié el contenido estático por la referencia al producto -->
-                <text><![CDATA[$F{product} == null ? "Unknown Product" : $F{product}.getName()]]></text>
+                <text><![CDATA[Cart Report]]></text>
             </staticText>
         </band>
     </title>
-    
+
     <pageHeader>
         <band height="35" splitType="Stretch"/>
     </pageHeader>
-    
-    <!-- Column Headers -->
+
+    <!-- Encabezado de columnas -->
     <columnHeader>
         <band height="20" splitType="Stretch">
             <staticText>
-                <reportElement x="0" y="0" width="100" height="20"/>
-                <textElement>
-                    <font isBold="true"/>
-                </textElement>
-                <text><![CDATA[Product]]></text>
-            </staticText>
-            
-            <staticText>
-                <reportElement x="110" y="0" width="100" height="20"/>
+                <reportElement x="0" y="0" width="150" height="20"/>
                 <textElement>
                     <font isBold="true"/>
                 </textElement>
                 <text><![CDATA[Quantity]]></text>
             </staticText>
-            
+
             <staticText>
-                <reportElement x="180" y="0" width="150" height="20"/>
-                <textElement>
-                    <font isBold="true"/>
-                </textElement>
-                <text><![CDATA[Bought]]></text>
-            </staticText>
-            
-            <staticText>
-                <reportElement x="380" y="0" width="100" height="20"/>
+                <reportElement x="160" y="0" width="150" height="20"/>
                 <textElement>
                     <font isBold="true"/>
                 </textElement>
                 <text><![CDATA[Order Date]]></text>
             </staticText>
-            
         </band>
     </columnHeader>
 
+    <!-- Detalles de las filas (solo cantidad y fecha de pedido) -->
     <detail>
         <band height="20">
             <textField>
-                <reportElement x="0" y="0" width="100" height="20"/>
-                <textFieldExpression><![CDATA[$F{product} == null ? "Unknown" : $F{product}.getTitle()]]></textFieldExpression>
-            </textField>
-            
-            <textField>
-                <reportElement x="110" y="0" width="100" height="20"/>
+                <reportElement x="0" y="0" width="150" height="20"/>
                 <textFieldExpression><![CDATA[$F{quantity}]]></textFieldExpression>
             </textField>
-            
+
             <textField>
-                <reportElement x="180" y="0" width="150" height="20"/>
-                <textFieldExpression><![CDATA[$F{bought} == null ? "Not Bought" : $F{bought} ? "Bought" : "Not Bought"]]></textFieldExpression>
-            </textField>
-            
-            <textField>
-                <reportElement x="380" y="0" width="100" height="20"/>
+                <reportElement x="160" y="0" width="150" height="20"/>
                 <textFieldExpression><![CDATA[new SimpleDateFormat("dd/MM/yyyy").format($F{orderDate})]]></textFieldExpression>
             </textField>
         </band>

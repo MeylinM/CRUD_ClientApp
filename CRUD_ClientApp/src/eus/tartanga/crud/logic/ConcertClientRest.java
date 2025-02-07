@@ -33,6 +33,7 @@ public class ConcertClientRest implements ConcertManager {
     private WebTarget webTarget;
     private Client client;
     private static final String BASE_URI = "http://localhost:8080/CRUD_ServerApp/api";
+    //private static final String BASE_URI = ResourceBundle.getBundle("config.config").getString("BASE_URI");
 
     /**
      * Constructor que inicializa el cliente REST y configura la URL base para

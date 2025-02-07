@@ -35,6 +35,7 @@ public class FanetixClientRest implements FanetixClientManager {
 
     private WebTarget webTarget;
     private Client client;
+    //private static final String BASE_URI = ResourceBundle.getBundle("config.config").getString("BASE_URI");
     private static final String BASE_URI = "http://localhost:8080/CRUD_ServerApp/api";
     private Logger logger = Logger.getLogger(FanetixClientRest.class.getName());
 

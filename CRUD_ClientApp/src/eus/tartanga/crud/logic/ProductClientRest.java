@@ -24,6 +24,7 @@ public class ProductClientRest implements ProductManager {
     private WebTarget webTarget;
     private Client client;
     private static final String BASE_URI = "http://localhost:8080/CRUD_ServerApp/api";
+    //private static final String BASE_URI = ResourceBundle.getBundle("config.config").getString("BASE_URI");
 
     /**
      * Constructor de ProductClientRest. Inicializa un cliente HTTP de Jersey y
