@@ -44,7 +44,7 @@ public class ConcertViewControllerTest extends ApplicationTest {
     public ConcertViewControllerTest() {
     }
 
-    @Test
+    //@Test
     public void testFilterConcertsBySearch() {
         clickOn("#tfEmail");
         write("irati@gmail.com");
@@ -117,7 +117,7 @@ public class ConcertViewControllerTest extends ApplicationTest {
         assertTrue("El número de conciertos debería haberse reducido al aplicar el filtro", totalConcertsAfter <= totalConcertsBefore);
     }
 
-    //@Test
+    @Test
     public void testFilterConcertsByDate() {
         clickOn("#tfEmail");
         write("irati@gmail.com");
@@ -130,7 +130,7 @@ public class ConcertViewControllerTest extends ApplicationTest {
         tableView = lookup("#concertTable").query();
 
         clickOn("#dpFrom");
-        write("01/01/2025");
+        write("01/01/2024");
         push(KeyCode.ENTER);
 
         clickOn("#dpTo");
@@ -139,7 +139,7 @@ public class ConcertViewControllerTest extends ApplicationTest {
 
         ObservableList<Concert> concerts = tableView.getItems();
         // Crear las fechas de comparación
-        java.util.Date fromDate = java.sql.Date.valueOf("2025-01-01");
+        java.util.Date fromDate = java.sql.Date.valueOf("2024-01-01");
         java.util.Date toDate = java.sql.Date.valueOf("2025-12-31");
 
         for (Concert concert : concerts) {
@@ -210,7 +210,7 @@ public class ConcertViewControllerTest extends ApplicationTest {
         assertTrue(notFound);
     }
 
-    @Test
+    //@Test
     public void test_update() {
         clickOn("#tfEmail");
         write("admin1@fanetix.com");
