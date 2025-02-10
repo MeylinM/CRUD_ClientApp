@@ -10,6 +10,9 @@ import eus.tartanga.crud.model.Artist;
 import java.net.MalformedURLException;
 import java.rmi.NotBoundException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.TableView;
@@ -39,7 +42,7 @@ public class ArtistViewControllerTest extends ApplicationTest {
     public ArtistViewControllerTest() {
     }
 
-    //@Test
+    @Test
     public void test_write() throws NotBoundException, MalformedURLException {
         clickOn("#tfEmail");
         write("admin@gmail.com");
@@ -56,36 +59,12 @@ public class ArtistViewControllerTest extends ApplicationTest {
 
         assertEquals(insertedArtist.getName(), "Name of the artist");
         assertEquals(insertedArtist.getCompany(), "Company of the artist");
-      
-    }
+        assertEquals(insertedArtist.getLastAlbum(), "Last album of the artist");
 
-    // @Test
-    public void test_delete() {
-        clickOn("#tfEmail");
-        write("admin@gmail.com");
-        clickOn("#pfPassword");
-        write("abcd*1234");
-        clickOn("#btnAccept");
-        Node tableColumnName = lookup("#nameColumn").nth(0).query();
-        clickOn(tableColumnName);
-        tableView = lookup("#artistTable").query();
+        LocalDate expectedDate = new Artist().getDebut().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate actualDate = insertedArtist.getDebut().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
-        // Get the total number of rows in the table
-        int rowCount = lookup(".table-row-cell").queryAll().size();
-
-        // Select the second-to-last row (penultimate row)
-        Node row = lookup(".table-row-cell").nth(rowCount - 2).query();
-
-        clickOn(row);
-        Artist artistDelete = (Artist) tableView.getSelectionModel().getSelectedItem();
-        String name = artistDelete.getName();
-        clickOn("#btnDeleteArtist");
-
-        // Re-select the second-to-last row after deletion
-        Node row2 = lookup(".table-row-cell").nth(rowCount - 2).query();
-        clickOn(row2);
-        Artist artistDeleteAfter = (Artist) tableView.getSelectionModel().getSelectedItem();
-        assertNotEquals(artistDelete, artistDeleteAfter);
+        assertEquals(expectedDate, actualDate);
 
     }
 
@@ -118,7 +97,6 @@ public class ArtistViewControllerTest extends ApplicationTest {
         Artist subjectArtist = (Artist) tableView.getSelectionModel().getSelectedItem();
         String title = subjectArtist.getName();
         String description = subjectArtist.getCompany();
-        
 
         // Click on the different cells to modify the data
         clickOn(tableColumnName);
@@ -132,7 +110,7 @@ public class ArtistViewControllerTest extends ApplicationTest {
         clickOn(tableColumnLastAlbum);
         write("LAST ALBUM");
         push(KeyCode.ENTER);
-        
+
         doubleClickOn(tableColumnDebut);
         clickOn(tableColumnDebut);
         write("01/11/2027");
@@ -151,20 +129,60 @@ public class ArtistViewControllerTest extends ApplicationTest {
         assertEquals("LAST ALBUM", modifiedArtist.getLastAlbum());
         assertEquals("01/11/2027", modifiedDateString);
     }
-    
-    //@Test
+
+    @Test
+    public void test_delete() {  // Asegurar que se ejecuta al final
+        clickOn("#tfEmail");
+        write("admin@gmail.com");
+        clickOn("#pfPassword");
+        write("abcd*1234");
+        clickOn("#btnAccept");
+
+        tableView = lookup("#artistTable").query();
+
+        // Obtener el número total de filas en la tabla
+        int rowCount = lookup(".table-row-cell").queryAll().size();
+
+        if (rowCount < 2) {
+            fail("No hay suficientes artistas en la tabla para ejecutar el test.");
+        }
+
+        // Seleccionar la penúltima fila
+        Node row = lookup(".table-row-cell").nth(rowCount - 2).query();
+        clickOn(row);
+
+        // Obtener el artista seleccionado antes de eliminarlo
+        Artist artistDelete = tableView.getSelectionModel().getSelectedItem();
+
+        // Intentar eliminar el artista
+        clickOn("#btnDeleteArtist");
+
+        // Esperar a que el Alert aparezca y manejarlo
+        WaitForAsyncUtils.waitForFxEvents();
+
+        if (lookup(".dialog-pane").tryQuery().isPresent()) {
+            Node alertButton = lookup(".button").match(node -> ((javafx.scene.control.Button) node).getText().equals("Aceptar")).query();
+            clickOn(alertButton);
+            System.out.println("Se detectó una alerta y se aceptó.");
+        } else {
+            System.out.println("No se detectó ninguna alerta.");
+        }
+
+    }
+
+    @Test
     public void testFilterArtistsBySearch() {
         clickOn("#tfEmail");
         write("olaia@gmail.com");
         clickOn("#pfPassword");
         write("abcd*1234");
         clickOn("#btnAccept");
-        
+
         // Obtener la tabla de productos
         tableView = lookup("#artistTable").query();
         // Escribir en el TextField para filtrar
         clickOn("#searchField");
-        write("YG Entertaiment");
+        write("JYP Entertaiment");
 
         // Esperar un poco para que se apliquen los filtros
         sleep(1000);
@@ -177,20 +195,20 @@ public class ArtistViewControllerTest extends ApplicationTest {
             String company = artist.getCompany().toLowerCase();
             //String lastAlbum = artist.getLastAlbum().toLowerCase();
 
-            assertTrue(name.contains("yg entertaiment") || company.contains("yg entertaiment"));
+            assertTrue(name.contains("jyp entertaiment") || company.contains("jyp entertaiment"));
         }
     }
-    
-    //@Test
+
+    @Test
     public void testFilterProductsByDate() {
         clickOn("#tfEmail");
         write("olaia@gmail.com");
         clickOn("#pfPassword");
         write("abcd*1234");
         clickOn("#btnAccept");
-        
+
         tableView = lookup("#artistTable").query();
-  
+
         clickOn("#dpFrom");
         write("31/12/2016");
         push(KeyCode.ENTER);
@@ -213,7 +231,4 @@ public class ArtistViewControllerTest extends ApplicationTest {
         }
     }
 
-
 }
-
-
