@@ -119,7 +119,7 @@ public class ConcertViewControllerTest extends ApplicationTest {
         assertTrue("El número de conciertos debería haberse reducido al aplicar el filtro", totalConcertsAfter <= totalConcertsBefore);
     }
 
-    //@Test
+    @Test
     public void testFilterConcertsByDate() {
         clickOn("#tfEmail");
         write("irati@gmail.com");
@@ -153,7 +153,7 @@ public class ConcertViewControllerTest extends ApplicationTest {
         }
     }
 
-    //@Test
+    @Test
     public void test_write() {
         clickOn("#tfEmail");
         write("meylin@gmail.com");
@@ -177,7 +177,7 @@ public class ConcertViewControllerTest extends ApplicationTest {
         //assertEquals(insertedConcert.getConcertTime(), new Date());
     }
 
-    //@Test
+    @Test
     public void test_delete() {
         clickOn("#tfEmail");
         write("meylin@gmail.com");
@@ -192,7 +192,7 @@ public class ConcertViewControllerTest extends ApplicationTest {
         //Selecciona para que se habilite el botón de borrado.
         clickOn(row);
         Concert concertDelete = (Concert) tableView.getSelectionModel().getSelectedItem();
-        String name = concertDelete.getConcertName();
+        //String name = concertDelete.getConcertName();
         clickOn("#btnDeleteConcert");
 
         verifyThat("Do you want to delete the selected concert(s)?", isVisible());
@@ -203,14 +203,11 @@ public class ConcertViewControllerTest extends ApplicationTest {
         assertNotEquals(concertDelete, concertDeleteAfter);
 
         List<Concert> dataConcert = new ArrayList<>(tableView.getItems());
-        Boolean notFound = true;
-        for (Concert concert : dataConcert) {
-            if (concert.getConcertName().equalsIgnoreCase(name)) {
-                notFound = false;
+      
+        
+        assertTrue(!dataConcert.contains(concertDelete));
+        
             }
-        }
-        assertTrue(notFound);
-    }
 
     @Test
     public void test_update() {
