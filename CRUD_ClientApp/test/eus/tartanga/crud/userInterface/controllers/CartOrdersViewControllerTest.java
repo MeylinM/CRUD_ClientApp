@@ -48,6 +48,7 @@ public class CartOrdersViewControllerTest extends ApplicationTest {
         clickOn("#btnClearCart");
         push(KeyCode.ENTER);
         assertTrue(cartView.getItems().isEmpty());
+        
         clickOn("#profile");
         clickOn("#itemLogOut");
 
@@ -88,6 +89,10 @@ public class CartOrdersViewControllerTest extends ApplicationTest {
         Cart newCart = items.get(rowIndex);
 
         assertEquals(newCart.getId().getProductId(), selectedProduct.getProductId());
+        assertEquals(newCart.getProduct().getTitle(), selectedProduct.getTitle());
+        assertEquals(newCart.getProduct().getDescription(), selectedProduct.getDescription());
+        assertEquals(newCart.getProduct().getPrice(), selectedProduct.getPrice());
+        assertEquals(newCart.getProduct().getArtist().getName(), selectedProduct.getArtist().getName());
         assertEquals(newCart.getBought().toString(), "false");
         assertEquals(newCart.getOrderDate().toString(), "Thu Feb 13 00:00:00 CET 2025");
         assertEquals(newCart.getQuantity().toString(), "1");
