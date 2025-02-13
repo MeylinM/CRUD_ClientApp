@@ -43,7 +43,7 @@ public class ProductViewControllerTest extends ApplicationTest {
 
     }
 
-    //@Test
+    @Test
     public void testFilterProductsBySearch() {
         clickOn("#tfEmail");
         write("meylin@gmail.com");
@@ -74,7 +74,7 @@ public class ProductViewControllerTest extends ApplicationTest {
         }
     }
 
-    //@Test
+    @Test
     public void test_filterAvailableProducts() {
         // Hacer login
         clickOn("#tfEmail");
@@ -109,7 +109,7 @@ public class ProductViewControllerTest extends ApplicationTest {
         assertTrue("El número de productos debería haberse reducido al aplicar el filtro", totalProductsAfter <= totalProductsBefore);
     }
 
-    //@Test
+    @Test
     public void testFilterProductsByDate() {
         clickOn("#tfEmail");
         write("meylin@gmail.com");
@@ -143,7 +143,7 @@ public class ProductViewControllerTest extends ApplicationTest {
         }
     }
 
-    // @Test
+    @Test
     public void test_write() {
         clickOn("#tfEmail");
         write("meylin@gmail.com");
@@ -165,7 +165,7 @@ public class ProductViewControllerTest extends ApplicationTest {
         assertEquals(insertedProduct.getPrice(), "0.0");
     }
 
-    //@Test
+    @Test
     public void test_delete() {
         clickOn("#tfEmail");
         write("meylin@gmail.com");
@@ -190,14 +190,7 @@ public class ProductViewControllerTest extends ApplicationTest {
         assertNotEquals(productDelete, productDeleteAfter);
 
         List<Product> dataProduct = new ArrayList<>(tableView.getItems());
-        Boolean notFound = true;
-        for (Product product : dataProduct) {
-            if (product.getTitle().equalsIgnoreCase(name)) {
-                notFound = false;
-            }
-        }
-
-        assertTrue(notFound);
+        assertFalse(dataProduct.contains(productDelete));
     }
 
     @Test
