@@ -22,6 +22,7 @@ import eus.tartanga.crud.model.Product;
 import eus.tartanga.crud.userInterface.factories.ArtistDateEditingCell;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -50,6 +51,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -59,6 +61,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
@@ -66,6 +69,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.Callback;
+import javafx.util.StringConverter;
 import javax.ws.rs.core.GenericType;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
@@ -358,20 +362,36 @@ public class ArtistViewController {
                 artistTable.setEditable(true);
                 debutColumn.setEditable(true);
 
-                // In case of an administrator, show the data differently
-                // Make the 'debutColumn' editable
-                final Callback<TableColumn<Artist, Date>, TableCell<Artist, Date>> dateCell
-                        = (TableColumn<Artist, Date> param) -> new ArtistDateEditingCell();
-                debutColumn.setCellFactory(dateCell);
-                debutColumn.setOnEditCommit(event -> {
+                // Define el formato de fecha
+                SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM d, ''yy");
 
+                debutColumn.setCellFactory(column -> new TextFieldTableCell<>(new StringConverter<Date>() {
+                    @Override
+                    public String toString(Date date) {
+                        return (date != null) ? dateFormat.format(date) : "";
+                    }
+
+                    @Override
+                    public Date fromString(String string) {
+                        try {
+                            return (string != null && !string.isEmpty()) ? dateFormat.parse(string) : null;
+                        } catch (ParseException e) {
+                            Logger.getLogger(ArtistViewController.class.getName()).log(Level.SEVERE, "Error al parsear la fecha", e);
+                            return null;
+                        }
+                    }
+                }));
+
+                debutColumn.setOnEditCommit(event -> {
                     Artist artist = event.getRowValue();
                     artist.setDebut(event.getNewValue());
 
                     try {
                         artistManager.updateArtist(artist, String.valueOf(artist.getArtistId()));
+                        Logger.getLogger(ArtistViewController.class.getName()).log(Level.INFO,
+                                "Fecha actualizada para {0}: {1}", new Object[]{artist.getName(), dateFormat.format(artist.getDebut())});
                     } catch (UpdateException ex) {
-                        Logger.getLogger(ArtistViewController.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(ArtistViewController.class.getName()).log(Level.SEVERE, "Error al actualizar la fecha", ex);
                     }
                 });
 
@@ -386,8 +406,8 @@ public class ArtistViewController {
 
                         if (artist.getName().isEmpty()) {
                             throw new TextEmptyException("El campo de nombre no puede estar vacío.");
-                        } else if (artist.getName().length() > 20) {
-                            throw new MaxCharacterException("El nombre no puede tener más de 20 caracteres.");
+                        } else if (artist.getName().length() > 150) {
+                            throw new MaxCharacterException("El nombre no puede tener más de 150 caracteres.");
                         }
 
                         updateArtist(artist);
@@ -413,8 +433,8 @@ public class ArtistViewController {
                         artist.setCompany(event.getNewValue());
                         if (artist.getCompany() == null || artist.getCompany().isEmpty()) {
                             throw new TextEmptyException("El campo de compañia no puede estar vacío");
-                        } else if (artist.getCompany().length() > 20) {
-                            throw new MaxCharacterException("La compañia no puede tener más de 20 caracteres");
+                        } else if (artist.getCompany().length() > 150) {
+                            throw new MaxCharacterException("La compañia no puede tener más de 150 caracteres");
                         }
                         updateArtist(artist);
                     } catch (TextEmptyException | MaxCharacterException e) {
@@ -439,8 +459,8 @@ public class ArtistViewController {
                         artist.setLastAlbum(event.getNewValue());
                         if (artist.getLastAlbum() == null || artist.getLastAlbum().isEmpty()) {
                             throw new TextEmptyException("El campo de Last Album no puede estar vacío");
-                        } else if (artist.getLastAlbum().length() > 50) {
-                            throw new MaxCharacterException("La Last Album no puede tener más de 50 caracteres");
+                        } else if (artist.getLastAlbum().length() > 150) {
+                            throw new MaxCharacterException("La Last Album no puede tener más de 150 caracteres");
                         }
                         updateArtist(artist);
                     } catch (TextEmptyException | MaxCharacterException e) {
@@ -539,7 +559,7 @@ public class ArtistViewController {
             artistTable.setItems(artistList);
             // Configure the styles of each row in the table
             configureRowStyling();
-            
+
             filterArtists();
 
         } catch (Exception e) {
@@ -756,16 +776,18 @@ public class ArtistViewController {
      * item
      */
     private void handleAddArtist(ActionEvent event) {
-        Artist artist = new Artist(); /// Creates a new empty artist
+        Artist artist = new Artist(); // Creates a new empty artist
+
         try {
             artistManager.createArtist(artist); // Calls the method to add the artist
+            artistTable.getItems().add(artist); // Adds the artist to the table
+            refreshArtistList();
             artistTable.refresh();
+            logger.info("Nuevo artista agregado con éxito: " + artist.getName());
         } catch (AddException e) {
-            System.out.println(e); // Prints the exception in case of error
+            logger.severe("Error al agregar un nuevo artista: " + e.getMessage());
+            e.printStackTrace();
         }
-
-        artistTable.getItems().add(artist); // Adds the artist to the table
-        refreshArtistList();
     }
 
     /**
@@ -777,27 +799,29 @@ public class ArtistViewController {
      */
     private void handleInfoButton(ActionEvent event) {
         try {
-            FXMLLoader loader
-                    = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/HelpArtistView.fxml"));
-            Parent root = (Parent) loader.load();
-            HelpArtistController helpController
-                    = ((HelpArtistController) loader.getController());
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/HelpArtistView.fxml"));
+            Parent root = loader.load();
+            HelpArtistController helpController = loader.getController();
+
             // Initializes and shows help stage
             if (client != null) {
                 helpController.initAndShowStageClient(root);
+                logger.info("Ventana de ayuda abierta en modo cliente.");
             } else {
                 helpController.initAndShowStageAdmin(root);
+                logger.info("Ventana de ayuda abierta en modo administrador.");
             }
         } catch (Exception ex) {
-            System.out.println(ex.getMessage());
-
+            logger.severe("Error al abrir la ventana de ayuda: " + ex.getMessage());
+            ex.printStackTrace();
         }
     }
 
     /**
      * Handles the action of deleting an artist. First checks if the artist has
      * associated concerts. If so, an alert is shown and the deletion process is
-     * stopped. If not, the artist is deleted from the database and the table.
+     * stopped. If not, a confirmation dialog appears. If the user confirms, the
+     * artist is deleted from the database and the table.
      *
      * @param event the event triggered by clicking the "Delete" menu item
      */
@@ -823,12 +847,22 @@ public class ArtistViewController {
                 return;
             }
 
-            // 2. If no concerts are associated, proceed with deletion
-            logger.info("Intentando eliminar artista con ID: " + selectedArtist.getArtistId());
-            artistManager.removeArtist(selectedArtist.getArtistId().toString());
-            artistList.remove(selectedArtist);
-            logger.info("Artista eliminado con éxito: " + selectedArtist.getName());
+            // 2. Confirm deletion
+            Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmationAlert.setTitle("Confirmar eliminación");
+            confirmationAlert.setHeaderText("¿Está seguro de que desea eliminar al artista " + selectedArtist.getName() + "?");
+            confirmationAlert.setContentText("Esta acción no se puede deshacer.");
 
+            Optional<ButtonType> result = confirmationAlert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                // 3. Proceed with deletion
+                logger.info("Intentando eliminar artista con ID: " + selectedArtist.getArtistId());
+                artistManager.removeArtist(selectedArtist.getArtistId().toString());
+                artistList.remove(selectedArtist);
+                logger.info("Artista eliminado con éxito: " + selectedArtist.getName());
+            } else {
+                logger.info("Eliminación cancelada por el usuario.");
+            }
         } catch (DeleteException e) {
             logger.severe("Error al eliminar el artista y sus relaciones: " + e.getMessage());
             e.printStackTrace();
@@ -984,11 +1018,13 @@ public class ArtistViewController {
     private void updateArtist(Artist artist) {
         try {
             artistManager.updateArtist(artist, artist.getArtistId().toString());
+            logger.info("Artista actualizado con éxito: " + artist.getName());
         } catch (UpdateException e) {
-            System.out.println(e);
+            logger.severe("Error al actualizar el artista: " + e.getMessage());
+            e.printStackTrace();
         }
     }
-    
+
     private void refreshArtistList() {
         List<Artist> updatedArtist = findAllArtists();
         artistList.setAll(updatedArtist);
