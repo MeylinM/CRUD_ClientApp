@@ -52,6 +52,9 @@ public class MenuBarViewController implements Initializable {
 
     @FXML
     private Menu menuHelp;
+    
+    @FXML
+    private Menu menuWindows;
 
     private static FanetixUser loggedUser;
     private static Stage stageMenu;
@@ -67,6 +70,8 @@ public class MenuBarViewController implements Initializable {
             if (user == null) {
                 menuMyCart.setVisible(false);
                 itemMyOrders.setVisible(false);
+            }else{
+                menuWindows.setVisible(false);
             }
         } catch (ReadException ex) {
             Logger.getLogger(MenuBarViewController.class.getName()).log(Level.SEVERE, null, ex);
@@ -156,7 +161,37 @@ public class MenuBarViewController implements Initializable {
             LOGGER.log(Level.SEVERE, "Error loading ArtistView.fxml", e);
         }
     }
-
+    
+    @FXML
+    public void openConcert(Event event) {
+        try {
+            // Cargar el archivo FXML de la vista Concert
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ConcertView.fxml"));
+            Parent root = loader.load();
+            ConcertViewController controller = loader.getController();
+            controller.setStage(stageMenu);
+            controller.initStage(root);
+        } catch (IOException e) {
+            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error loading ArtistView.fxml", e);
+        }
+    }
+    
+    @FXML
+    public void openProduct(Event event) {
+        try {
+            // Cargar el archivo FXML de la vista Product
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/eus/tartanga/crud/userInterface/views/ProductView.fxml"));
+            Parent root = loader.load();
+            ProductViewController controller = loader.getController();
+            controller.setStage(stageMenu);
+            controller.initStage(root);
+        } catch (IOException e) {
+            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error loading ArtistView.fxml", e);
+        }
+    }
+    
     @FXML
     public void openMyCart() {
         try {

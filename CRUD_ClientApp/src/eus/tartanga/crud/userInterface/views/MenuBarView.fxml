@@ -6,7 +6,7 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 
-<MenuBar fx:id="menu" prefHeight="32.0" prefWidth="161.0" stylesheets="@../css/styles.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eus.tartanga.crud.userInterface.controllers.MenuBarViewController">
+<MenuBar fx:id="menu" prefHeight="32.0" prefWidth="222.0" stylesheets="@../css/styles.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eus.tartanga.crud.userInterface.controllers.MenuBarViewController">
     <menus>
         <Menu fx:id="profile">
             <graphic>
@@ -17,24 +17,31 @@
                 </ImageView>
             </graphic>
             <items>
-                <MenuItem fx:id="itemProfile" text="Profile" onAction ="#openProfile" />
-                <MenuItem fx:id="itemMyOrders" text="MyOrders" onAction = "#openMyOrders"/>
-                <MenuItem fx:id="itemLogOut" text="LogOut" onAction = "#logOut" />
+                <MenuItem fx:id="itemProfile" onAction="#openProfile" text="Profile" />
+                <MenuItem fx:id="itemMyOrders" onAction="#openMyOrders" text="MyOrders" />
+                <MenuItem fx:id="itemLogOut" onAction="#logOut" text="LogOut" />
             </items>
         </Menu>
+      <Menu fx:id="menuWindows" mnemonicParsing="false" text="Windows">
+        <items>
+          <MenuItem fx:id="viewArtist" mnemonicParsing="false" text="Artist" onAction="#openArtist"/>
+            <MenuItem fx:id="viewConcert" mnemonicParsing="false" text="Concerts" onAction="#openConcert"/>
+            <MenuItem fx:id="viewProduct" mnemonicParsing="false" text="Products" onAction="#openProduct"/>
+        </items>
+      </Menu>
         <Menu fx:id="menuArtist" text="Artist">
             <items>
-                <MenuItem fx:id="itemArtist" onAction="#openArtist"/>
+                <MenuItem fx:id="itemArtist" onAction="#openArtist" />
             </items>
         </Menu>
         <Menu fx:id="menuMyCart" text="MyCart">
             <items>
-                <MenuItem fx:id="itemMyCart" onAction ="#openMyCart"/>
+                <MenuItem fx:id="itemMyCart" onAction="#openMyCart" />
             </items>
         </Menu>
         <Menu fx:id="menuHelp" text="Help">
             <items>
-                <MenuItem onAction ="#showHelp"/>
+                <MenuItem onAction="#showHelp" />
             </items>
         </Menu>
     </menus>
