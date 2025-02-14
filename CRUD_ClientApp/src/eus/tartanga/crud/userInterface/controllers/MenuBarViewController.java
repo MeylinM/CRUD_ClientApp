@@ -173,7 +173,7 @@ public class MenuBarViewController implements Initializable {
             controller.initStage(root);
         } catch (IOException e) {
             e.printStackTrace();
-            LOGGER.log(Level.SEVERE, "Error loading ArtistView.fxml", e);
+            LOGGER.log(Level.SEVERE, "Error loading ConcertView.fxml", e);
         }
     }
     
@@ -188,7 +188,7 @@ public class MenuBarViewController implements Initializable {
             controller.initStage(root);
         } catch (IOException e) {
             e.printStackTrace();
-            LOGGER.log(Level.SEVERE, "Error loading ArtistView.fxml", e);
+            LOGGER.log(Level.SEVERE, "Error loading ProductView.fxml", e);
         }
     }
     
