@@ -1,12 +1,14 @@
 package eus.tartanga.crud.userInterface.factories;
 
 import eus.tartanga.crud.model.Concert;
+import java.text.DateFormat;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Celda editable de una tabla en la interfaz de usuario que permite editar la hora
@@ -21,10 +23,16 @@ import java.util.Date;
  */
 public class ConcertTimeEditingCell extends TableCell<Concert, Date> {
     
-    // Formato de la hora en "HH:mm"
-    private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+    private SimpleDateFormat timeFormat = new SimpleDateFormat("K:mm a,z", Locale.US);
     private TextField textField;  // Campo de texto para la edición de la hora
 
+    public ConcertTimeEditingCell() {
+        textField = new TextField();
+        timeFormat = new SimpleDateFormat("K:mm a,z",  Locale.US);
+                
+    }
+
+    
     /**
      * Actualiza la celda con un nuevo valor de hora, o la limpia si está vacía.
      * 
@@ -67,13 +75,18 @@ public class ConcertTimeEditingCell extends TableCell<Concert, Date> {
     }
 
     /**
-     * Cancela la edición y restaura el valor original de la celda.
+     * Cancela la edición.
      */
     @Override
     public void cancelEdit() {
-        super.cancelEdit();
-        setText(timeFormat.format(getItem()));  // Restaurar el texto cuando se cancela la edición
+         super.cancelEdit();
+
+        // Asegurar que se restaure el texto cuando se cancela la edición
+        Date time = getItem();
+        setText(time != null ? timeFormat.format(time) : null);
         setGraphic(null);
+        
+        
     }
 
     /**

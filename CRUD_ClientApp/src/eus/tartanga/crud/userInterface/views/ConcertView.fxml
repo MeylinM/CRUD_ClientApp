@@ -52,12 +52,11 @@
                   <TableView fx:id="concertTable" prefHeight="400.0" prefWidth="1279.0" stylesheets="@../css/styles.css">
                         <columns>
                             <TableColumn fx:id="billboardColumn" prefWidth="129" style="-fx-alignment: center;" text="Billboard" />
-                            <TableColumn fx:id="concertColumn" prefWidth="217" style="-fx-alignment: center;" text="Concert" />
-                            <TableColumn fx:id="artistColumn" prefWidth="228" style="-fx-alignment: center;" text="Artist" />
-                            <TableColumn fx:id="locationColumn" prefWidth="205" style="-fx-alignment: center;" text="Location" />
-                            <TableColumn fx:id="cityColumn" prefWidth="186" style="-fx-alignment: center;" text="City" />
-                            <TableColumn fx:id="dateColumn" prefWidth="177" style="-fx-alignment: center;" text="Date" />
-                            <TableColumn fx:id="timeColumn" prefWidth="148" style="-fx-alignment: center;" text="Time" />
+                            <TableColumn fx:id="concertColumn" prefWidth="231.20008850097656" style="-fx-alignment: center;" text="Concert" />
+                            <TableColumn fx:id="locationColumn" prefWidth="236.7999267578125" style="-fx-alignment: center;" text="Location" />
+                            <TableColumn fx:id="cityColumn" prefWidth="232.79998779296875" style="-fx-alignment: center;" text="City" />
+                            <TableColumn fx:id="dateColumn" prefWidth="237.59991455078125" style="-fx-alignment: center;" text="Date" />
+                            <TableColumn fx:id="timeColumn" prefWidth="208.800048828125" style="-fx-alignment: center;" text="Time" />
                         </columns>
                     </TableView>
                   <HBox prefHeight="30.0" prefWidth="1255.0" spacing="373.0">

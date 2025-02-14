@@ -113,9 +113,6 @@ public class ConcertViewController {
     private TableColumn<Concert, String> concertColumn;
 
     @FXML
-    private TableColumn<Concert, String> artistColumn;
-
-    @FXML
     private TableColumn<Concert, String> locationColumn;
 
     @FXML
@@ -207,7 +204,6 @@ public class ConcertViewController {
             // Configurar columnas básicas
             billboardColumn.setCellValueFactory(new PropertyValueFactory<>("billboard"));
             concertColumn.setCellValueFactory(new PropertyValueFactory<>("concertName"));
-            artistColumn.setCellValueFactory(new PropertyValueFactory<>("artistList"));
             locationColumn.setCellValueFactory(new PropertyValueFactory<>("location"));
             cityColumn.setCellValueFactory(new PropertyValueFactory<>("city"));
             dateColumn.setCellValueFactory(new PropertyValueFactory<>("concertDate"));
@@ -581,14 +577,7 @@ public class ConcertViewController {
             addItem.setOnAction(this::handleAddConcert);
             MenuItem deleteItem = new MenuItem("Delete");
             deleteItem.setOnAction(this::handleDeleteConcert);
-            MenuItem selectArtistItem = new MenuItem("Select artist/s");
-            selectArtistItem.setOnAction(event -> {
-                Concert selectedArtist = concertTable.getSelectionModel().getSelectedItem();
-                if (selectedArtist != null) {
-                    showArtistSelectionDialog(selectedArtist);
-                }
-            });
-            contextMenuInside.getItems().addAll(addItem, deleteItem, printItemInside, selectArtistItem);
+            contextMenuInside.getItems().addAll(addItem, deleteItem, printItemInside);
         }
         // Crear menú contextual para clics fuera de la tabla
         contextMenuOutside = new ContextMenu();
@@ -600,87 +589,6 @@ public class ConcertViewController {
             MenuItem addItemOutside = new MenuItem("Add new concert");
             addItemOutside.setOnAction(this::handleAddConcert);
             contextMenuOutside.getItems().addAll(printItemOutside, addItemOutside);
-        }
-    }
-
-    /**
-     * Muestra un cuadro de diálogo que permite seleccionar artistas para un
-     * concierto.
-     *
-     * Este método crea una ventana emergente donde se muestra una lista de
-     * artistas disponibles. El usuario puede seleccionar o deseleccionar
-     * artistas de la lista. Los artistas seleccionados se agregarán al
-     * concierto y se actualizarán en la base de datos. La ventana también tiene
-     * un botón de confirmación para guardar los cambios.
-     *
-     * @param concert El concierto al que se le agregarán los artistas
-     * seleccionados.
-     */
-    private void showArtistSelectionDialog(Concert concert) {
-        Stage artistStage = new Stage();
-        artistStage.setTitle("Select Artists");
-        ListView<Artist> artistListView = new ListView<>();
-        ObservableList<Artist> selectedArtist = FXCollections.observableArrayList(); // Lista de elementos seleccionados manualmente
-
-        try {
-            List<Artist> artists = artistList;
-            // Agregar los artistas a la lista de artistas
-            artistListView.setItems(FXCollections.observableArrayList(artists));
-            // Agregar manejador de clics personalizados
-            artistListView.setCellFactory(lv -> {
-                ListCell<Artist> cell = new ListCell<Artist>() {
-                    @Override
-                    protected void updateItem(Artist item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (item != null) {
-                            setText(item.getName()); // Mostrar el nombre del artista
-                        } else {
-                            setText(null);
-                        }
-                    }
-                };
-                cell.setOnMouseClicked(event -> {
-                    if (cell.getItem() != null) {
-                        Artist clickedCategory = cell.getItem();
-                        if (selectedArtist.contains(clickedCategory)) {
-                            selectedArtist.remove(clickedCategory); // Deseleccionar si ya está seleccionado
-                            cell.setStyle(""); // Restablecer estilo
-                        } else {
-                            selectedArtist.add(clickedCategory); // Seleccionar si no está seleccionado
-                            cell.setStyle("-fx-background-color: #fdd3e1;");
-                        }
-                    }
-                });
-                return cell;
-            });
-
-            Button confirmButton = new Button("Save");
-            confirmButton.setStyle("-fx-background-color: #f9eccf");
-            confirmButton.setOnAction(e -> {
-                if (!selectedArtist.isEmpty()) {
-                    try {
-                        concert.setArtistList(selectedArtist);
-                        concertManager.updateConcert_XML(concert, concert.getConcertId().toString());
-                        artistStage.close();
-                        concertTable.refresh();
-                        logger.log(Level.INFO, "Selected Artist: {0}", concert.getConcertName());
-                    } catch (UpdateException ex) {
-                        logger.severe(ex.getMessage());
-                    }
-                }
-            });
-            VBox layout = new VBox(10);
-            layout.setPadding(new javafx.geometry.Insets(10));
-            layout.getChildren().addAll(artistListView, confirmButton);
-            Scene scene = new Scene(layout);
-            artistStage.setScene(scene);
-            artistStage.setWidth(400);
-            artistStage.setHeight(400);
-
-            artistStage.show();
-        } catch (Exception ex) {
-            logger.log(Level.SEVERE, "Error", ex);
-            showAlert("Selection error", "An error occurred while selecting the artists");
         }
     }
 
