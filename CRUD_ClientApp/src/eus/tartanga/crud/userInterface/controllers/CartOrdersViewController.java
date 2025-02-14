@@ -72,6 +72,7 @@ import net.sf.jasperreports.view.JasperViewer;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
+import javafx.scene.control.SelectionMode;
 
 /**
  * Controller class for the Cart and Orders view in the application. It manages
@@ -407,7 +408,14 @@ public class CartOrdersViewController {
             // Set action for deleting a product (enabled only if a product is selected).
             mIDelete.setOnAction(event -> handleDeleteProduct());
             mIDelete.setDisable(true);
-
+            //Desabilitar el boton de normal
+            btnBuy.setDisable(true);
+            //Activar la multiseleccion 
+            tbCart.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+            //El boton de buy solo estará active cuando haya algun item seleccionado
+            tbCart.getSelectionModel().selectedItemProperty().addListener(
+                    (obs, oldSelection, newSelection) -> btnBuy.setDisable(newSelection == null)
+            );
             // Enable "Delete" only when a product is selected.
             tbCart.getSelectionModel().selectedItemProperty().addListener(
                     (obs, oldSelection, newSelection) -> mIDelete.setDisable(newSelection == null)
@@ -730,55 +738,62 @@ public class CartOrdersViewController {
      * button click).
      */
     private void handleBuyProduct(ActionEvent event) {
-        // Get the list of products that have not been bought yet
-        List<Cart> buy = findAllNotBoughtCartProducts();
+        // Get the list of products that the user wants to buy
+        ObservableList<Cart> selectedProducts = tbCart.getSelectionModel().getSelectedItems();
+        // Get the selected product from the table view
+        // Show a confirmation alert before proceeding with purchase
+        boolean confirmPurchase = showConfirmationAlert(
+                "Are you sure you want to buy the selected products?", // Message in the alert
+                "" // Additional information in the alert
+        );
+        if (confirmPurchase) {
+            try {
+                // Iterate over each product in the cart that hasn't been bought
+                for (Cart cart : selectedProducts) {
+                    // Mark the product as bought
+                    cart.setBought(true);
 
-        try {
-            // Iterate over each product in the cart that hasn't been bought
-            for (Cart cart : buy) {
-                // Mark the product as bought
-                cart.setBought(true);
+                    // Update the cart information in the database
+                    cartManager.updateCart_XML(cart, cart.getId().getEmail(), cart.getId().getProductId().toString());
 
-                // Update the cart information in the database
-                cartManager.updateCart_XML(cart, cart.getId().getEmail(), cart.getId().getProductId().toString());
+                    // Get the product related to the cart item
+                    Product product = cart.getProduct();
 
-                // Get the product related to the cart item
-                Product product = cart.getProduct();
+                    // Get the current stock of the product
+                    int currentStock = Integer.parseInt(product.getStock());
+                    int quantityInCart = cart.getQuantity();
+                    int updatedStock = currentStock - quantityInCart;
 
-                // Get the current stock of the product
-                int currentStock = Integer.parseInt(product.getStock());
-                int quantityInCart = cart.getQuantity();
-                int updatedStock = currentStock - quantityInCart;
+                    // Convert the updated stock to String
+                    String updatedStockStr = String.valueOf(updatedStock);
 
-                // Convert the updated stock to String
-                String updatedStockStr = String.valueOf(updatedStock);
+                    // Update the stock of the product in the database
+                    product.setStock(updatedStockStr);
+                    productManager.edit_XML(product, product.getProductId().toString());
+                }
 
-                // Update the stock of the product in the database
-                product.setStock(updatedStockStr);
-                productManager.edit_XML(product, product.getProductId().toString());
+                // Inform the user that the purchase was successful
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Purchase successful");
+                alert.setHeaderText(null);
+                alert.setContentText("Your products have been successfully purchased.");
+                alert.showAndWait();
+                //Update the database after buy products
+                //Get the updated list of carts
+                List<Cart> updatedCartList = findAllNotBoughtCartProducts();
+
+                // Update the table with the new list
+                tbCart.setItems(FXCollections.observableArrayList(updatedCartList));
+
+                // Refresh the table view to reflect the updated cart information
+                tbCart.refresh();
+
+            } catch (UpdateException e) {
+                // If an error occurs during the process, show an error alert
+                showErrorAlert("Problem with buying products");
+                // Log the error for further analysis
+                LOGGER.getLogger(getClass().getName()).log(Level.SEVERE, "Error during product purchase", e);
             }
-
-            // Inform the user that the purchase was successful
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Purchase successful");
-            alert.setHeaderText(null);
-            alert.setContentText("Your products have been successfully purchased.");
-            alert.showAndWait();
-            //Update the database after buy products
-            //Get the updated list of carts
-            List<Cart> updatedCartList = findAllNotBoughtCartProducts();
-
-            // Update the table with the new list
-            tbCart.setItems(FXCollections.observableArrayList(updatedCartList));
-
-            // Refresh the table view to reflect the updated cart information
-            tbCart.refresh();
-
-        } catch (UpdateException e) {
-            // If an error occurs during the process, show an error alert
-            showErrorAlert("Problem with buying products");
-            // Log the error for further analysis
-            LOGGER.getLogger(getClass().getName()).log(Level.SEVERE, "Error during product purchase", e);
         }
     }
 
@@ -1116,7 +1131,7 @@ public class CartOrdersViewController {
     private boolean showConfirmationAlert(String headerText, String contentText) {
         // Create the confirmation alert
         Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmationAlert.setTitle("Delete Confirmation");
+        confirmationAlert.setTitle("Confirmation");
         confirmationAlert.setHeaderText(headerText);
         confirmationAlert.setContentText(contentText);
 
